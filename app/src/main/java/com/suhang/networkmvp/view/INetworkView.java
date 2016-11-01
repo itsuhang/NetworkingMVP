@@ -7,7 +7,7 @@ import com.suhang.networkmvp.bean.ErrorBean;
  * Created by sh on 2016/10/25 17:43.
  */
 
-public interface INetworkView<T> {
+public interface INetworkView {
 	/**
 	 * 获取数据时可用于显示加载中进度条
 	 */
@@ -31,7 +31,7 @@ public interface INetworkView<T> {
 	 * 就会出现空指针异常,所以在设置数据之前要先判断页面是否被销毁,或者判断控件是否为空
 	 * @param tag
 	 */
-	void setData(T t, int tag);
+	void setData(Object o,int tag);
 
 	void progress(int precent, int tag);
 }

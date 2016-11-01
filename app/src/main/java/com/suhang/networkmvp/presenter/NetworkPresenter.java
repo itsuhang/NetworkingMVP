@@ -22,12 +22,12 @@ public class NetworkPresenter implements INetworkPresenter {
 	}
 
 	@Override
-	public <T> void getData(Class<T> aClass, Map<String, String> params, boolean needCache, int tag) {
+	public void getData(Class aClass, Map<String, String> params, boolean needCache, int tag) {
 		mNetworkView.showLoading();
-		mNetworkModel.loadData(aClass, params, needCache, tag, new OnDataLoadingListener<T>() {
+		mNetworkModel.loadData(aClass, params, needCache, tag, new OnDataLoadingListener() {
 			@Override
-			public void onSuccess(T t, boolean isNetWork) {
-				mNetworkView.setData(t, tag);
+			public void onSuccess(Object o, boolean isNetWork) {
+				mNetworkView.setData(o, tag);
 				if (isNetWork) {
 					mNetworkView.hideLoading();
 				}
@@ -62,7 +62,7 @@ public class NetworkPresenter implements INetworkPresenter {
 		mNetworkModel.download(url, name, path, tag, new OnDataLoadingListener() {
 			@Override
 			public void onSuccess(Object o, boolean isNetWork) {
-				mNetworkView.setData(o, tag);
+				mNetworkView.setData(o,tag);
 				mNetworkView.hideLoading();
 			}
 
@@ -79,11 +79,11 @@ public class NetworkPresenter implements INetworkPresenter {
 	}
 
 	@Override
-	public <T> void uploadFile(Class<T> aClass ,Map<String, String> params, File file, int tag) {
-		mNetworkModel.upload(aClass,params, file, tag, new OnDataLoadingListener<T>() {
+	public void uploadFile(Class aClass, Map<String, String> params, File file, int tag) {
+		mNetworkModel.upload(aClass, params, file, tag, new OnDataLoadingListener() {
 			@Override
-			public void onSuccess(T t, boolean isNetWork) {
-				mNetworkView.setData(t, tag);
+			public void onSuccess(Object o, boolean isNetWork) {
+				mNetworkView.setData(o, tag);
 			}
 
 			@Override

@@ -16,7 +16,7 @@ public interface INetworkPresenter {
 	 *  @param tag  标记,用于一个页面同时处理多个获取数据的请求
 	 * @param params 接口参数
 	 */
-	<T> void getData(Class<T> aClass, Map<String, String> params, boolean needCache, int tag);
+	void getData(Class aClass, Map<String, String> params, boolean needCache, int tag);
 
 	/**
 	 * 取消网络访问或停止上传
@@ -45,7 +45,7 @@ public interface INetworkPresenter {
 	 * @param file
 	 * @param tag
 	 */
-	<T> void uploadFile(Class<T> aClass, Map<String, String> params, File file, int tag);
+	void uploadFile(Class aClass ,Map<String, String> params, File file, int tag);
 
 	/**
 	 * 取消所有任务
@@ -56,8 +56,8 @@ public interface INetworkPresenter {
 	 * 获取数据的回调接口
 	 * param type 为获取的Bean类型,默认1为正常类型,2为Error类型
 	 */
-	interface OnDataLoadingListener<T> {
-		void onSuccess(T t, boolean isNetWork);
+	interface OnDataLoadingListener {
+		void onSuccess(Object o, boolean isNetWork);
 
 		void onError(ErrorBean errorBean);
 

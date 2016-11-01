@@ -12,29 +12,30 @@ import java.util.Map;
 
 public interface INetworkModel {
 
+
 	/**
 	 * 获取数据的方法
 	 *
 	 * @param params   post请求需要的参数键值对
 	 * @param listener 回调接口
 	 */
-	<T> void loadData(Class<T> aClass, Map<String, String> params, boolean needCache, int tag, INetworkPresenter.OnDataLoadingListener<T> listener);
+	void loadData(Class aClass, Map<String, String> params, boolean needCache, int tag, INetworkPresenter.OnDataLoadingListener listener);
 
 	/**
 	 * 上传文件
+	 *
 	 * @param params
 	 * @param file
-	 * @param tag 标识
+	 * @param tag      标识
 	 * @param listener
 	 */
-	<T> void upload(Class<T> aClass, Map<String, String> params, File file, int tag, INetworkPresenter.OnDataLoadingListener<T> listener);
+	void upload(Class aClass, Map<String, String> params, File file, int tag, INetworkPresenter.OnDataLoadingListener listener);
 
 	/**
 	 * 下载文件
 	 *
 	 * @param url
 	 * @param listener
-	 * @param handler
 	 */
 	void download(String url, String name, String path, int tag, INetworkPresenter.OnDataLoadingListener listener);
 

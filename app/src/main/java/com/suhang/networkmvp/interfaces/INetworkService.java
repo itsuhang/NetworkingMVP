@@ -1,12 +1,16 @@
 package com.suhang.networkmvp.interfaces;
 
 import com.suhang.networkmvp.MyApplication;
+import com.suhang.networkmvp.bean.HotListBean;
+import com.suhang.networkmvp.bean.SectionListBean;
+import com.suhang.networkmvp.bean.ThemeListBean;
 
 import java.io.File;
 import java.util.Map;
 
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import rx.Observable;
 
@@ -15,20 +19,16 @@ import rx.Observable;
  */
 
 public interface INetworkService {
-	//缓存目录
-	String CACHE_PATH = MyApplication.getInstance().getCacheDir().getAbsolutePath() + File.separator + "NetCache";
 	//主URL
-	String BASE_URL = "http://dev.huanpeng.com/";
+	String BASE_URL = "http://news-at.zhihu.com/api/4/";
 
 
-//	@POST(GameInfoBean.URL)
-//	Observable<GameInfoBean> getGameInfo();
-//
-//	@POST(HistoryBean.URL)
-//	@FormUrlEncoded
-//	Observable<HistoryBean> getHistoryInfo(@FieldMap Map<String, String> params);
-//
-//	@POST(PersonalInfoBean.URL)
-//	@FormUrlEncoded
-//	Observable<PersonalInfoBean> getPersonalInfo(@FieldMap Map<String, String> params);
+	@GET(HotListBean.URL)
+	Observable<HotListBean> getHotList();
+
+	@GET(SectionListBean.URL)
+	Observable<SectionListBean> getSectionList();
+
+	@GET(ThemeListBean.URL)
+	Observable<ThemeListBean> getThemeList();
 }

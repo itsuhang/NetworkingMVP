@@ -22,8 +22,15 @@ public class ErrorCode {
 	public static String ERROR_DESC_CACHEWR = "缓存读写错误";
 	//访问网络时,通过反射获取Bean中的子URL字段出错
 	public static String ERROR_CODE_GETURL = "-8004";
-	public static String ERROR_DESC_GETURL = "获取子URL异常(反射)";
+	public static String ERROR_DESC_GETURL = "获取子方法异常(反射)";
+	//访问网络时,通过反射调用对应的方法时,没有找到该方法
+	public static String ERROR_CODE_INVOKE = "-8005";
+	public static String ERROR_DESC_INVOKE = "没有该方法(反射)";
 	//下载过程中出现IO异常
-	public static String ERROR_CODE_DOWNLOAD_IO = "-8005";
+	public static String ERROR_CODE_DOWNLOAD_IO = "-8006";
 	public static String ERROR_DESC_DOWNLOAD_IO = "下载IO异常";
+	//RxBus出现异常
+	public static String ERROR_CODE_RXBUS = "-8007";
+	public static String ERROR_DESC_RXBUS = "RxBus出现异常";
+
 }

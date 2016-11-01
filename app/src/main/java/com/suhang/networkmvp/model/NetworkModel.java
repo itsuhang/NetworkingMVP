@@ -1,10 +1,15 @@
 package com.suhang.networkmvp.model;
 
+import android.content.Context;
+
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.google.gson.Gson;
+import com.suhang.networkmvp.annotation.ClassProvider;
 import com.suhang.networkmvp.bean.ErrorBean;
+import com.suhang.networkmvp.constants.Constant;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.interfaces.INetworkService;
+import com.suhang.networkmvp.model.INetworkModel;
 import com.suhang.networkmvp.presenter.INetworkPresenter;
 import com.suhang.networkmvp.util.Md5Util;
 import com.suhang.networkmvp.util.RetrofitHelper;
@@ -16,6 +21,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,23 +72,30 @@ public class NetworkModel implements INetworkModel {
 	 */
 	private static void initDiskLruCache() {
 		try {
-			sOpen = DiskLruCache.open(new File(INetworkService.CACHE_PATH), SystemUtil.getAppVersion(), 1, 1024 * 1024 * 200);
+			sOpen = DiskLruCache.open(new File(Constant.CACHE_PATH), SystemUtil.getAppVersion(), 1, 1024 * 1024 * 100);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public <T> void loadData(Class<T> aClass, Map<String, String> params, boolean needCache, int tag, INetworkPresenter.OnDataLoadingListener<T> listener) {
-		T t = dealCache(aClass, null, listener);
-		if (t != null) {
-			listener.onSuccess(t, false);
+	public void loadData(Class aClass, Map<String, String> params, boolean needCache, int tag, INetworkPresenter.OnDataLoadingListener listener) {
+		Object obj = dealCache(aClass, null, listener);
+		if (obj != null) {
+			listener.onSuccess(obj, false);
 		}
-		Observable<T> observable = fetch(aClass, params);
+		Observable<?> observable = null;
+		try {
+			observable = fetch(aClass, params);
+		} catch (InvocationTargetException e) {
+			listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_INVOKE, ErrorCode.ERROR_DESC_INVOKE));
+		} catch (IllegalAccessException e) {
+			listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_INVOKE, ErrorCode.ERROR_DESC_INVOKE));
+		}
 		if (observable != null) {
-			Subscription subscribe = observable.compose(RxUtil.fixScheduler()).subscribe(t1 -> {
-				listener.onSuccess(t1, true);
-				dealCache(aClass, t1, listener);
+			Subscription subscribe = observable.compose(RxUtil.fixScheduler()).subscribe(o -> {
+				listener.onSuccess(o, true);
+				dealCache(aClass, o, listener);
 			}, throwable -> {
 				listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage()));
 			});
@@ -91,15 +106,16 @@ public class NetworkModel implements INetworkModel {
 
 	}
 
+
 	@Override
-	public <T> void upload(Class<T> aClass, Map<String, String> params, File file, int tag, INetworkPresenter.
-			OnDataLoadingListener<T> listener) {
-		Observable<T> observable = mHelper.uploadHead(aClass, file, params, (currentBytes, contentLength, done) -> listener.onProgress((int) (100f * currentBytes / contentLength), done));
-		Subscription subscribe = observable.compose(RxUtil.fixScheduler()).subscribe(t -> listener.onSuccess(t, false)
-				, throwable -> {
-					listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage()));
-				});
-		addSubscrebe(subscribe, tag);
+	public void upload(Class aClass, Map<String, String> params, File file, int tag, INetworkPresenter.
+			OnDataLoadingListener listener) {
+//		Observable<?> observable = mHelper.uploadHead(aClass, file, params, (currentBytes, contentLength, done) -> listener.onProgress((int) (100f * currentBytes / contentLength), done));
+//		Subscription subscribe = observable.compose(RxUtil.fixScheduler()).subscribe(o -> listener.onSuccess(o, false)
+//				, throwable -> {
+//					listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage()));
+//				});
+//		addSubscrebe(subscribe, tag);
 	}
 
 	@Override
@@ -131,24 +147,23 @@ public class NetworkModel implements INetworkModel {
 	 * 从本地获取缓存,有网则先从本地获取,再从网络获取,写入缓存
 	 *
 	 * @param aClass
-	 * @param t
 	 * @return
 	 */
 
-	private <T> T dealCache(Class<T> aClass, T t, INetworkPresenter.OnDataLoadingListener<T> listener) {
-		T at = null;
+	private Object dealCache(Class aClass, Object o, INetworkPresenter.OnDataLoadingListener listener) {
+		Object at = null;
 		try {
 			Field field = aClass.getField("URL");
 			String url = (String) field.get(null);
 			String key = Md5Util.getMD5(url);
 			DiskLruCache.Value value = sOpen.get(key);
-			if (t != null) {
-				String s = mGson.toJson(t);
+			if (o != null) {
+				String s = mGson.toJson(o);
 				if (value == null || !s.equals(value.getString(0))) {
 					DiskLruCache.Editor edit = sOpen.edit(key);
 					edit.set(0, s);
 					edit.commit();
-					at = t;
+					at = o;
 				}
 			} else {
 				if (value != null) {
@@ -157,11 +172,11 @@ public class NetworkModel implements INetworkModel {
 			}
 		} catch (IOException e) {
 			listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_CACHEWR, ErrorCode.ERROR_DESC_CACHEWR));
-		} catch (NoSuchFieldException e) {
+		} catch (IllegalAccessException e) {
 			listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL));
 		} catch (NoSuchAlgorithmException e) {
 			listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_ALGORITHM, ErrorCode.ERROR_DESC_ALGORITHM));
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchFieldException e) {
 			listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL));
 		}
 		return at;
@@ -174,15 +189,14 @@ public class NetworkModel implements INetworkModel {
 	 * @param params
 	 * @return
 	 */
-	private <T> Observable<T> fetch(Class<T> aClass, Map<String, String> params) {
-		Observable<T> observable = null;
-//		if (GameInfoBean.class.equals(aClass)) {
-//			observable = mHelper.getGameInfo(aClass, params);
-//		} else if (HistoryBean.class.equals(aClass)) {
-//			observable = mHelper.getHistoryInfo(aClass, params);
-//		} else if (PersonalInfoBean.class.equals(aClass)) {
-//			observable = mHelper.getPersonalInfo(aClass, params);
-//		}
+	private Observable<?> fetch(Class aClass, Map<String, String> params) throws InvocationTargetException, IllegalAccessException {
+		Observable<?> observable = null;
+		for (Method method : mHelper.getClass().getMethods()) {
+			ClassProvider annotation = method.getAnnotation(ClassProvider.class);
+			if (annotation!=null&&aClass.equals(annotation.value())) {
+				observable = (Observable<?>) method.invoke(mHelper);
+			}
+		}
 		return observable;
 	}
 

@@ -3,6 +3,10 @@ package com.suhang.networkmvp.util;
 import android.webkit.MimeTypeMap;
 
 
+import com.suhang.networkmvp.annotation.ClassProvider;
+import com.suhang.networkmvp.bean.HotListBean;
+import com.suhang.networkmvp.bean.SectionListBean;
+import com.suhang.networkmvp.bean.ThemeListBean;
 import com.suhang.networkmvp.interfaces.IUploadService;
 import com.suhang.networkmvp.interfaces.INetworkService;
 import com.suhang.networkmvp.interfaces.ProgressListener;
@@ -66,26 +70,20 @@ public class RetrofitHelper {
 		return retrofit.create(IUploadService.class);
 	}
 
-//	public <T> Observable<T> uploadHead(Class<T> aClass, File file, Map<String, String> params, ProgressListener listener) {
-//		Map<String, RequestBody> requestBodyMap = new HashMap<>();
-//		UploadFileRequestBody fileRequestBody = new UploadFileRequestBody(file, MediaType.parse(getMimeType(file.getAbsolutePath())), listener);
-//		requestBodyMap.put("file\"; filename=\"" + file.getName(), fileRequestBody);
-//		for (Map.Entry<String, String> entry : params.entrySet()) {
-//			requestBodyMap.put(entry.getKey(), RequestBody.create(null, entry.getValue()));
-//		}
-//		return mUploadService.getUploadHead(requestBodyMap).ofType(aClass);
-//	}
-//
-//
-//	public <T> Observable<T> getGameInfo(Class<T> aClass, Map<String, String> params) {
-//		return mNetWorkService.getGameInfo().ofType(aClass);
-//	}
-//
-//	public <T> Observable<T> getHistoryInfo(Class<T> aClass, Map<String, String> params) {
-//		return mNetWorkService.getHistoryInfo(params).ofType(aClass);
-//	}
-//
-//	public <T> Observable<T> getPersonalInfo(Class<T> aClass, Map<String, String> params) {
-//		return mNetWorkService.getPersonalInfo(params).ofType(aClass);
-//	}
+	@ClassProvider(ThemeListBean.class)
+	public Observable fetchDailyThemeListInfo() {
+		return mNetWorkService.getThemeList();
+	}
+
+	@ClassProvider(SectionListBean.class)
+	public Observable fetchSectionListInfo() {
+		return mNetWorkService.getSectionList();
+	}
+
+	@ClassProvider(HotListBean.class)
+	public Observable fetchHotListInfo() {
+		return mNetWorkService.getHotList();
+	}
+
+
 }
