@@ -1,34 +1,17 @@
 package com.suhang.networkmvp.interfaces;
 
-import com.suhang.networkmvp.MyApplication;
-import com.suhang.networkmvp.bean.HotListBean;
-import com.suhang.networkmvp.bean.SectionListBean;
-import com.suhang.networkmvp.bean.ThemeListBean;
 
-import java.io.File;
-import java.util.Map;
+import com.suhang.networkmvp.domain.GithubBean;
 
-import retrofit2.http.FieldMap;
-import retrofit2.http.FormUrlEncoded;
+import io.reactivex.Flowable;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
-import rx.Observable;
+import retrofit2.http.Path;
 
 /**
  * Created by sh on 2016/10/24 16:01.
  */
 
 public interface INetworkService {
-	//主URL
-	String BASE_URL = "http://news-at.zhihu.com/api/4/";
-
-
-	@GET(HotListBean.URL)
-	Observable<HotListBean> getHotList();
-
-	@GET(SectionListBean.URL)
-	Observable<SectionListBean> getSectionList();
-
-	@GET(ThemeListBean.URL)
-	Observable<ThemeListBean> getThemeList();
+    @GET("history/content/{user}")
+    Flowable<GithubBean> getGithubData(@Path("user") String path);
 }
