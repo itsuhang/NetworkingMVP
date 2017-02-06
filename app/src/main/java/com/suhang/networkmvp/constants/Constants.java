@@ -3,7 +3,9 @@ package com.suhang.networkmvp.constants;
 import android.os.Environment;
 
 
+import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.utils.ResourceUtil;
 
 import java.io.File;
 
@@ -26,4 +28,11 @@ public class Constants {
      */
     public static final String ERRORTYPE_TWO = "2";
     public static final String ERRORTYPE_THREE = "3";
+
+    public static final String HOST = ResourceUtil.s(R.string.host);
+
+    /*
+       Activity匹配
+     */
+    public static final String SPLASH = "splash";
 }

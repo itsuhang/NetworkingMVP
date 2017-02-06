@@ -26,7 +26,6 @@ public class InputLeakUtil {
             field.setAccessible(true);
             field.set(manager, null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
         }
 //        for (Field field : manager.getClass().getDeclaredFields()) {
 //            field.setAccessible(true);
