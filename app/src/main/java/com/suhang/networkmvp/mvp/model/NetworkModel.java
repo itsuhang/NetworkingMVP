@@ -29,7 +29,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -47,6 +51,8 @@ public class NetworkModel extends BaseModel {
     DiskLruCache sOpen;
     @Inject
     Gson mGson;
+
+    private CompositeDisposable mDisposable = new CompositeDisposable();
     private Map<Integer, Disposable> mSubscriptionMap = new HashMap<>();
     private Map<Integer, Call> mCallMap = new HashMap<>();
 
@@ -155,10 +161,7 @@ public class NetworkModel extends BaseModel {
      */
     private void load(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
         if (needCache) {
-            ErrorBean obj = dealCache(aClass, append, cacheTag, null, listener);
-            if (obj != null) {
-                listener.onSuccess(obj, false);
-            }
+            dealCache(aClass, append, cacheTag,false, null, listener);
         }
         Flowable<? extends ErrorBean> flowable = null;
         try {
@@ -177,8 +180,7 @@ public class NetworkModel extends BaseModel {
                 if (o.getCode() != null) {
                     listener.onError(o);
                 } else {
-                    listener.onSuccess(o, true);
-                    dealCache(aClass, append, cacheTag, o, listener);
+                    dealCache(aClass, append, cacheTag,true, o, listener);
                 }
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
@@ -286,48 +288,55 @@ public class NetworkModel extends BaseModel {
      *
      * @param append 一个Bean类对应多个URL时用的标志
      * @param cacheTag 用于给缓存加上分辨标志
+     * @param isNetwork 是否是请求网络得到数据后调用的此方法,是的话就缓存数据,不是就读取数据
      * @param o 网络返回的结果Bean类
      */
-    private ErrorBean dealCache(Class<? extends ErrorBean> aClass, String append, String cacheTag, ErrorBean o, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-        ErrorBean at = null;
-        try {
-            Field field;
-            if (TextUtils.isEmpty(append)) {
-                field = aClass.getField(Constants.URL);
-            } else {
-                field = aClass.getField(Constants.URL + append);
-            }
-            String url = (String) field.get(null);
-            String key;
-            if (cacheTag != null) {
-                key = Md5Util.getMD5(url + cacheTag);
-            } else {
-                key = Md5Util.getMD5(url);
-            }
-            DiskLruCache.Value value = sOpen.get(key);
-            if (o != null) {
-                String s = mGson.toJson(o);
-                if (value == null || !s.equals(value.getString(0))) {
-                    DiskLruCache.Editor edit = sOpen.edit(key);
-                    edit.set(0, s);
-                    edit.commit();
-                    at = o;
+    private void dealCache(Class<? extends ErrorBean> aClass, String append, String cacheTag, boolean isNetwork, ErrorBean o, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        mDisposable.add(Flowable.create((FlowableOnSubscribe<ErrorBean>) sub -> {
+            ErrorBean at = null;
+            try {
+                Field field;
+                if (TextUtils.isEmpty(append)) {
+                    field = aClass.getField(Constants.URL);
+                } else {
+                    field = aClass.getField(Constants.URL + append);
                 }
-            } else {
-                if (value != null) {
-                    at = mGson.fromJson(value.getString(0), aClass);
+                String url = (String) field.get(null);
+                String key;
+                if (cacheTag != null) {
+                    key = Md5Util.getMD5(url + cacheTag);
+                } else {
+                    key = Md5Util.getMD5(url);
                 }
+                DiskLruCache.Value value = sOpen.get(key);
+                if (o != null) {
+                    String s = mGson.toJson(o);
+                    if (value == null || !s.equals(value.getString(0))) {
+                        DiskLruCache.Editor edit = sOpen.edit(key);
+                        edit.set(0, s);
+                        edit.commit();
+                        at = o;
+                    }
+                } else {
+                    if (value != null) {
+                        at = mGson.fromJson(value.getString(0), aClass);
+                    }
+                }
+            } catch (IOException e) {
+                listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_CACHEWR, ErrorCode.ERROR_DESC_CACHEWR));
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL));
+            } catch (NoSuchAlgorithmException e) {
+                listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_ALGORITHM, ErrorCode.ERROR_DESC_ALGORITHM));
+            } catch (Exception e) {
+                listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS));
             }
-        } catch (IOException e) {
-            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_CACHEWR, ErrorCode.ERROR_DESC_CACHEWR));
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL));
-        } catch (NoSuchAlgorithmException e) {
-            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_ALGORITHM, ErrorCode.ERROR_DESC_ALGORITHM));
-        } catch (Exception e) {
-            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS));
-        }
-        return at;
+            if (at != null) {
+                sub.onNext(at);
+            }
+        }, BackpressureStrategy.BUFFER).compose(RxUtil.fixScheduler()).subscribe(errorBean -> {
+            listener.onSuccess(errorBean, isNetwork);
+        }));
     }
 
 
