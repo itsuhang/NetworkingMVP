@@ -62,13 +62,22 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
     @Inject
     Dialog mDialog;
 
+    private boolean isRegisterEventBus;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDialog = DialogHelp.getWaitDialog(this);
-        mBaseComponent = ((App)getApplication()).getAppComponent().baseComponent(new BaseModule(this));
+        mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
+    }
+
+    /**
+     * 注册事件总线
+     */
+    protected void registerEventBus() {
         EventBus.getDefault().register(this);
+        isRegisterEventBus = true;
     }
 
     /**
@@ -209,7 +218,9 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
         if (mPresenter != null) {
             mPresenter.detachView();
         }
-        EventBus.getDefault().unregister(this);
+        if (isRegisterEventBus) {
+            EventBus.getDefault().unregister(this);
+        }
         //处理InputMethodManager导致的内存泄漏
         InputLeakUtil.fixInputMethodManager(this);
     }

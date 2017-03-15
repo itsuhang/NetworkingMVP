@@ -63,12 +63,21 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 
     private Context mContext;
 
+    private boolean isRegisterEventBus;
+
     public BasePager(Activity activity) {
         mActivity = activity;
         mContext = mActivity;
         mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
         injectDagger();
+    }
+
+    /**
+     * 注册事件总线
+     */
+    protected void registerEventBus() {
         EventBus.getDefault().register(this);
+        isRegisterEventBus = true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -121,7 +130,6 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 
     /**
      * 获得根布局
-     * @return
      */
     public View getRootView() {
         return mBinding.getRoot();
@@ -130,7 +138,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
     /**
      * 初始化事件
      */
-    protected void initEvent(){
+    protected void initEvent() {
 
     }
 
@@ -148,7 +156,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
     }
 
     /**
-     * 	隐藏软键盘
+     * 隐藏软键盘
      */
     public void hideKeyboard() {
         View view = getActivity().getCurrentFocus();
@@ -172,7 +180,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
             Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
             mBinding.setVariable(BR.event, mEvent.getType().newInstance());
         } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING +"\n"+e.getMessage()), ERROR_TAG);
+            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
         }
     }
 
@@ -184,7 +192,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
             Field mData = mBinding.getClass().getDeclaredField("mData");
             mBinding.setVariable(BR.data, mData.getType().newInstance());
         } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING +"\n"+e.getMessage()), ERROR_TAG);
+            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
         }
     }
 
@@ -198,19 +206,21 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
     }
 
     public void setVisiable(boolean visiable) {
-        getRootView().setVisibility(visiable?View.VISIBLE:View.INVISIBLE);
+        getRootView().setVisibility(visiable ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void destory() {
         mDisposables.dispose();
-        if(mPresenter !=null)
+        if (mPresenter != null)
             mPresenter.detachView();
         //取消所有正在进行的网络任务
         if (mDialog != null) {
             mDialog.dismiss();
             mDialog = null;
         }
-        EventBus.getDefault().unregister(this);
+        if (isRegisterEventBus) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 
 }

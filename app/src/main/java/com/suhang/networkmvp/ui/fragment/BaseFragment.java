@@ -69,13 +69,22 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
     //是否为缓存布局
     protected boolean isCacheView;
 
+    private boolean isRegisterEventBus;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDialog = DialogHelp.getWaitDialog(getActivity());
         mBaseComponent = ((App) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
+    }
+
+    /**
+     * 注册事件总线
+     */
+    protected void registerEventBus() {
         EventBus.getDefault().register(this);
+        isRegisterEventBus = true;
     }
 
     /**
@@ -250,6 +259,8 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
             mDialog.dismiss();
             mDialog = null;
         }
-        EventBus.getDefault().unregister(this);
+        if (isRegisterEventBus) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 }

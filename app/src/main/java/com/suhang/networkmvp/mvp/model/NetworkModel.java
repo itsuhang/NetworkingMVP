@@ -161,7 +161,7 @@ public class NetworkModel extends BaseModel {
      */
     private void load(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
         if (needCache) {
-            dealCache(aClass, append, cacheTag,false, null, listener);
+            dealCache(aClass, append, cacheTag, null, listener);
         }
         Flowable<? extends ErrorBean> flowable = null;
         try {
@@ -180,7 +180,8 @@ public class NetworkModel extends BaseModel {
                 if (o.getCode() != null) {
                     listener.onError(o);
                 } else {
-                    dealCache(aClass, append, cacheTag,true, o, listener);
+                    dealCache(aClass, append, cacheTag, o, listener);
+                    listener.onSuccess(o,true);
                 }
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
@@ -288,12 +289,11 @@ public class NetworkModel extends BaseModel {
      *
      * @param append 一个Bean类对应多个URL时用的标志
      * @param cacheTag 用于给缓存加上分辨标志
-     * @param isNetwork 是否是请求网络得到数据后调用的此方法,是的话就缓存数据,不是就读取数据
      * @param o 网络返回的结果Bean类
      */
-    private void dealCache(Class<? extends ErrorBean> aClass, String append, String cacheTag, boolean isNetwork, ErrorBean o, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+    private void dealCache(Class<? extends ErrorBean> aClass, String append, String cacheTag, ErrorBean o, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
         mDisposable.add(Flowable.create((FlowableOnSubscribe<ErrorBean>) sub -> {
-            ErrorBean at = null;
+            ErrorBean at = o;
             try {
                 Field field;
                 if (TextUtils.isEmpty(append)) {
@@ -335,7 +335,9 @@ public class NetworkModel extends BaseModel {
                 sub.onNext(at);
             }
         }, BackpressureStrategy.BUFFER).compose(RxUtil.fixScheduler()).subscribe(errorBean -> {
-            listener.onSuccess(errorBean, isNetwork);
+            if (o == null) {
+                listener.onSuccess(errorBean, false);
+            }
         }));
     }
 
