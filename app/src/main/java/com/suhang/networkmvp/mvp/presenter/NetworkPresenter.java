@@ -26,35 +26,60 @@ public class NetworkPresenter extends BasePresenter<INetworkContract.INetworkVie
     }
 
     @Override
-    public void getData(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag) {
-        loadData(aClass, null, params, null, needCache, tag);
+    public void getPostData(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag) {
+        loadPostData(false,aClass, null, params, null, needCache, tag);
     }
 
     @Override
-    public void getData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag) {
-        loadData(aClass, append, params, null, needCache, tag);
+    public void getPostData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag) {
+        loadPostData(false,aClass, append, params, null, needCache, tag);
     }
 
     @Override
-    public void getData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag) {
-        loadData(aClass, append, params, cacheTag, true, tag);
+    public void getPostData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag) {
+        loadPostData(false,aClass, append, params, cacheTag, true, tag);
     }
 
     @Override
-    public void getData(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag) {
-        loadData(aClass, null, params, cacheTag, true, tag);
+    public void getPostData(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag) {
+        loadPostData(false,aClass, null, params, cacheTag, true, tag);
     }
 
     @Override
-    public void getData(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag) {
-        loadData(aClass, path, params, tag);
+    public void getGetData(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag) {
+        loadGetData(false,aClass, path, params, tag);
+    }
+
+    @Override
+    public void getPostDataWrap(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag) {
+        loadPostData(true,aClass, null, params, null, needCache, tag);
+    }
+
+    @Override
+    public void getPostDataWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag) {
+        loadPostData(true,aClass, append, params, null, needCache, tag);
+    }
+
+    @Override
+    public void getPostDataWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag) {
+        loadPostData(true,aClass, append, params, cacheTag, true, tag);
+    }
+
+    @Override
+    public void getPostDataWrap(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag) {
+        loadPostData(true,aClass, null, params, cacheTag, true, tag);
+    }
+
+    @Override
+    public void getGetDataWrap(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag) {
+        loadGetData(true,aClass, path, params, tag);
     }
 
 
-    private void loadData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag) {
+    private void loadPostData(boolean isWrap,Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag) {
         mView.showLoading(tag);
         if (TextUtils.isEmpty(cacheTag)) {
-            mModel.loadData(aClass, append, params, needCache, tag, new OnDataLoadingListener() {
+            mModel.loadPostData(isWrap,aClass, append, params, needCache, tag, new OnDataLoadingListener() {
                 @Override
                 public void onSuccess(ErrorBean o, boolean isNeedLoad) {
                     if (isNeedLoad) {
@@ -75,7 +100,7 @@ public class NetworkPresenter extends BasePresenter<INetworkContract.INetworkVie
                 }
             });
         } else {
-            mModel.loadData(aClass, append, params, cacheTag, tag, new OnDataLoadingListener() {
+            mModel.loadPostData(isWrap,aClass, append, params, cacheTag, tag, new OnDataLoadingListener() {
                 @Override
                 public void onSuccess(ErrorBean o, boolean isNeedLoad) {
                     if (isNeedLoad) {
@@ -98,9 +123,9 @@ public class NetworkPresenter extends BasePresenter<INetworkContract.INetworkVie
         }
     }
 
-    private void loadData(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag) {
+    private void loadGetData(boolean isWrap,Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag) {
         mView.showLoading(tag);
-        mModel.loadData(aClass, path, params, tag, new OnDataLoadingListener() {
+        mModel.loadGetData(isWrap,aClass, path, params, tag, new OnDataLoadingListener() {
             @Override
             public void onSuccess(ErrorBean o, boolean isNeedLoad) {
                 if (isNeedLoad) {

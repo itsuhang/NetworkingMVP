@@ -6,6 +6,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.annotation.LayoutRes;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -59,17 +60,20 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
     @Inject
     Dialog mDialog;
 
-    private Activity mActivity;
+    @Inject
+    Activity mActivity;
 
-    private Context mContext;
+    @Inject
+    Context mContext;
 
     private boolean isRegisterEventBus;
 
     public BasePager(Activity activity) {
-        mActivity = activity;
-        mContext = mActivity;
         mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
         injectDagger();
+        if (mActivity == null) {
+            throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
+        }
     }
 
     /**

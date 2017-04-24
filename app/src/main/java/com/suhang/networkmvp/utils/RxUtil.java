@@ -1,12 +1,22 @@
 package com.suhang.networkmvp.utils;
 
 
+import com.suhang.networkmvp.annotation.Content;
+import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.domain.WrapBean;
+
+import org.reactivestreams.Publisher;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.FlowableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -50,10 +60,10 @@ public class RxUtil {
 //	 * @param <T>
 //	 * @return
 //	 */
-//	public static <T extends ErrorBean> FlowableTransformer<HuanpengBean<T>, T> handleResult() {
-//		return upstream -> upstream.flatMap(new Function<HuanpengBean<T>, Publisher<T>>() {
+//	public static <T extends ErrorBean> FlowableTransformer<WrapBean<T>, T> handleResult() {
+//		return upstream -> upstream.flatMap(new Function<WrapBean<T>, Publisher<T>>() {
 //			@Override
-//			public Publisher<T> apply(HuanpengBean<T> tHuanpengBean) throws Exception {
+//			public Publisher<T> apply(WrapBean<T> tHuanpengBean) throws Exception {
 //				if ("1".equals(tHuanpengBean.getStatus())) {
 //					return createData(tHuanpengBean.getContent());
 //				} else {
@@ -63,18 +73,24 @@ public class RxUtil {
 //		});
 //	}
 //
-//	/**
-//	 * 统一返回结果处理
-//	 *
-//	 * @param <T>
-//	 * @return
-//	 */
-//	public static <T> FlowableTransformer<T, ErrorBean> handleResultNone() {
-//		return upstream -> upstream.flatMap(new Function<T, Publisher<ErrorBean>>() {
-//			@Override
-//			public Publisher<ErrorBean> apply(T t) throws Exception {
-//				return createData(tHuanpengBean.getContent());
-//			}
-//		});
-//	}
+	/**
+	 * 统一返回结果处理
+	 * 从给定包裹类中获取内容部分,转换后返回,包裹类中需将返回内容的get方法用@Content注解标记
+	 * @param <T>
+	 * @return
+	 */
+	public static <T extends WrapBean> FlowableTransformer<T, ErrorBean> handleResultNone() {
+		return upstream -> upstream.flatMap(new Function<T, Publisher<ErrorBean>>() {
+			@Override
+			public Publisher<ErrorBean> apply(T t) throws Exception {
+				for (Method m : t.getClass().getMethods()) {
+					if (m.getAnnotation(Content.class) != null) {
+						ErrorBean o = (ErrorBean) m.invoke(t);
+						return createData(o);
+					}
+				}
+				throw new RuntimeException("包裹bean类与实际获得的bean类不匹配,或包裹类中找不到@Content注解标记的get内容的方法");
+			}
+		});
+	}
 }

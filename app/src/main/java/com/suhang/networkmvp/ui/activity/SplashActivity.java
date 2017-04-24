@@ -1,12 +1,11 @@
 package com.suhang.networkmvp.ui.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.github.mzule.activityrouter.annotation.Router;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivitySplashBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.mvp.base.BlankPresent;
@@ -29,6 +28,7 @@ public class SplashActivity extends BaseActivity<BlankPresent, ActivitySplashBin
 
     @Override
     protected void injectDagger() {
+        getBaseComponent().getBlankComponent(new BlankModule(this)).inject(this);
     }
 
     @Override

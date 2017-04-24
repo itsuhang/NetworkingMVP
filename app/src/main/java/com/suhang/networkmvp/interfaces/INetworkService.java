@@ -1,10 +1,17 @@
 package com.suhang.networkmvp.interfaces;
 
 
+import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.GithubBean;
+import com.suhang.networkmvp.domain.HuanPeng;
+
+import java.util.Map;
 
 import io.reactivex.Flowable;
+import retrofit2.http.FieldMap;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 /**
@@ -14,4 +21,8 @@ import retrofit2.http.Path;
 public interface INetworkService {
     @GET("history/content/{user}")
     Flowable<GithubBean> getGithubData(@Path("user") String path);
+
+    @POST(AppMain.URL)
+    @FormUrlEncoded
+    Flowable<HuanPeng<AppMain>> getAppMain(@FieldMap Map<String, String> params);
 }

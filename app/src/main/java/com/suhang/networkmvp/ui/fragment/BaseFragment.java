@@ -64,6 +64,12 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
     @Inject
     Dialog mDialog;
 
+    @Inject
+    Activity mActivity;
+
+    @Inject
+    Context mContext;
+
     //fragment布局缓存
     protected View cacheView;
     //是否为缓存布局
@@ -77,6 +83,9 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
         mDialog = DialogHelp.getWaitDialog(getActivity());
         mBaseComponent = ((App) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
+        if (mActivity == null) {
+            throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
+        }
     }
 
     /**

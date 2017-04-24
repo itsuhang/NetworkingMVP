@@ -2,14 +2,12 @@ package com.suhang.networkmvp.ui.activity;
 
 import android.os.Bundle;
 
-
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.MainFragmentAdapter;
 import com.suhang.networkmvp.annotation.ActivityScope;
 import com.suhang.networkmvp.dagger.module.MainModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.interfaces.INetworkService;
 import com.suhang.networkmvp.mvp.contract.IMainContract;
 import com.suhang.networkmvp.mvp.presenter.MainPresenter;
 import com.suhang.networkmvp.ui.fragment.AttentionFragment;
@@ -20,13 +18,9 @@ import com.suhang.networkmvp.utils.LogUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 @ActivityScope
 public class MainActivity extends BaseActivity<MainPresenter, ActivityMainBinding> implements IMainContract.IMainView {
     private static final String TAG = "MainActivity";
-    @Inject
-    INetworkService mService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

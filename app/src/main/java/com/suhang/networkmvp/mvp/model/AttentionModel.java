@@ -2,7 +2,10 @@ package com.suhang.networkmvp.mvp.model;
 
 
 
+import android.util.ArrayMap;
+
 import com.suhang.networkmvp.annotation.PagerScope;
+import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.GithubBean;
 
 import javax.inject.Inject;
@@ -19,6 +22,6 @@ public class AttentionModel extends CanNetworkModel {
     }
 
     public void log() {
-        mNetworkPresenter.getData(GithubBean.class,"2/1",null,100);
+        mNetworkPresenter.getPostDataWrap(AppMain.class,new ArrayMap<>(),false,100);
     }
 }

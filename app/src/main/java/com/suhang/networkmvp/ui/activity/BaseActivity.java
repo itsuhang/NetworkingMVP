@@ -58,6 +58,12 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
     //databing类
     private E mBinding;
 
+    @Inject
+    Activity mActivity;
+
+    @Inject
+    Context mContext;
+
     //进度对话框
     @Inject
     Dialog mDialog;
@@ -70,6 +76,9 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
         mDialog = DialogHelp.getWaitDialog(this);
         mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
+        if (mActivity == null) {
+            throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
+        }
     }
 
     /**
@@ -179,7 +188,7 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
 
     @Override
     public Activity provideActivity() {
-        return this;
+        return mActivity;
     }
 
     /**

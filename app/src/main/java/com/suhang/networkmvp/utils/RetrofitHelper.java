@@ -5,6 +5,7 @@ import android.webkit.MimeTypeMap;
 
 
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.domain.WrapBean;
 import com.suhang.networkmvp.function.ProgressListener;
 import com.suhang.networkmvp.function.UploadFileRequestBody;
 import com.suhang.networkmvp.interfaces.INetworkService;
@@ -82,6 +83,19 @@ public class RetrofitHelper {
 
     /**
      * 反射查找Retrofit的Service中的方法
+     * 此方法获取的是包裹类
+     *
+     * @param method 要查找的方法名
+     * @param params 要携带的参数
+     */
+    @SuppressWarnings("unchecked")
+    public Flowable<? extends WrapBean> fetchWrap(String method, Map<String, String> params) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method fetch = mNetworkService.getClass().getDeclaredMethod(method, Map.class);
+        return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, params);
+    }
+
+    /**
+     * 反射查找Retrofit的Service中的方法
      *
      * @param method 要查找的方法名(没有则传null)
      * @param path get请求未确定路径(不需要则传null)
@@ -101,6 +115,31 @@ public class RetrofitHelper {
         } else {
             Method fetch = mNetworkService.getClass().getDeclaredMethod(method, String.class);
             return (Flowable<? extends ErrorBean>) fetch.invoke(mNetworkService, path);
+        }
+    }
+
+    /**
+     * 反射查找Retrofit的Service中的方法
+     * 此方法获取的是包裹类
+     *
+     * @param method 要查找的方法名(没有则传null)
+     * @param path get请求未确定路径(不需要则传null)
+     * @param params 要携带的参数
+     */
+    @SuppressWarnings("unchecked")
+    public Flowable<? extends WrapBean> fetchWrap(String method, String path, Map<String, String> params) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (TextUtils.isEmpty(path) && params != null) {
+            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, Map.class);
+            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, params);
+        } else if (TextUtils.isEmpty(path) && params == null) {
+            Method fetch = mNetworkService.getClass().getDeclaredMethod(method);
+            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService);
+        } else if (!TextUtils.isEmpty(path) && params != null) {
+            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, String.class, Map.class);
+            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, path, params);
+        } else {
+            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, String.class);
+            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, path);
         }
     }
 }

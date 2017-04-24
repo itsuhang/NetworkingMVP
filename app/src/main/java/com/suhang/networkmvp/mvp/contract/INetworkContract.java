@@ -1,7 +1,6 @@
 package com.suhang.networkmvp.mvp.contract;
 
 
-
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.mvp.IPresenter;
 import com.suhang.networkmvp.mvp.IView;
@@ -24,7 +23,7 @@ public interface INetworkContract {
          * @param needCache 是否需要缓存数据
          * @param tag 标记,用于一个页面同时处理多个获取数据的请求
          */
-        void getData(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag);
+        void getPostData(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag);
 
         /**
          * 获取数据，根据Bean类中的URL+append和METHOD+append属性
@@ -35,7 +34,7 @@ public interface INetworkContract {
          * @param needCache 是否需要缓存数据
          * @param tag 标记,用于一个页面同时处理多个获取数据的请求
          */
-        void getData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag);
+        void getPostData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag);
 
         /**
          * 带有缓存标记
@@ -46,7 +45,7 @@ public interface INetworkContract {
          * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
          * @param tag 标记,用于一个页面同时处理多个获取数据的请求
          */
-        void getData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag);
+        void getPostData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag);
 
         /**
          * @param aClass Bean类字节码
@@ -54,16 +53,65 @@ public interface INetworkContract {
          * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
          * @param tag 标记,用于一个页面同时处理多个获取数据的请求
          */
-        void getData(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag);
+        void getPostData(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag);
 
         /**
          * GET
-         * @param aClass
-         * @param path
-         * @param params
-         * @param tag
          */
-        void getData(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag);
+        void getGetData(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag);
+
+
+        /**
+         * 获取数据的方法，根据Bean类中的URL和METHOD属性
+         * 此方法获取包裹类
+         *
+         * @param aClass Bean类字节码
+         * @param params 接口参数
+         * @param needCache 是否需要缓存数据
+         * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+         */
+        void getPostDataWrap(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag);
+
+        /**
+         * 获取数据，根据Bean类中的URL+append和METHOD+append属性
+         * 此方法获取包裹类
+         *
+         * @param aClass Bean类字节码
+         * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
+         * @param params 接口参数
+         * @param needCache 是否需要缓存数据
+         * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+         */
+        void getPostDataWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag);
+
+        /**
+         * 带有缓存标记
+         * 此方法获取包裹类
+         *
+         * @param aClass Bean类字节码
+         * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
+         * @param params 接口参数
+         * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
+         * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+         */
+        void getPostDataWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag);
+
+        /**
+         * 此方法获取包裹类
+         *
+         * @param aClass Bean类字节码
+         * @param params 接口参数
+         * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
+         * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+         */
+        void getPostDataWrap(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag);
+
+        /**
+         * 此方法获取包裹类
+         * GET
+         */
+        void getGetDataWrap(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag);
+
 
         /**
          * 取消网络访问或停止上传

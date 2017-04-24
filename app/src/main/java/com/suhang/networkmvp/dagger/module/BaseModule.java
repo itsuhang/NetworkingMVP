@@ -14,7 +14,7 @@ import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by 苏杭 on 2017/1/20 16:26.
- * 用于提供公共对象
+ * 用于提供公共对象(公用但非单例)
  */
 
 @BaseScope

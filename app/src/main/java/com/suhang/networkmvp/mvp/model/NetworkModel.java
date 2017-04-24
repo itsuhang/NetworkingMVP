@@ -9,6 +9,7 @@ import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.domain.DownLoadBean;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.domain.ErrorCode;
+import com.suhang.networkmvp.domain.WrapBean;
 import com.suhang.networkmvp.function.ProgressListener;
 import com.suhang.networkmvp.mvp.base.BaseModel;
 import com.suhang.networkmvp.mvp.contract.INetworkContract;
@@ -31,8 +32,8 @@ import javax.inject.Inject;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.FlowableTransformer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import okhttp3.Call;
@@ -60,6 +61,10 @@ public class NetworkModel extends BaseModel {
     public NetworkModel() {
     }
 
+    public <T extends WrapBean> void providerWrap(T t) {
+
+    }
+
     /**
      * 添加网络任务到队列,以便于取消任务
      */
@@ -77,8 +82,12 @@ public class NetworkModel extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      * @param listener 成功和错误等回调
      */
-    public void loadData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-        load(aClass, append, params, null, needCache, tag, listener);
+    public void loadPostData(boolean isWrap, Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        if (isWrap) {
+            loadPostWrap(aClass, append, params, null, needCache, tag, listener);
+        } else {
+            loadPost(aClass, append, params, null, needCache, tag, listener);
+        }
     }
 
     /**
@@ -91,8 +100,12 @@ public class NetworkModel extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      * @param listener 成功和错误等回调
      */
-    public void loadData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-        load(aClass, append, params, cacheTag, true, tag, listener);
+    public void loadPostData(boolean isWrap, Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        if (isWrap) {
+            loadPostWrap(aClass, append, params, cacheTag, true, tag, listener);
+        } else {
+            loadPost(aClass, append, params, cacheTag, true, tag, listener);
+        }
     }
 
     /**
@@ -104,8 +117,12 @@ public class NetworkModel extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      * @param listener 成功和错误等回调
      */
-    public void loadData(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-        load(aClass, null, params, cacheTag, true, tag, listener);
+    public void loadPostData(boolean isWrap, Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        if (isWrap) {
+            loadPostWrap(aClass, null, params, cacheTag, true, tag, listener);
+        } else {
+            loadPost(aClass, null, params, cacheTag, true, tag, listener);
+        }
     }
 
     /**
@@ -117,23 +134,14 @@ public class NetworkModel extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      * @param listener 成功和错误等回调
      */
-    public void loadData(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-        load(aClass, null, params, null, needCache, tag, listener);
+    public void loadPostData(boolean isWrap, Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        if (isWrap) {
+            loadPostWrap(aClass, null, params, null, needCache, tag, listener);
+        } else {
+            loadPost(aClass, null, params, null, needCache, tag, listener);
+        }
     }
 
-    /**
-     * 访问网络获取数据(GET)
-     *
-     * @param aClass Bean类字节码
-     * @param path get请求路径
-     * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
-     * @param tag 标记,用于一个页面同时处理多个获取数据的请求
-     * @param listener 成功和错误等回调
-     */
-    public void loadData(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-        load(aClass, path, append, params, tag, listener);
-    }
 
     /**
      * 访问网络获取数据(GET)
@@ -144,8 +152,12 @@ public class NetworkModel extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      * @param listener 成功和错误等回调
      */
-    public void loadData(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-        load(aClass, path, null, params, tag, listener);
+    public void loadGetData(boolean isWrap, Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        if (isWrap) {
+            loadGetWrap(aClass, path, null, params, tag, listener);
+        } else {
+            loadGet(aClass, path, null, params, tag, listener);
+        }
     }
 
     /**
@@ -159,7 +171,7 @@ public class NetworkModel extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      * @param listener 成功和错误等回调
      */
-    private void load(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+    private void loadPost(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
         if (needCache) {
             dealCache(aClass, append, cacheTag, null, listener);
         }
@@ -181,7 +193,104 @@ public class NetworkModel extends BaseModel {
                     listener.onError(o);
                 } else {
                     dealCache(aClass, append, cacheTag, o, listener);
-                    listener.onSuccess(o,true);
+                    listener.onSuccess(o, true);
+                }
+            }, throwable -> {
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
+                errorBean.setType(Constants.ERRORTYPE_TWO);
+                LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
+                listener.onError(errorBean);
+            });
+            addDisposable(disposable, tag);
+        } else {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH);
+            errorBean.setType(Constants.ERRORTYPE_TWO);
+            listener.onError(errorBean);
+        }
+    }
+
+
+    /**
+     * 访问网络获取数据(POST)
+     * 此方法将获取的包裹类转换为内容类并返回
+     *
+     * @param aClass Bean类字节码
+     * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
+     * @param params 接口参数
+     * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
+     * @param needCache 是否需要缓存
+     * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+     * @param listener 成功和错误等回调
+     */
+    private void loadPostWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        if (needCache) {
+            dealCache(aClass, append, cacheTag, null, listener);
+        }
+        Flowable<? extends WrapBean> flowable = null;
+        try {
+            flowable = fetchWrap(aClass, append, params);
+        } catch (InvocationTargetException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage()));
+        } catch (IllegalAccessException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getMessage()));
+        } catch (NoSuchMethodException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_METHOD, ErrorCode.ERROR_DESC_NETWORK_METHOD + "\n" + e.getMessage()));
+        } catch (NoSuchFieldException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage()));
+        }
+        if (flowable != null) {
+            Disposable disposable = flowable.compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler()).subscribe(o -> {
+                if (o.getCode() != null) {
+                    listener.onError(o);
+                } else {
+                    dealCache(aClass, append, cacheTag, o, listener);
+                    listener.onSuccess(o, true);
+                }
+            }, throwable -> {
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
+                errorBean.setType(Constants.ERRORTYPE_TWO);
+                LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
+                listener.onError(errorBean);
+            });
+            addDisposable(disposable, tag);
+        } else {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH);
+            errorBean.setType(Constants.ERRORTYPE_TWO);
+            listener.onError(errorBean);
+        }
+    }
+
+
+    /**
+     * 访问网络获取数据(GET)
+     *
+     * @param aClass Bean类字节码
+     * @param path get请求路径
+     * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
+     * @param params 接口参数
+     * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+     * @param listener 成功和错误等回调
+     */
+    private void loadGet(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        Flowable<? extends ErrorBean> flowable = null;
+        try {
+            flowable = fetch(aClass, path, append, params);
+        } catch (InvocationTargetException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage()));
+        } catch (IllegalAccessException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getMessage()));
+        } catch (NoSuchMethodException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_METHOD, ErrorCode.ERROR_DESC_NETWORK_METHOD + "\n" + e.getMessage()));
+        } catch (NoSuchFieldException e) {
+            listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage()));
+        }
+        if (flowable != null) {
+            Disposable disposable = flowable.compose(RxUtil.fixScheduler()).subscribe(o -> {
+                if (o.getCode() != null) {
+                    listener.onError(o);
+                } else {
+                    listener.onSuccess(o, true);
+//                    dealCache(aClass, append, cacheTag, o, listener);
                 }
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
@@ -199,6 +308,7 @@ public class NetworkModel extends BaseModel {
 
     /**
      * 访问网络获取数据(GET)
+     * 此方法将获取的包裹类转换为内容类并返回
      *
      * @param aClass Bean类字节码
      * @param path get请求路径
@@ -207,16 +317,10 @@ public class NetworkModel extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      * @param listener 成功和错误等回调
      */
-    private void load(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
-//        if (needCache) {
-//            ErrorBean obj = dealCache(aClass, append, cacheTag, null, listener);
-//            if (obj != null) {
-//                listener.onSuccess(obj, false);
-//            }
-//        }
-        Flowable<? extends ErrorBean> flowable = null;
+    private void loadGetWrap(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag, INetworkContract.INetworkPresenter.OnDataLoadingListener listener) {
+        Flowable<? extends WrapBean> flowable = null;
         try {
-            flowable = fetch(aClass, path, append, params);
+            flowable = fetchWrap(aClass, path, append, params);
         } catch (InvocationTargetException e) {
             listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage()));
         } catch (IllegalAccessException e) {
@@ -227,7 +331,7 @@ public class NetworkModel extends BaseModel {
             listener.onError(new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage()));
         }
         if (flowable != null) {
-            Disposable disposable = flowable.compose(RxUtil.fixScheduler()).subscribe(o -> {
+            Disposable disposable = flowable.compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler()).subscribe(o -> {
                 if (o.getCode() != null) {
                     listener.onError(o);
                 } else {
@@ -358,6 +462,22 @@ public class NetworkModel extends BaseModel {
     }
 
     /**
+     * 通过Class来判断是否有该Bean类对应的抓取数据的方法(POST)
+     * 此方法获取的是包裹类,需通转换为内容Bean类
+     */
+    private Flowable<? extends WrapBean> fetchWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
+        Flowable<? extends WrapBean> flowable;
+        String method;
+        if (TextUtils.isEmpty(append)) {
+            method = (String) aClass.getDeclaredField("METHOD").get(null);
+        } else {
+            method = (String) aClass.getDeclaredField("METHOD" + append).get(null);
+        }
+        flowable = mHelper.fetchWrap(method, params);
+        return flowable;
+    }
+
+    /**
      * 通过Class来判断是否有该Bean类对应的抓取数据的方法(GET)
      */
     private Flowable<? extends ErrorBean> fetch(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
@@ -369,6 +489,22 @@ public class NetworkModel extends BaseModel {
             method = (String) aClass.getDeclaredField("METHOD" + append).get(null);
         }
         flowable = mHelper.fetch(method, path, params);
+        return flowable;
+    }
+
+    /**
+     * 通过Class来判断是否有该Bean类对应的抓取数据的方法(GET)
+     * 此方法获取的是包裹类,需通转换为内容Bean类
+     */
+    private Flowable<? extends WrapBean> fetchWrap(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
+        Flowable<? extends WrapBean> flowable;
+        String method;
+        if (TextUtils.isEmpty(append)) {
+            method = (String) aClass.getDeclaredField("METHOD").get(null);
+        } else {
+            method = (String) aClass.getDeclaredField("METHOD" + append).get(null);
+        }
+        flowable = mHelper.fetchWrap(method, path, params);
         return flowable;
     }
 

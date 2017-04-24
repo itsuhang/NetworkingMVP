@@ -3,6 +3,8 @@ package com.suhang.networkmvp.ui.pager;
 import android.app.Activity;
 
 import com.suhang.networkmvp.R;
+import com.suhang.networkmvp.dagger.module.BaseModule;
+import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionTwoBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.mvp.base.BlankPresent;
@@ -21,7 +23,7 @@ public class AttentionTwoPager extends BasePager<BlankPresent,PagerAttentionTwoB
 
     @Override
     protected void injectDagger() {
-
+        getBaseComponent().getBlankComponent(new BlankModule(this)).inject(this);
     }
 
     @Override
