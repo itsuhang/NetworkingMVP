@@ -2,7 +2,6 @@ package com.suhang.networkmvp.application;
 
 import android.app.Application;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.suhang.networkmvp.dagger.component.AppComponent;
 import com.suhang.networkmvp.dagger.component.DaggerAppComponent;
 import com.suhang.networkmvp.dagger.module.AppModule;
@@ -27,12 +26,9 @@ public class BaseApp extends Application {
     public void onCreate() {
         super.onCreate();
         sApp = this;
-        ARouter.init(this); // 尽可能早，推荐在Application中初始化
         CrashHandler.getInstance().init(this);
         if (isDebug) {
             LogUtil.changeLogSwitch(true);
-            ARouter.openLog();     // 打印日志
-            ARouter.openDebug();
         } else {
             LogUtil.changeLogSwitch(false);
         }

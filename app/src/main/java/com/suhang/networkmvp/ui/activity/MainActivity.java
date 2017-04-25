@@ -1,11 +1,7 @@
 package com.suhang.networkmvp.ui.activity;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.MainFragmentAdapter;
 import com.suhang.networkmvp.annotation.ActivityScope;
@@ -29,14 +25,6 @@ public class MainActivity extends BaseActivity<MainPresenter, ActivityMainBindin
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bind(R.layout.activity_main);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        Uri uri = getIntent().getData();
-        LogUtil.i("啊啊啊"+uri);
-        ARouter.getInstance().build(uri).navigation();
     }
 
     @Override
