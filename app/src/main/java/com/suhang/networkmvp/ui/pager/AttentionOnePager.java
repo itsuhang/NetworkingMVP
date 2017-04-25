@@ -36,7 +36,8 @@ public class AttentionOnePager extends BasePager<AttentionPresenter,PagerAttenti
     @Override
     protected void initEvent() {
         getBinding().data.setOnClickListener(v -> {
-            Log.i("啊啊啊",mActivity+"   "+mContext);
+            getPresenter().doRefresh();
+            getPresenter().doLoadMore();
             Routers.open(getContext(), RouterUtil.formatWithParams(Constants.SPLASH,new String[]{"name","age"},new String[]{"我测啊","111"}));
         });
     }

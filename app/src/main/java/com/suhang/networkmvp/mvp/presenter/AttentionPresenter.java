@@ -23,4 +23,14 @@ public class AttentionPresenter extends BasePresenter<IAttentionContract.IAttent
         getModel().log();
         getView().log();
     }
+
+    @Override
+    public void doRefresh() {
+        getModel().doRefresh();
+    }
+
+    @Override
+    public void doLoadMore() {
+        getModel().doLoadMore();
+    }
 }

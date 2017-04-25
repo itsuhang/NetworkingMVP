@@ -3,6 +3,7 @@ package com.suhang.networkmvp.mvp.model;
 
 
 import android.util.ArrayMap;
+import android.util.Log;
 
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.domain.AppMain;
@@ -23,5 +24,13 @@ public class AttentionModel extends CanNetworkModel {
 
     public void log() {
         mNetworkPresenter.getPostDataWrap(AppMain.class,new ArrayMap<>(),false,100);
+    }
+
+    public void doRefresh() {
+        Log.i("啊啊啊", "刷新咯");
+    }
+
+    public void doLoadMore() {
+        Log.i("啊啊啊", "加载更多咯");
     }
 }

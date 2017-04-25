@@ -5,11 +5,11 @@ package com.suhang.networkmvp.mvp.contract;
  */
 
 public interface IAttentionContract {
-    interface IAttentionView extends ICanNetworkContract.ICanNetworkView {
+    interface IAttentionView extends ICanNetworkContract.ICanNetworkView,ICanRefreshContract.ICanNetworkView {
         void log();
     }
 
-    interface IAttentionPresenter extends ICanNetworkContract.ICanNetworkPresenter {
+    interface IAttentionPresenter extends ICanNetworkContract.ICanNetworkPresenter,ICanRefreshContract.ICanNetworkPresenter {
         void doLog();
     }
 }
