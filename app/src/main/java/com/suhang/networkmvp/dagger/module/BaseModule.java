@@ -5,8 +5,17 @@ import android.app.Dialog;
 import android.content.Context;
 
 
+import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.suhang.networkmvp.annotation.BaseScope;
+import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.utils.DialogHelp;
+import com.suhang.networkmvp.utils.SystemUtil;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -47,6 +56,21 @@ public class BaseModule {
     @Provides
     CompositeDisposable provideCD() {
         return new CompositeDisposable();
+    }
+
+    /**
+     * 提供硬盘缓存工具
+     * @return
+     */
+    @Provides
+    DiskLruCache provideDiskLruCache() {
+        DiskLruCache diskLruCache = null;
+        try {
+            diskLruCache = DiskLruCache.open(new File(Constants.CACHE_PATH), SystemUtil.getAppVersion(), 1, 1024 * 1024 * 100);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return diskLruCache;
     }
 
 }

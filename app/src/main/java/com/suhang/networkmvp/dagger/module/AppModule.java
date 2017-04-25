@@ -96,22 +96,6 @@ public class AppModule {
     }
 
     /**
-     * 提供硬盘缓存工具(全局单例)
-     * @return
-     */
-    @Singleton
-    @Provides
-    DiskLruCache provideDiskLruCache() {
-        DiskLruCache diskLruCache = null;
-        try {
-            diskLruCache = DiskLruCache.open(new File(Constants.CACHE_PATH), SystemUtil.getAppVersion(), 1, 1024 * 1024 * 100);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return diskLruCache;
-    }
-
-    /**
      * 提供Gson(全局单例)
      * @return
      */

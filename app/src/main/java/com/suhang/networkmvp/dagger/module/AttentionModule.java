@@ -2,9 +2,11 @@ package com.suhang.networkmvp.dagger.module;
 
 
 import com.suhang.networkmvp.annotation.FragmentScope;
+import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.base.IBlankView;
 
 import dagger.Module;
+import dagger.Provides;
 
 /**
  * Created by 苏杭 on 2017/1/20 17:03.

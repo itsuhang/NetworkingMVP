@@ -17,13 +17,8 @@
                 android:launchMode="singleTask"
                 android:screenOrientation="portrait">
             <intent-filter>
-                <data
-                        android:host="www.suhang.com"
-                        android:scheme="router"/>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.SplashActivity">

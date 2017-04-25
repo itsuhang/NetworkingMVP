@@ -12,6 +12,5 @@ import dagger.Subcomponent;
  */
 @Subcomponent(modules = BlankModule.class)
 public interface BlankComponent {
-    void inject(AttentionTwoPager pager);
     void inject(SplashActivity activity);
 }

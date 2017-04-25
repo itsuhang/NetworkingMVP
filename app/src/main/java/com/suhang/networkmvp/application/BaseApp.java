@@ -26,7 +26,7 @@ public class BaseApp extends Application {
     public void onCreate() {
         super.onCreate();
         sApp = this;
-        CrashHandler.getInstance().init(this);
+//        CrashHandler.getInstance().init(this);
         if (isDebug) {
             LogUtil.changeLogSwitch(true);
         } else {

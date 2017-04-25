@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.ui.pager;
 
 import android.app.Activity;
+import android.util.ArrayMap;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.PagerScope;
@@ -8,8 +9,16 @@ import com.suhang.networkmvp.dagger.module.AttentionOnStartModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.domain.ErrorResult;
+import com.suhang.networkmvp.domain.SuccessResult;
+import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.contract.IAttentionContract;
+import com.suhang.networkmvp.mvp.model.NetworkModel2;
 import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
+import com.suhang.networkmvp.utils.LogUtil;
+import com.suhang.networkmvp.utils.RxUtil;
+
+import javax.inject.Inject;
 
 
 /**
@@ -18,9 +27,15 @@ import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
 
 @PagerScope
 public class AttentionOnePager extends BasePager<AttentionPresenter,PagerAttentionOneBinding> implements IAttentionContract.IAttentionView {
+    @Inject
+    NetworkModel2 mModel2;
+
+    @Inject
+    RxBus mRxBus;
     public AttentionOnePager(Activity activity) {
         super(activity);
         bind(R.layout.pager_attention_one);
+
     }
 
     @Override
@@ -33,7 +48,6 @@ public class AttentionOnePager extends BasePager<AttentionPresenter,PagerAttenti
         getBinding().data.setOnClickListener(v -> {
             getPresenter().doRefresh();
             getPresenter().doLoadMore();
-//            ARouter.getInstance().build(RouterConstants.SPLASH).navigation();
         });
     }
 
@@ -55,7 +69,14 @@ public class AttentionOnePager extends BasePager<AttentionPresenter,PagerAttenti
 
     @Override
     public void initData() {
-        getPresenter().doLog();
+//        getPresenter().doLog();
+        mModel2.loadPostData(true,AppMain.class,new ArrayMap<>(),false,100);
+        mDisposables.add(mRxBus.toFlowable(SuccessResult.class).subscribe(appMain -> {
+            LogUtil.i("啊啊啊"+appMain.getResult(AppMain.class).getTotal());
+        }));
+        mDisposables.add(mRxBus.toFlowable(ErrorResult.class).subscribe(errorResult -> {
+            LogUtil.i("啊啊啊"+errorResult.getResult());
+        }));
     }
 
     @Override

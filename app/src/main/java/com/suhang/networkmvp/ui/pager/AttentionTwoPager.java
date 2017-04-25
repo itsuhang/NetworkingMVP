@@ -1,21 +1,33 @@
 package com.suhang.networkmvp.ui.pager;
 
 import android.app.Activity;
+import android.util.ArrayMap;
 
 import com.suhang.networkmvp.R;
-import com.suhang.networkmvp.dagger.module.BaseModule;
-import com.suhang.networkmvp.dagger.module.BlankModule;
+import com.suhang.networkmvp.annotation.PagerScope;
+import com.suhang.networkmvp.dagger.module.AttentionOnStartModule;
 import com.suhang.networkmvp.databinding.PagerAttentionTwoBinding;
+import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.mvp.base.BlankPresent;
-import com.suhang.networkmvp.mvp.base.IBlankView;
+import com.suhang.networkmvp.function.RxBus;
+import com.suhang.networkmvp.mvp.contract.IAttentionContract;
+import com.suhang.networkmvp.mvp.model.NetworkModel2;
+import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
+
+import javax.inject.Inject;
 
 
 /**
  * Created by 苏杭 on 2017/1/24 16:28.
  */
 
-public class AttentionTwoPager extends BasePager<BlankPresent,PagerAttentionTwoBinding> implements IBlankView {
+@PagerScope
+public class AttentionTwoPager extends BasePager<AttentionPresenter,PagerAttentionTwoBinding> implements IAttentionContract.IAttentionView {
+    @Inject
+    NetworkModel2 mModel2;
+
+    @Inject
+    RxBus mRxBus;
     public AttentionTwoPager(Activity activity) {
         super(activity);
         bind(R.layout.pager_attention_two);
@@ -23,12 +35,12 @@ public class AttentionTwoPager extends BasePager<BlankPresent,PagerAttentionTwoB
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getBlankComponent(new BlankModule(this)).inject(this);
+        getBaseComponent().getAttentionOnStartComponent(new AttentionOnStartModule(this)).inject(this);
     }
 
     @Override
     public void initData() {
-
+        mModel2.loadPostData(true,AppMain.class,new ArrayMap<>(),false,100);
     }
 
     @Override
@@ -43,6 +55,21 @@ public class AttentionTwoPager extends BasePager<BlankPresent,PagerAttentionTwoB
 
     @Override
     public void hideLoading(int tag) {
+
+    }
+
+    @Override
+    public void log() {
+
+    }
+
+    @Override
+    public void setData(ErrorBean e, int tag) {
+
+    }
+
+    @Override
+    public void progress(int precent, int tag) {
 
     }
 }

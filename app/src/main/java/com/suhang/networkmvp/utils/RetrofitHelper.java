@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Flowable;
 import okhttp3.MediaType;
@@ -27,6 +28,7 @@ import okhttp3.RequestBody;
  * Created by sh on 2016/10/25 16:06. Retrofit工具
  */
 
+@Singleton
 public class RetrofitHelper {
     @Inject
     INetworkService mNetworkService;
