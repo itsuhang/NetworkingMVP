@@ -7,6 +7,7 @@ import android.content.Context;
 
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.suhang.networkmvp.annotation.BaseScope;
+import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.utils.DialogHelp;
@@ -71,6 +72,12 @@ public class BaseModule {
             e.printStackTrace();
         }
         return diskLruCache;
+    }
+
+    @Provides
+    @BaseScope
+    RxBus getRxBus() {
+        return new RxBus();
     }
 
 }

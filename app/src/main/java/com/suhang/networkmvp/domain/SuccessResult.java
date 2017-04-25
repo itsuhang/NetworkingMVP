@@ -10,17 +10,6 @@ public class SuccessResult {
     private ErrorBean result;
     //用于判断是哪一个请求
     private int tag;
-    //是否是网络获取的数据（而不是缓存数据）
-    private boolean isNetwork;
-
-    public boolean isNetwork() {
-        return isNetwork;
-    }
-
-    public void setNetwork(boolean network) {
-        isNetwork = network;
-    }
-
     /**
      * 处理成需要的bean类
      * @param tClass
@@ -43,9 +32,8 @@ public class SuccessResult {
         this.tag = tag;
     }
 
-    public SuccessResult(ErrorBean result,int tag,boolean isNetwork) {
+    public SuccessResult(ErrorBean result,int tag) {
         this.result = result;
         this.tag = tag;
-        this.isNetwork = isNetwork;
     }
 }

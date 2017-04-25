@@ -18,10 +18,4 @@ public class AttentionOnStartModule extends NetworkModule<IAttentionContract.IAt
     public AttentionOnStartModule(IAttentionContract.IAttentionView view) {
         super(view);
     }
-
-    @Provides
-    @PagerScope
-    RxBus getRxBus() {
-        return new RxBus();
-    }
 }

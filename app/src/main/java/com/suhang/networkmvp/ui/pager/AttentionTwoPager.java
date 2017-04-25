@@ -13,6 +13,7 @@ import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.contract.IAttentionContract;
 import com.suhang.networkmvp.mvp.model.NetworkModel2;
 import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
+import com.suhang.networkmvp.utils.LogUtil;
 
 import javax.inject.Inject;
 
@@ -40,7 +41,7 @@ public class AttentionTwoPager extends BasePager<AttentionPresenter,PagerAttenti
 
     @Override
     public void initData() {
-        mModel2.loadPostData(true,AppMain.class,new ArrayMap<>(),false,100);
+        mModel2.loadPostDataWrap(AppMain.class,new ArrayMap<>(),false,100);
     }
 
     @Override

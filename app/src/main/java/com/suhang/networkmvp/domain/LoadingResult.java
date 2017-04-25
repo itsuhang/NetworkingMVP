@@ -26,4 +26,9 @@ public class LoadingResult {
     public void setTag(int tag) {
         this.tag = tag;
     }
+
+    public LoadingResult(boolean isLoading, int tag) {
+        this.isLoading = isLoading;
+        this.tag = tag;
+    }
 }

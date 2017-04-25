@@ -22,6 +22,11 @@ import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.domain.ErrorCode;
+import com.suhang.networkmvp.domain.ErrorResult;
+import com.suhang.networkmvp.domain.LoadingResult;
+import com.suhang.networkmvp.domain.ProgressResult;
+import com.suhang.networkmvp.domain.SuccessResult;
+import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.IView;
 import com.suhang.networkmvp.mvp.base.BasePresenter;
 import com.suhang.networkmvp.utils.DialogHelp;
@@ -35,7 +40,10 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
@@ -69,6 +77,9 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
 
     @Inject
     Context mContext;
+
+    @Inject
+    RxBus mRxBus;
 
     //fragment布局缓存
     protected View cacheView;
@@ -152,6 +163,62 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
     public void event(Integer i) {
 
     }
+
+    /**
+     * 获取RxBus,可进行订阅操作
+     *
+     * @return
+     */
+    protected RxBus getRxBus() {
+        return mRxBus;
+    }
+
+    /**
+     * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
+     *
+     * @return
+     */
+    protected Flowable<SuccessResult> subscribeSuccess() {
+        return mRxBus.toFlowable(SuccessResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+    }
+
+    /**
+     * 订阅错误事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
+     *
+     * @return
+     */
+    protected Flowable<ErrorResult> subscribeError() {
+        return mRxBus.toFlowable(ErrorResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+    }
+
+    /**
+     * 订阅加载事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
+     *
+     * @return
+     */
+    protected Flowable<LoadingResult> subscribLoading() {
+        return mRxBus.toFlowable(LoadingResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+    }
+
+    /**
+     * 订阅进度事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
+     *
+     * @return
+     */
+    protected Flowable<ProgressResult> subscribeProgress() {
+        return mRxBus.toFlowable(ProgressResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+    }
+
+
+    /**
+     * 添加rx事件到回收集合中,请尽量使用该方法把所有的事件添加到该集合中
+     *
+     * @param disposable
+     */
+    protected void addSubscribe(Disposable disposable) {
+        mDisposables.add(disposable);
+    }
+
 
     /**
      * 获得根布局
