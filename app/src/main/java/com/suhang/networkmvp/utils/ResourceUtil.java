@@ -5,7 +5,7 @@ import android.support.annotation.StringRes;
 
 
 import com.suhang.networkmvp.R;
-import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.application.BaseApp;
 
 import java.lang.reflect.Field;
 
@@ -15,11 +15,11 @@ import java.lang.reflect.Field;
 
 public class ResourceUtil {
 	public static String s(@StringRes int id) {
-		return App.getInstance().getResources().getString(id);
+		return BaseApp.getInstance().getResources().getString(id);
 	}
 
 	public static int c(@ColorRes int id) {
-		return App.getInstance().getResources().getColor(id);
+		return BaseApp.getInstance().getResources().getColor(id);
 	}
 
 	public static int getZBRank(String rank) {

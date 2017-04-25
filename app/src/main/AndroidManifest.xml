@@ -13,22 +13,17 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
-                android:name="com.github.mzule.activityrouter.router.RouterActivity"
-                android:theme="@android:style/Theme.NoDisplay">
+                android:name=".ui.activity.MainActivity"
+                android:launchMode="singleTask"
+                android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data android:scheme="@string/host"/> <!-- 改成自己的scheme -->
-            </intent-filter>
-        </activity>
-        <activity android:name=".ui.activity.MainActivity">
-            <intent-filter>
+                <data
+                        android:host="www.suhang.com"
+                        android:scheme="router"/>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.SplashActivity">

@@ -6,14 +6,13 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.annotation.LayoutRes;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 
 import com.suhang.networkmvp.BR;
-import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
@@ -69,7 +68,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
     private boolean isRegisterEventBus;
 
     public BasePager(Activity activity) {
-        mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
+        mBaseComponent = ((BaseApp) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
         injectDagger();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");

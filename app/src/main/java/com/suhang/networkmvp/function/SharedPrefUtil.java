@@ -3,7 +3,7 @@ package com.suhang.networkmvp.function;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.application.BaseApp;
 
 
 /**
@@ -34,43 +34,43 @@ public class SharedPrefUtil {
 	//下面方法都是对不同数据类型进行保存,获取
 
 	public static void putBoolean(String key, boolean value) {
-		getSharedPref(App.getInstance()).edit().putBoolean(key, value).apply();
+		getSharedPref(BaseApp.getInstance()).edit().putBoolean(key, value).apply();
 	}
 
 	public static boolean getBoolean(String key, boolean defValue) {
-		return getSharedPref(App.getInstance()).getBoolean(key, defValue);
+		return getSharedPref(BaseApp.getInstance()).getBoolean(key, defValue);
 	}
 
 	public static void putString(String key, String value) {
-		getSharedPref(App.getInstance()).edit().putString(key, value).apply();
+		getSharedPref(BaseApp.getInstance()).edit().putString(key, value).apply();
 	}
 
 	public static String getString(String key, String defValue) {
-		return getSharedPref(App.getInstance()).getString(key, defValue);
+		return getSharedPref(BaseApp.getInstance()).getString(key, defValue);
 	}
 
 	public static void putInt(String key, int value) {
-		getSharedPref(App.getInstance()).edit().putInt(key, value).apply();
+		getSharedPref(BaseApp.getInstance()).edit().putInt(key, value).apply();
 	}
 
 	public static int getInt(String key, int defValue) {
-		return getSharedPref(App.getInstance()).getInt(key, defValue);
+		return getSharedPref(BaseApp.getInstance()).getInt(key, defValue);
 	}
 
 	public static void putFloat(String key, float value) {
-		getSharedPref(App.getInstance()).edit().putFloat(key, value).apply();
+		getSharedPref(BaseApp.getInstance()).edit().putFloat(key, value).apply();
 	}
 
 	public static float getFloat(String key, float defValue) {
-		return getSharedPref(App.getInstance()).getFloat(key, defValue);
+		return getSharedPref(BaseApp.getInstance()).getFloat(key, defValue);
 	}
 
 	public static void putLong(String key, long value) {
-		getSharedPref(App.getInstance()).edit().putLong(key, value).apply();
+		getSharedPref(BaseApp.getInstance()).edit().putLong(key, value).apply();
 	}
 
 	public static long getLong(String key, long defValue) {
-		return getSharedPref(App.getInstance()).getLong(key, defValue);
+		return getSharedPref(BaseApp.getInstance()).getLong(key, defValue);
 	}
 
 

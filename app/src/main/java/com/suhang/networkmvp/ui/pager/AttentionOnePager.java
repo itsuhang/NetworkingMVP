@@ -1,20 +1,15 @@
 package com.suhang.networkmvp.ui.pager;
 
 import android.app.Activity;
-import android.util.Log;
 
-import com.github.mzule.activityrouter.router.Routers;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.PagerScope;
-import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.dagger.module.AttentionOnStartModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.domain.GithubBean;
 import com.suhang.networkmvp.mvp.contract.IAttentionContract;
 import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
-import com.suhang.networkmvp.utils.RouterUtil;
 
 
 /**
@@ -38,7 +33,7 @@ public class AttentionOnePager extends BasePager<AttentionPresenter,PagerAttenti
         getBinding().data.setOnClickListener(v -> {
             getPresenter().doRefresh();
             getPresenter().doLoadMore();
-            Routers.open(getContext(), RouterUtil.formatWithParams(Constants.SPLASH,new String[]{"name","age"},new String[]{"我测啊","111"}));
+//            ARouter.getInstance().build(RouterConstants.SPLASH).navigation();
         });
     }
 

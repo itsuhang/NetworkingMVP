@@ -17,7 +17,7 @@ import android.widget.EditText;
 
 
 import com.suhang.networkmvp.BR;
-import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
@@ -81,7 +81,7 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDialog = DialogHelp.getWaitDialog(getActivity());
-        mBaseComponent = ((App) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
+        mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
