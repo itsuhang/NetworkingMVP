@@ -13,6 +13,9 @@ import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.dagger.module.AttentionModule;
 import com.suhang.networkmvp.databinding.FragmentAttentionBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.event.ErrorResult;
+import com.suhang.networkmvp.event.LoadingResult;
+import com.suhang.networkmvp.event.SuccessResult;
 import com.suhang.networkmvp.mvp.base.BlankPresent;
 import com.suhang.networkmvp.mvp.base.IBlankView;
 import com.suhang.networkmvp.ui.pager.AttentionOnePager;
@@ -62,4 +65,18 @@ public class AttentionFragment extends BaseFragment<BlankPresent,FragmentAttenti
 
     }
 
+    @Override
+    public void onLoading(LoadingResult loadingResult) {
+
+    }
+
+    @Override
+    public void onError(ErrorResult errorResult) {
+
+    }
+
+    @Override
+    public void onSuccess(SuccessResult successResult) {
+
+    }
 }

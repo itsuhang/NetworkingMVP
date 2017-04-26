@@ -15,10 +15,8 @@ import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
-import com.suhang.networkmvp.function.BaseSubscribe;
-import com.suhang.networkmvp.function.RxBus;
+import com.suhang.networkmvp.function.SubscribeManager;
 import com.suhang.networkmvp.mvp.IView;
 import com.suhang.networkmvp.mvp.base.BasePresenter;
 
@@ -30,10 +28,7 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by 苏杭 on 2017/1/24 15:12.
@@ -71,7 +66,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 	Context mContext;
 
 	@Inject
-	BaseSubscribe mSubscribe;
+    SubscribeManager mSubscribe;
 
 	private boolean isRegisterEventBus;
 
@@ -101,7 +96,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 	 *
 	 * @return
 	 */
-	protected BaseSubscribe getBS() {
+	protected SubscribeManager getBS() {
 		return mSubscribe;
 	}
 
@@ -260,6 +255,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 		if (isRegisterEventBus) {
 			EventBus.getDefault().unregister(this);
 		}
+		mSubscribe.destory();
 	}
 
 }

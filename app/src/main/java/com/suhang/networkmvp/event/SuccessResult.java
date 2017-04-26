@@ -1,15 +1,17 @@
 package com.suhang.networkmvp.event;
 
-import android.service.carrier.CarrierMessagingService;
-
+import com.suhang.networkmvp.annotation.Result;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.interfaces.IResultCallback;
+
+import java.lang.annotation.Inherited;
 
 /**
  * Created by 苏杭 on 2017/4/25 16:10.
  *  View层从model层获取数据成功后的返回类，用于获取需要的bean类，并可扩展属性（如：需要tag，则可以直接在此类中添加tag属性）
  */
 
-public class SuccessResult implements BaseResult{
+public class SuccessResult extends BaseResult{
     //返回的结果类
     private ErrorBean result;
     //用于判断是哪一个请求
@@ -41,4 +43,8 @@ public class SuccessResult implements BaseResult{
         this.tag = tag;
     }
 
+    @Result
+    public interface SuccessCallback extends IResultCallback {
+        void onSuccess(SuccessResult successResult);
+    }
 }

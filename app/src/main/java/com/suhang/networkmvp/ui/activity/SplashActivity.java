@@ -7,6 +7,9 @@ import com.suhang.networkmvp.annotation.ActivityScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivitySplashBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.event.ErrorResult;
+import com.suhang.networkmvp.event.LoadingResult;
+import com.suhang.networkmvp.event.SuccessResult;
 import com.suhang.networkmvp.mvp.base.BlankPresent;
 import com.suhang.networkmvp.mvp.base.IBlankView;
 import com.suhang.networkmvp.utils.LogUtil;
@@ -45,6 +48,21 @@ public class SplashActivity extends BaseActivity<BlankPresent, ActivitySplashBin
 
     @Override
     public void hideLoading(int tag) {
+
+    }
+
+    @Override
+    public void onLoading(LoadingResult loadingResult) {
+
+    }
+
+    @Override
+    public void onError(ErrorResult errorResult) {
+
+    }
+
+    @Override
+    public void onSuccess(SuccessResult successResult) {
 
     }
 }

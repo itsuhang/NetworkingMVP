@@ -39,10 +39,10 @@ public class AttentionTwoPager extends BasePager<AttentionPresenter,PagerAttenti
 
     @Override
     public void initData() {
-        addSubscribe(subscribe(SuccessResult.class).subscribe(successResult -> {
-            getBinding().tv.setText(successResult.getResult(GithubBean.class).toString());
-        }));
-        mModel2.loadGetData(GithubBean.class,"2/1",null,100);
+//        addSubscribe(subscribe(SuccessResult.class).subscribe(successResult -> {
+//            getBinding().tv.setText(successResult.getResult(GithubBean.class).toString());
+//        }));
+//        mModel2.loadGetData(GithubBean.class,"2/1",null,100);
     }
 
     @Override
