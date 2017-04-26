@@ -1,5 +1,6 @@
 package com.suhang.networkmvp.ui.activity;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import com.suhang.networkmvp.R;
@@ -14,6 +15,7 @@ import com.suhang.networkmvp.ui.fragment.AttentionFragment;
 import com.suhang.networkmvp.ui.fragment.BaseFragment;
 import com.suhang.networkmvp.ui.fragment.HomeFragment;
 import com.suhang.networkmvp.utils.LogUtil;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,8 @@ public class MainActivity extends BaseActivity<MainPresenter, ActivityMainBindin
         fragments.add(new HomeFragment());
         fragments.add(new AttentionFragment());
         getBinding().vpMain.setAdapter(new MainFragmentAdapter(getSupportFragmentManager(),fragments));
+        new RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE).subscribe(aBoolean -> {
+        });
     }
 
     @Override

@@ -2,11 +2,12 @@ package com.suhang.networkmvp.domain;
 
 
 import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.event.ErrorCode;
 
 /**
  * Created by sh on 2016/3/11 16:13.
  */
-public class ErrorBean extends ErrorCode{
+public class ErrorBean extends ErrorCode {
 
 	public ErrorBean(String code, String desc) {
 		this.code = code;

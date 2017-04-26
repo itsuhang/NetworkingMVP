@@ -18,10 +18,7 @@ import retrofit2.http.Path;
  * Created by sh on 2016/10/24 16:01.
  */
 
-public interface INetworkService {
-    @GET("history/content/{user}")
-    Flowable<GithubBean> getGithubData(@Path("user") String path);
-
+public interface INetworkService{
     @POST(AppMain.URL)
     @FormUrlEncoded
     Flowable<HuanPeng<AppMain>> getAppMain(@FieldMap Map<String, String> params);

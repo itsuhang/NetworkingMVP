@@ -1,10 +1,10 @@
-package com.suhang.networkmvp.domain;
+package com.suhang.networkmvp.event;
 
 /**
  * Created by 苏杭 on 2017/4/25 16:33.
  */
 
-public class ProgressResult {
+public class ProgressResult extends BaseResult{
     //返回的进度信息
     private int progress;
     //用于判断是哪一个请求

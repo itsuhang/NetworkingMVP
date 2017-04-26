@@ -19,6 +19,7 @@ public class Constants {
     public static final String CACHE_PATH = BaseApp.getInstance().getCacheDir().getAbsolutePath() + File.separator + "NetCache";
     public static final String CACHE_PATH_OKHTTP= BaseApp.getInstance().getCacheDir().getAbsolutePath() + File.separator + "NetCache_OKHTTP";
     public static final String BASE_URL = "http://www.huanpeng.com";
+    public static final String BASE_URL1 = "http://gank.io/api/";
     /**
      * 错误类型1,不显示给用户
      */

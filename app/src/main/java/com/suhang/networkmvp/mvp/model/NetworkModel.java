@@ -8,7 +8,7 @@ import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.domain.DownLoadBean;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.domain.ErrorCode;
+import com.suhang.networkmvp.event.ErrorCode;
 import com.suhang.networkmvp.domain.WrapBean;
 import com.suhang.networkmvp.function.ProgressListener;
 import com.suhang.networkmvp.mvp.base.BaseModel;
@@ -33,7 +33,6 @@ import javax.inject.Inject;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
-import io.reactivex.FlowableTransformer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import okhttp3.Call;
@@ -46,7 +45,7 @@ import okhttp3.Response;
  */
 
 public class NetworkModel extends BaseModel {
-    @Inject
+//    @Inject
     RetrofitHelper mHelper;
     @Inject
     DiskLruCache sOpen;

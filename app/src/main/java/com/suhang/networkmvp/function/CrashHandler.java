@@ -77,8 +77,8 @@ public class CrashHandler implements UncaughtExceptionHandler {
 			//如果用户没有处理则让系统默认的异常处理器来处理
 			mDefaultHandler.uncaughtException(thread, ex);
 		} else {
-			android.os.Process.killProcess(android.os.Process.myPid());
-			System.exit(1);
+//			android.os.Process.killProcess(android.os.Process.myPid());
+//			System.exit(1);
 		}
 	}
 
@@ -157,8 +157,11 @@ public class CrashHandler implements UncaughtExceptionHandler {
 		printWriter.close();
 		String result = writer.toString();
 		sb.append(result);
-		LogUtil.i("啊啊啊"+sb.toString());
-		File file = new File(Constants.APP_PATH + File.separator + "log.txt");
+		File dir = new File(Constants.APP_PATH);
+		File file = new File(dir,"log.txt");
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
 		try {
 			if (!file.exists()) {
 				boolean success = file.createNewFile();

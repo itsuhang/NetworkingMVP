@@ -3,13 +3,10 @@ package com.suhang.networkmvp.utils;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.domain.WrapBean;
 import com.suhang.networkmvp.function.ProgressListener;
 import com.suhang.networkmvp.function.UploadFileRequestBody;
-import com.suhang.networkmvp.interfaces.INetworkService;
-import com.suhang.networkmvp.interfaces.IUploadService;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import io.reactivex.Flowable;
 import okhttp3.MediaType;
@@ -28,17 +24,13 @@ import okhttp3.RequestBody;
  * Created by sh on 2016/10/25 16:06. Retrofit工具
  */
 
-@Singleton
-public class RetrofitHelper {
+public class RetrofitHelper<T> {
     @Inject
-    INetworkService mNetworkService;
-    @Inject
-    IUploadService mUploadService;
+    T t;
 
     @Inject
     public RetrofitHelper() {
     }
-
     /**
      * 获取资源MIME类型
      */
@@ -67,8 +59,8 @@ public class RetrofitHelper {
         for (Map.Entry<String, String> entry : params.entrySet()) {
             requestBodyMap.put(entry.getKey(), RequestBody.create(null, entry.getValue()));
         }
-        Method fetch = mUploadService.getClass().getDeclaredMethod(method, Map.class);
-        return (Flowable<? extends ErrorBean>) fetch.invoke(mUploadService, requestBodyMap);
+        Method fetch = t.getClass().getDeclaredMethod(method, Map.class);
+        return (Flowable<? extends ErrorBean>) fetch.invoke(t, requestBodyMap);
     }
 
     /**
@@ -79,8 +71,8 @@ public class RetrofitHelper {
      */
     @SuppressWarnings("unchecked")
     public Flowable<? extends ErrorBean> fetch(String method, Map<String, String> params) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method fetch = mNetworkService.getClass().getDeclaredMethod(method, Map.class);
-        return (Flowable<? extends ErrorBean>) fetch.invoke(mNetworkService, params);
+        Method fetch = t.getClass().getDeclaredMethod(method, Map.class);
+        return (Flowable<? extends ErrorBean>) fetch.invoke(t, params);
     }
 
     /**
@@ -92,8 +84,8 @@ public class RetrofitHelper {
      */
     @SuppressWarnings("unchecked")
     public Flowable<? extends WrapBean> fetchWrap(String method, Map<String, String> params) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method fetch = mNetworkService.getClass().getDeclaredMethod(method, Map.class);
-        return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, params);
+        Method fetch = t.getClass().getDeclaredMethod(method, Map.class);
+        return (Flowable<? extends WrapBean>) fetch.invoke(t, params);
     }
 
     /**
@@ -106,17 +98,17 @@ public class RetrofitHelper {
     @SuppressWarnings("unchecked")
     public Flowable<? extends ErrorBean> fetch(String method, String path, Map<String, String> params) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (TextUtils.isEmpty(path) && params != null) {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, Map.class);
-            return (Flowable<? extends ErrorBean>) fetch.invoke(mNetworkService, params);
+            Method fetch = t.getClass().getDeclaredMethod(method, Map.class);
+            return (Flowable<? extends ErrorBean>) fetch.invoke(t, params);
         } else if (TextUtils.isEmpty(path) && params == null) {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method);
-            return (Flowable<? extends ErrorBean>) fetch.invoke(mNetworkService);
+            Method fetch = t.getClass().getDeclaredMethod(method);
+            return (Flowable<? extends ErrorBean>) fetch.invoke(t);
         } else if (!TextUtils.isEmpty(path) && params != null) {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, String.class, Map.class);
-            return (Flowable<? extends ErrorBean>) fetch.invoke(mNetworkService, path, params);
+            Method fetch = t.getClass().getDeclaredMethod(method, String.class, Map.class);
+            return (Flowable<? extends ErrorBean>) fetch.invoke(t, path, params);
         } else {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, String.class);
-            return (Flowable<? extends ErrorBean>) fetch.invoke(mNetworkService, path);
+            Method fetch = t.getClass().getDeclaredMethod(method, String.class);
+            return (Flowable<? extends ErrorBean>) fetch.invoke(t, path);
         }
     }
 
@@ -131,17 +123,17 @@ public class RetrofitHelper {
     @SuppressWarnings("unchecked")
     public Flowable<? extends WrapBean> fetchWrap(String method, String path, Map<String, String> params) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (TextUtils.isEmpty(path) && params != null) {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, Map.class);
-            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, params);
+            Method fetch = t.getClass().getDeclaredMethod(method, Map.class);
+            return (Flowable<? extends WrapBean>) fetch.invoke(t, params);
         } else if (TextUtils.isEmpty(path) && params == null) {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method);
-            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService);
+            Method fetch = t.getClass().getDeclaredMethod(method);
+            return (Flowable<? extends WrapBean>) fetch.invoke(t);
         } else if (!TextUtils.isEmpty(path) && params != null) {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, String.class, Map.class);
-            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, path, params);
+            Method fetch = t.getClass().getDeclaredMethod(method, String.class, Map.class);
+            return (Flowable<? extends WrapBean>) fetch.invoke(t, path, params);
         } else {
-            Method fetch = mNetworkService.getClass().getDeclaredMethod(method, String.class);
-            return (Flowable<? extends WrapBean>) fetch.invoke(mNetworkService, path);
+            Method fetch = t.getClass().getDeclaredMethod(method, String.class);
+            return (Flowable<? extends WrapBean>) fetch.invoke(t, path);
         }
     }
 }

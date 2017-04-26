@@ -10,8 +10,11 @@ import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.function.AddCookiesInterceptor;
 import com.suhang.networkmvp.function.CacheInterceptor;
 import com.suhang.networkmvp.function.ReceivedCookiesInterceptor;
+import com.suhang.networkmvp.interfaces.INetworkOtherService;
 import com.suhang.networkmvp.interfaces.INetworkService;
 import com.suhang.networkmvp.interfaces.IUploadService;
+import com.suhang.networkmvp.utils.LogUtil;
+import com.suhang.networkmvp.utils.RetrofitHelper;
 import com.suhang.networkmvp.utils.SystemUtil;
 
 import java.io.File;
@@ -61,6 +64,7 @@ public class AppModule {
         builder.addInterceptor(new CacheInterceptor());
         builder.addNetworkInterceptor(new CacheInterceptor());
         mOkHttpClient = builder.build();
+        LogUtil.i("啊啊啊"+mOkHttpClient);
     }
 
     /**
@@ -82,6 +86,17 @@ public class AppModule {
     INetworkService provideNetworkService() {
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
         return retrofit.create(INetworkService.class);
+    }
+
+    /**
+     * 提供网络Service(全局单例)
+     * @return
+     */
+    @Singleton
+    @Provides
+    INetworkOtherService provideNetworkOtherService() {
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL1).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
+        return retrofit.create(INetworkOtherService.class);
     }
 
     /**

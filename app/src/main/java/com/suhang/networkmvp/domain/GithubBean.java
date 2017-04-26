@@ -29,7 +29,28 @@ public class GithubBean extends ErrorBean{
         this.results = results;
     }
 
+    @Override
+    public String toString() {
+        return "GithubBean{" +
+                "error=" + error +
+                ", results=" + results +
+                '}';
+    }
+
     public static class ResultsEntity {
+        @Override
+        public String toString() {
+            return "ResultsEntity{" +
+                    "_id='" + _id + '\'' +
+                    ", content='" + content + '\'' +
+                    ", created_at='" + created_at + '\'' +
+                    ", publishedAt='" + publishedAt + '\'' +
+                    ", rand_id='" + rand_id + '\'' +
+                    ", title='" + title + '\'' +
+                    ", updated_at='" + updated_at + '\'' +
+                    '}';
+        }
+
         private String _id;
         private String content;
         private String created_at;

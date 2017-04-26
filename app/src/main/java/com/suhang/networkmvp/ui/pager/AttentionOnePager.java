@@ -6,10 +6,18 @@ import android.util.ArrayMap;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.dagger.module.AttentionOnStartModule;
+import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.event.ErrorResult;
+import com.suhang.networkmvp.event.LoadingResult;
+import com.suhang.networkmvp.event.SuccessResult;
 import com.suhang.networkmvp.function.RxBus;
+import com.suhang.networkmvp.interfaces.INetworkOtherService;
+import com.suhang.networkmvp.interfaces.INetworkService;
+import com.suhang.networkmvp.mvp.base.BlankPresent;
+import com.suhang.networkmvp.mvp.base.IBlankView;
 import com.suhang.networkmvp.mvp.contract.IAttentionContract;
 import com.suhang.networkmvp.mvp.model.NetworkModel2;
 import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
@@ -23,59 +31,35 @@ import javax.inject.Inject;
  */
 
 @PagerScope
-public class AttentionOnePager extends BasePager<AttentionPresenter, PagerAttentionOneBinding> implements IAttentionContract.IAttentionView {
+public class AttentionOnePager extends BasePager<BlankPresent, PagerAttentionOneBinding> implements IBlankView {
 	@Inject
-	NetworkModel2 mModel2;
+	NetworkModel2<INetworkService> mModel2;
 
 	public AttentionOnePager(Activity activity) {
 		super(activity);
 		bind(R.layout.pager_attention_one);
 	}
 
-	@Override
-	public void log() {
-
-	}
 
 	@Override
 	protected void initEvent() {
 		getBinding().data.setOnClickListener(v -> {
-			getPresenter().doRefresh();
-			getPresenter().doLoadMore();
 		});
 	}
 
 	@Override
-	public void setData(ErrorBean e, int tag) {
-		AppMain b = (AppMain) e;
-		getBinding().data.setText(b.toString());
-	}
-
-	@Override
-	public void progress(int precent, int tag) {
-
-	}
-
-	@Override
 	protected void injectDagger() {
-		getBaseComponent().getAttentionOnStartComponent(new AttentionOnStartModule(this)).inject(this);
+		getBaseComponent().getBlankComponent(new BlankModule(this)).inject(this);
 	}
 
 	@Override
 	public void initData() {
-//        getPresenter().doLog();
-		addSubscribe(subscribeSuccess().subscribe(successResult -> {
-			LogUtil.i("啊啊啊" + successResult.getResult(AppMain.class).getTotal() + "  " + Thread.currentThread());
+		addSubscribe(subscribe(SuccessResult.class).subscribe(successResult -> {
+			getBinding().data.setText(successResult.getResult(AppMain.class).toString());
 		}));
-		addSubscribe(subscribeError().subscribe(errorResult -> {
-			LogUtil.i("啊啊啊" + errorResult.getResult() + " " + Thread.currentThread());
+		addSubscribe(subscribe(ErrorResult.class).subscribe(errorResult -> {
 		}));
-		addSubscribe(subscribLoading().subscribe(loadingResult -> {
-			if (loadingResult.isLoading()) {
-				LogUtil.i("啊啊啊" + "加载开始" + Thread.currentThread());
-			} else {
-				LogUtil.i("啊啊啊" + "加载结束" + Thread.currentThread());
-			}
+		addSubscribe(subscribe(LoadingResult.class).subscribe(loadingResult -> {
 		}));
 		mModel2.loadPostDataWrap(AppMain.class, new ArrayMap<>(), false, 100);
 	}

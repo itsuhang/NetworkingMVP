@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.domain;
+package com.suhang.networkmvp.event;
 
 /**
  * Created by sh on 2016/10/28 14:58.

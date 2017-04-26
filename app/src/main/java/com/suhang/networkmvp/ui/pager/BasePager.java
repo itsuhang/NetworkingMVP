@@ -16,11 +16,11 @@ import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.domain.ErrorCode;
-import com.suhang.networkmvp.domain.ErrorResult;
-import com.suhang.networkmvp.domain.LoadingResult;
-import com.suhang.networkmvp.domain.ProgressResult;
-import com.suhang.networkmvp.domain.SuccessResult;
+import com.suhang.networkmvp.event.BaseResult;
+import com.suhang.networkmvp.event.ErrorCode;
+import com.suhang.networkmvp.event.ErrorResult;
+import com.suhang.networkmvp.event.LoadingResult;
+import com.suhang.networkmvp.event.ProgressResult;
 import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.IView;
 import com.suhang.networkmvp.mvp.base.BasePresenter;
@@ -110,40 +110,13 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 
 	/**
 	 * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-	 *
+	 * @param aClass 继承BaseResult的结果类的字节码
+	 * @param <V>
 	 * @return
 	 */
-	protected Flowable<SuccessResult> subscribeSuccess() {
-		return mRxBus.toFlowable(SuccessResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+	protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass){
+		return mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
 	}
-
-	/**
-	 * 订阅错误事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-	 *
-	 * @return
-	 */
-	protected Flowable<ErrorResult> subscribeError() {
-		return mRxBus.toFlowable(ErrorResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
-	}
-
-	/**
-	 * 订阅加载事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-	 *
-	 * @return
-	 */
-	protected Flowable<LoadingResult> subscribLoading() {
-		return mRxBus.toFlowable(LoadingResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
-	}
-
-	/**
-	 * 订阅进度事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-	 *
-	 * @return
-	 */
-	protected Flowable<ProgressResult> subscribeProgress() {
-		return mRxBus.toFlowable(ProgressResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
-	}
-
 
 	/**
 	 * 添加rx事件到回收集合中,请尽量使用该方法把所有的事件添加到该集合中
