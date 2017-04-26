@@ -1,15 +1,18 @@
 package com.suhang.networkmvp.function;
 
+import com.suhang.networkmvp.annotation.BaseScope;
+
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.processors.FlowableProcessor;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.subscribers.SerializedSubscriber;
-
+@BaseScope
 public class RxBus {
     //相当于Rxjava1.x中的Subject
     private final FlowableProcessor<Object> mBus;
+    @Inject
     public RxBus() {
         //调用toSerialized()方法，保证线程安全
         mBus = PublishProcessor.create().toSerialized();

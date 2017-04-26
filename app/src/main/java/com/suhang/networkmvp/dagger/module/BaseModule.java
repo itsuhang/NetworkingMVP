@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 
-
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.suhang.networkmvp.annotation.BaseScope;
-import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.utils.DialogHelp;
@@ -15,8 +13,6 @@ import com.suhang.networkmvp.utils.SystemUtil;
 
 import java.io.File;
 import java.io.IOException;
-
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -73,11 +69,4 @@ public class BaseModule {
         }
         return diskLruCache;
     }
-
-    @Provides
-    @BaseScope
-    RxBus getRxBus() {
-        return new RxBus();
-    }
-
 }

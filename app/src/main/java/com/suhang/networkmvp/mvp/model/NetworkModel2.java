@@ -332,6 +332,7 @@ public class NetworkModel2<T> extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
     private void loadGet(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag) {
+        LogUtil.i("啊啊啊"+mRxBus);
         mRxBus.post(new LoadingResult(true, tag));
         Flowable<? extends ErrorBean> flowable = null;
         try {

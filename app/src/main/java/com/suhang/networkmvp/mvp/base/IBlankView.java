@@ -8,6 +8,6 @@ import com.suhang.networkmvp.mvp.IView;
  * 不需要任何基本功能的View层(不需要网络访问等)
  */
 
-public interface IBlankView extends IView {
+public interface IBlankView extends IView{
 
 }

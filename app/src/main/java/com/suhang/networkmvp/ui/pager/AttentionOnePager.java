@@ -54,13 +54,14 @@ public class AttentionOnePager extends BasePager<BlankPresent, PagerAttentionOne
 
 	@Override
 	public void initData() {
-		addSubscribe(subscribe(SuccessResult.class).subscribe(successResult -> {
-			getBinding().data.setText(successResult.getResult(AppMain.class).toString());
-		}));
-		addSubscribe(subscribe(ErrorResult.class).subscribe(errorResult -> {
-		}));
-		addSubscribe(subscribe(LoadingResult.class).subscribe(loadingResult -> {
-		}));
+//		addSubscribe(subscribe(SuccessResult.class).subscribe(successResult -> {
+//			getBinding().data.setText(successResult.getResult(AppMain.class).toString());
+//		}));
+//		addSubscribe(subscribe(ErrorResult.class).subscribe(errorResult -> {
+//		}));
+//		addSubscribe(subscribe(LoadingResult.class).subscribe(loadingResult -> {
+//		}));
+//		getBS().subscribe(SuccessResult.class,this);
 		mModel2.loadPostDataWrap(AppMain.class, new ArrayMap<>(), false, 100);
 	}
 
@@ -78,4 +79,5 @@ public class AttentionOnePager extends BasePager<BlankPresent, PagerAttentionOne
 	public void hideLoading(int tag) {
 
 	}
+
 }

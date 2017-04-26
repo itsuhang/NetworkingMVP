@@ -13,6 +13,7 @@ import com.suhang.networkmvp.interfaces.INetworkOtherService;
 import com.suhang.networkmvp.mvp.contract.IAttentionContract;
 import com.suhang.networkmvp.mvp.model.NetworkModel2;
 import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
+import com.suhang.networkmvp.utils.LogUtil;
 
 import javax.inject.Inject;
 

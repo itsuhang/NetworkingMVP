@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-
 import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
@@ -18,9 +17,7 @@ import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
-import com.suhang.networkmvp.event.ErrorResult;
-import com.suhang.networkmvp.event.LoadingResult;
-import com.suhang.networkmvp.event.ProgressResult;
+import com.suhang.networkmvp.function.BaseSubscribe;
 import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.IView;
 import com.suhang.networkmvp.mvp.base.BasePresenter;
@@ -74,7 +71,7 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 	Context mContext;
 
 	@Inject
-	RxBus mRxBus;
+	BaseSubscribe mSubscribe;
 
 	private boolean isRegisterEventBus;
 
@@ -104,28 +101,28 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 	 *
 	 * @return
 	 */
-	protected RxBus getRxBus() {
-		return mRxBus;
+	protected BaseSubscribe getBS() {
+		return mSubscribe;
 	}
 
-	/**
-	 * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-	 * @param aClass 继承BaseResult的结果类的字节码
-	 * @param <V>
-	 * @return
-	 */
-	protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass){
-		return mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
-	}
-
-	/**
-	 * 添加rx事件到回收集合中,请尽量使用该方法把所有的事件添加到该集合中
-	 *
-	 * @param disposable
-	 */
-	protected void addSubscribe(Disposable disposable) {
-		mDisposables.add(disposable);
-	}
+//	/**
+//	 * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
+//	 * @param aClass 继承BaseResult的结果类的字节码
+//	 * @param <V>
+//	 * @return
+//	 */
+//	protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass){
+//		return mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+//	}
+//
+//	/**
+//	 * 添加rx事件到回收集合中,请尽量使用该方法把所有的事件添加到该集合中
+//	 *
+//	 * @param disposable
+//	 */
+//	protected void addSubscribe(Disposable disposable) {
+//		mDisposables.add(disposable);
+//	}
 
 	/**
 	 * 获取Presenter
