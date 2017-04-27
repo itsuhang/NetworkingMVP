@@ -76,7 +76,6 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDialog = DialogHelp.getWaitDialog(this);
         mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
         subscribeEvent();

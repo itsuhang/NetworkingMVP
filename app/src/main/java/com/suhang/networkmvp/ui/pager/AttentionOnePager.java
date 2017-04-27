@@ -40,8 +40,6 @@ public class AttentionOnePager extends BasePager<PagerAttentionOneBinding> {
 
     @Override
     protected void initEvent() {
-        getBinding().data.setOnClickListener(v -> {
-        });
     }
 
     @Override
