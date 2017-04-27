@@ -21,12 +21,7 @@ import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
 import com.suhang.networkmvp.event.ErrorResult;
-import com.suhang.networkmvp.event.LoadingResult;
-import com.suhang.networkmvp.event.ProgressResult;
-import com.suhang.networkmvp.event.SuccessResult;
 import com.suhang.networkmvp.function.RxBus;
-import com.suhang.networkmvp.mvp.IView;
-import com.suhang.networkmvp.mvp.base.BasePresenter;
 import com.suhang.networkmvp.utils.DialogHelp;
 import com.suhang.networkmvp.utils.InputLeakUtil;
 import com.suhang.networkmvp.utils.ScreenUtils;
@@ -47,7 +42,7 @@ import io.reactivex.disposables.Disposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBinding> extends AppCompatActivity implements IView {
+public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatActivity{
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -60,12 +55,8 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
     @Inject
     CompositeDisposable mDisposables;
 
-    //mvp中的presenter
-    @Inject
-    T mPresenter;
-
     //databing类
-    private E mBinding;
+    private T mBinding;
 
     @Inject
     Activity mActivity;
@@ -88,10 +79,16 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
         mDialog = DialogHelp.getWaitDialog(this);
         mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
+        subscribeEvent();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
         }
     }
+
+    /**
+     * 订阅事件
+     */
+    protected abstract void  subscribeEvent();
 
     /**
      * 注册事件总线
@@ -101,17 +98,11 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
         isRegisterEventBus = true;
     }
 
-    /**
-     * 获取Presenter
-     */
-    public T getPresenter() {
-        return mPresenter;
-    }
 
     /**
      * 获取Binding类
      */
-    protected E getBinding() {
+    protected T getBinding() {
         return mBinding;
     }
 
@@ -154,7 +145,7 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
      * @param aClass 继承BaseResult的结果类的字节码
      */
     protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass) {
-        return mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+        return getRxBus().toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
     }
 
     /**
@@ -193,7 +184,8 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
             Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
             mBinding.setVariable(BR.event, mEvent.getType().newInstance());
         } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -205,7 +197,8 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
             Field mData = mBinding.getClass().getDeclaredField("mData");
             mBinding.setVariable(BR.data, mData.getType().newInstance());
         } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -221,11 +214,6 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
      * MainModule()).inject(this);
      */
     protected abstract void injectDagger();
-
-    @Override
-    public Activity provideActivity() {
-        return mActivity;
-    }
 
     /**
      * 隐藏软键盘
@@ -259,9 +247,6 @@ public abstract class BaseActivity<T extends BasePresenter, E extends ViewDataBi
         super.onDestroy();
         if (mDisposables != null) {
             mDisposables.dispose();
-        }
-        if (mPresenter != null) {
-            mPresenter.detachView();
         }
         if (isRegisterEventBus) {
             EventBus.getDefault().unregister(this);

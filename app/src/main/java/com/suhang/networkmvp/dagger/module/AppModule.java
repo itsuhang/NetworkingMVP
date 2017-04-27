@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 
 import android.app.Application;
 
-import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.function.AddCookiesInterceptor;
@@ -13,12 +12,8 @@ import com.suhang.networkmvp.function.ReceivedCookiesInterceptor;
 import com.suhang.networkmvp.interfaces.INetworkOtherService;
 import com.suhang.networkmvp.interfaces.INetworkService;
 import com.suhang.networkmvp.interfaces.IUploadService;
-import com.suhang.networkmvp.utils.LogUtil;
-import com.suhang.networkmvp.utils.RetrofitHelper;
-import com.suhang.networkmvp.utils.SystemUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
@@ -64,7 +59,6 @@ public class AppModule {
         builder.addInterceptor(new CacheInterceptor());
         builder.addNetworkInterceptor(new CacheInterceptor());
         mOkHttpClient = builder.build();
-        LogUtil.i("啊啊啊"+mOkHttpClient);
     }
 
     /**

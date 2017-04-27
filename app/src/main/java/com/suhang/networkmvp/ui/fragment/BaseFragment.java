@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-
 import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
@@ -24,12 +23,7 @@ import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
 import com.suhang.networkmvp.event.ErrorResult;
-import com.suhang.networkmvp.event.LoadingResult;
-import com.suhang.networkmvp.event.ProgressResult;
-import com.suhang.networkmvp.event.SuccessResult;
 import com.suhang.networkmvp.function.RxBus;
-import com.suhang.networkmvp.mvp.IView;
-import com.suhang.networkmvp.mvp.base.BasePresenter;
 import com.suhang.networkmvp.utils.DialogHelp;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
@@ -49,7 +43,7 @@ import io.reactivex.disposables.Disposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBinding> extends Fragment implements IView {
+public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -62,12 +56,8 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
     @Inject
     CompositeDisposable mDisposables;
 
-    //mvp中的presenter
-    @Inject
-    T mPresenter;
-
     //databing类
-    private E mBinding;
+    private T mBinding;
 
     //进度对话框
     @Inject
@@ -95,10 +85,16 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
         mDialog = DialogHelp.getWaitDialog(getActivity());
         mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
+        subscribeEvent();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
         }
     }
+
+    /**
+     * 订阅事件
+     */
+    protected abstract void  subscribeEvent();
 
     /**
      * 注册事件总线
@@ -109,16 +105,9 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
     }
 
     /**
-     * 获取Presenter
-     */
-    public T getPresenter() {
-        return mPresenter;
-    }
-
-    /**
      * 获取Binding类
      */
-    protected E getBinding() {
+    protected T getBinding() {
         return mBinding;
     }
 
@@ -176,21 +165,12 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
 
     /**
      * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-     *
-     * @return
-     */
-    protected Flowable<SuccessResult> subscribeSuccess() {
-        return mRxBus.toFlowable(SuccessResult.class).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
-    }
-
-    /**
-     * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
      * @param aClass 继承BaseResult的结果类的字节码
      * @param <V>
      * @return
      */
     protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass){
-        return mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+        return getRxBus().toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
     }
 
     /**
@@ -231,7 +211,8 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
             Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
             mBinding.setVariable(BR.event, mEvent.getType().newInstance());
         } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
-            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
         }
     }
 
@@ -243,7 +224,8 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
             Field mData = mBinding.getClass().getDeclaredField("mData");
             mBinding.setVariable(BR.data, mData.getType().newInstance());
         } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
-            showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
         }
     }
 
@@ -260,10 +242,6 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
      */
     protected abstract void injectDagger();
 
-    @Override
-    public Activity provideActivity() {
-        return getActivity();
-    }
 
     /**
      * 隐藏软键盘
@@ -298,9 +276,6 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
         if (mDisposables != null) {
             mDisposables.dispose();
         }
-        if (mPresenter != null) {
-            mPresenter.detachView();
-        }
         EventBus.getDefault().unregister(this);
     }
 
@@ -310,9 +285,6 @@ public abstract class BaseFragment<T extends BasePresenter, E extends ViewDataBi
      */
     public void destory() {
         mDisposables.dispose();
-        if (mPresenter != null) {
-            mPresenter.detachView();
-        }
         //取消所有正在进行的网络任务
         if (mDialog != null) {
             mDialog.dismiss();

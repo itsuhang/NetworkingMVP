@@ -15,10 +15,10 @@ import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
-import com.suhang.networkmvp.function.SubscribeManager;
-import com.suhang.networkmvp.mvp.IView;
-import com.suhang.networkmvp.mvp.base.BasePresenter;
+import com.suhang.networkmvp.event.ErrorResult;
+import com.suhang.networkmvp.function.RxBus;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -28,14 +28,17 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by 苏杭 on 2017/1/24 15:12.
  * Fragment中不方便再嵌套Fragment时,用Pager页面
  */
 
-public abstract class BasePager<T extends BasePresenter, E extends ViewDataBinding> implements IView {
+public abstract class BasePager<T extends ViewDataBinding>{
 	//基类内部错误tag
 	public static final int ERROR_TAG = -1;
 
@@ -48,12 +51,8 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 	@Inject
 	CompositeDisposable mDisposables;
 
-	//mvp中的presenter
-	@Inject
-	T mPresenter;
-
 	//databing类
-	private E mBinding;
+	private T mBinding;
 
 	//进度对话框
 	@Inject
@@ -66,17 +65,23 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 	Context mContext;
 
 	@Inject
-    SubscribeManager mSubscribe;
+    RxBus mRxBus;
 
 	private boolean isRegisterEventBus;
 
 	public BasePager(Activity activity) {
 		mBaseComponent = ((BaseApp) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
 		injectDagger();
+		subscribeEvent();
 		if (mActivity == null) {
 			throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
 		}
 	}
+
+	/**
+	 * 订阅事件
+	 */
+	protected abstract void subscribeEvent();
 
 	/**
 	 * 注册事件总线
@@ -96,40 +101,33 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 	 *
 	 * @return
 	 */
-	protected SubscribeManager getBS() {
-		return mSubscribe;
+	protected RxBus getRxBus() {
+		return mRxBus;
 	}
 
-//	/**
-//	 * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-//	 * @param aClass 继承BaseResult的结果类的字节码
-//	 * @param <V>
-//	 * @return
-//	 */
-//	protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass){
-//		return mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
-//	}
-//
-//	/**
-//	 * 添加rx事件到回收集合中,请尽量使用该方法把所有的事件添加到该集合中
-//	 *
-//	 * @param disposable
-//	 */
-//	protected void addSubscribe(Disposable disposable) {
-//		mDisposables.add(disposable);
-//	}
+	/**
+	 * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
+	 * @param aClass 继承BaseResult的结果类的字节码
+	 * @param <V>
+	 * @return
+	 */
+	protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass){
+		return getRxBus().toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
+	}
 
 	/**
-	 * 获取Presenter
+	 * 添加rx事件到回收集合中,请尽量使用该方法把所有的事件添加到该集合中
+	 *
+	 * @param disposable
 	 */
-	public T getPresenter() {
-		return mPresenter;
+	protected void addSubscribe(Disposable disposable) {
+		mDisposables.add(disposable);
 	}
 
 	/**
 	 * 获取Binding类
 	 */
-	protected E getBinding() {
+	protected T getBinding() {
 		return mBinding;
 	}
 
@@ -214,7 +212,8 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 			Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
 			mBinding.setVariable(BR.event, mEvent.getType().newInstance());
 		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-			showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
+			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
 		}
 	}
 
@@ -226,13 +225,9 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 			Field mData = mBinding.getClass().getDeclaredField("mData");
 			mBinding.setVariable(BR.data, mData.getType().newInstance());
 		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-			showError(new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage()), ERROR_TAG);
+			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
 		}
-	}
-
-	@Override
-	public Activity provideActivity() {
-		return mActivity;
 	}
 
 	protected boolean isVisiable() {
@@ -245,8 +240,6 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 
 	public void destory() {
 		mDisposables.dispose();
-		if (mPresenter != null)
-			mPresenter.detachView();
 		//取消所有正在进行的网络任务
 		if (mDialog != null) {
 			mDialog.dismiss();
@@ -255,7 +248,6 @@ public abstract class BasePager<T extends BasePresenter, E extends ViewDataBindi
 		if (isRegisterEventBus) {
 			EventBus.getDefault().unregister(this);
 		}
-		mSubscribe.destory();
 	}
 
 }

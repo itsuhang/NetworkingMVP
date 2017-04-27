@@ -1,10 +1,6 @@
 package com.suhang.networkmvp.event;
 
-import com.suhang.networkmvp.annotation.Result;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.interfaces.IResultCallback;
-
-import java.lang.annotation.Inherited;
 
 /**
  * Created by 苏杭 on 2017/4/25 16:10.
@@ -41,10 +37,5 @@ public class SuccessResult extends BaseResult{
     public SuccessResult(ErrorBean result,int tag) {
         this.result = result;
         this.tag = tag;
-    }
-
-    @Result
-    public interface SuccessCallback extends IResultCallback {
-        void onSuccess(SuccessResult successResult);
     }
 }

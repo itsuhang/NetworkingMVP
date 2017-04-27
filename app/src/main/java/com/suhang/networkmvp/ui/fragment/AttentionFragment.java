@@ -6,18 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.AttentionPagerAdapter;
 import com.suhang.networkmvp.annotation.FragmentScope;
-import com.suhang.networkmvp.dagger.module.AttentionModule;
+import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentAttentionBinding;
-import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.ErrorResult;
-import com.suhang.networkmvp.event.LoadingResult;
-import com.suhang.networkmvp.event.SuccessResult;
-import com.suhang.networkmvp.mvp.base.BlankPresent;
-import com.suhang.networkmvp.mvp.base.IBlankView;
 import com.suhang.networkmvp.ui.pager.AttentionOnePager;
 import com.suhang.networkmvp.ui.pager.AttentionTwoPager;
 import com.suhang.networkmvp.ui.pager.BasePager;
@@ -29,12 +22,17 @@ import java.util.List;
  * Created by 苏杭 on 2017/1/24 15:31.
  */
 @FragmentScope
-public class AttentionFragment extends BaseFragment<BlankPresent,FragmentAttentionBinding> implements IBlankView {
+public class AttentionFragment extends BaseFragment<FragmentAttentionBinding>{
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return bind(inflater, container, R.layout.fragment_attention);
+    }
+
+    @Override
+    protected void subscribeEvent() {
+
     }
 
     @Override
@@ -47,36 +45,6 @@ public class AttentionFragment extends BaseFragment<BlankPresent,FragmentAttenti
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getAttentionComponent(new AttentionModule(this)).inject(this);
-    }
-
-    @Override
-    public void showError(ErrorBean e, int tag) {
-
-    }
-
-    @Override
-    public void showLoading(int tag) {
-
-    }
-
-    @Override
-    public void hideLoading(int tag) {
-
-    }
-
-    @Override
-    public void onLoading(LoadingResult loadingResult) {
-
-    }
-
-    @Override
-    public void onError(ErrorResult errorResult) {
-
-    }
-
-    @Override
-    public void onSuccess(SuccessResult successResult) {
-
+        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
     }
 }

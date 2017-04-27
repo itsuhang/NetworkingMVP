@@ -2,12 +2,8 @@ package com.suhang.networkmvp.dagger.component;
 
 
 import com.suhang.networkmvp.annotation.BaseScope;
-import com.suhang.networkmvp.dagger.module.AttentionModule;
-import com.suhang.networkmvp.dagger.module.AttentionOnStartModule;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.dagger.module.BlankModule;
-import com.suhang.networkmvp.dagger.module.HomeModule;
-import com.suhang.networkmvp.dagger.module.MainModule;
 
 import dagger.Subcomponent;
 
@@ -20,12 +16,7 @@ import dagger.Subcomponent;
 public interface BaseComponent {
     /**
      * 暴露子Component
-     * @param module
-     * @return
      */
-    MainComponent getMainComponent(MainModule module);
-    HomeComponent getHomeComponent(HomeModule module);
-    AttentionComponent getAttentionComponent(AttentionModule module);
-    AttentionOnStartComponent getAttentionOnStartComponent(AttentionOnStartModule module);
     BlankComponent getBlankComponent(BlankModule module);
+
 }

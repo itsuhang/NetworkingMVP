@@ -4,7 +4,6 @@ import android.view.ViewGroup;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.databinding.ItemHomeBinding;
-import com.suhang.networkmvp.mvp.presenter.HomePresenter;
 
 import javax.inject.Inject;
 
@@ -12,7 +11,7 @@ import javax.inject.Inject;
  * Created by 苏杭 on 2017/1/24 16:51.
  */
 
-public class HomeRvAdapter extends BaseRvAdapter<HomePresenter,ItemHomeBinding>  {
+public class HomeRvAdapter extends BaseRvAdapter<ItemHomeBinding>  {
     @Inject
     public HomeRvAdapter() {
     }

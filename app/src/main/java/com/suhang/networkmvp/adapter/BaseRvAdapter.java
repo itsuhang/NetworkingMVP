@@ -10,9 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.interfaces.IAdapterHelper;
-import com.suhang.networkmvp.mvp.IPresenter;
-import com.suhang.networkmvp.mvp.IView;
 
 import javax.inject.Inject;
 
@@ -22,7 +21,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-public abstract class BaseRvAdapter<E extends IPresenter, T extends ViewDataBinding> extends RecyclerView.Adapter implements IAdapterHelper {
+public abstract class BaseRvAdapter<T extends ViewDataBinding> extends RecyclerView.Adapter implements IAdapterHelper {
     //基类内部错误tag
     private static final int ERROR_TAG = -1;
     @Inject
@@ -34,12 +33,8 @@ public abstract class BaseRvAdapter<E extends IPresenter, T extends ViewDataBind
     @Inject
     CompositeDisposable mDisposables;
 
-    //用于在调用该Adaper所在的页面中的showError()方法
     @Inject
-    IView mView;
-
-    @Inject
-    E mPresenter;
+    RxBus mRxBus;
 
     private int mNetItemCount;
     private int mMaxCount = 1;
@@ -52,9 +47,10 @@ public abstract class BaseRvAdapter<E extends IPresenter, T extends ViewDataBind
         return mContext;
     }
 
-    public E getPresenter() {
-        return mPresenter;
+    public RxBus getRxBus() {
+        return mRxBus;
     }
+
 
     public BaseRvAdapter() {
     }

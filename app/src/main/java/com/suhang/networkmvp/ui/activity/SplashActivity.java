@@ -6,16 +6,9 @@ import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.ActivityScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivitySplashBinding;
-import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.ErrorResult;
-import com.suhang.networkmvp.event.LoadingResult;
-import com.suhang.networkmvp.event.SuccessResult;
-import com.suhang.networkmvp.mvp.base.BlankPresent;
-import com.suhang.networkmvp.mvp.base.IBlankView;
-import com.suhang.networkmvp.utils.LogUtil;
 
 @ActivityScope
-public class SplashActivity extends BaseActivity<BlankPresent, ActivitySplashBinding> implements IBlankView {
+public class SplashActivity extends BaseActivity<ActivitySplashBinding>{
 
 
     @Override
@@ -27,42 +20,18 @@ public class SplashActivity extends BaseActivity<BlankPresent, ActivitySplashBin
     }
 
     @Override
+    protected void subscribeEvent() {
+
+    }
+
+    @Override
     protected void initData() {
         getBinding().getData().da.set(getIntent().getStringExtra("name")+"   "+getIntent().getStringExtra("age"));
     }
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getBlankComponent(new BlankModule(this)).inject(this);
+        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
     }
 
-    @Override
-    public void showError(ErrorBean e, int tag) {
-        LogUtil.i("啊啊啊" + e.getDesc());
-    }
-
-    @Override
-    public void showLoading(int tag) {
-
-    }
-
-    @Override
-    public void hideLoading(int tag) {
-
-    }
-
-    @Override
-    public void onLoading(LoadingResult loadingResult) {
-
-    }
-
-    @Override
-    public void onError(ErrorResult errorResult) {
-
-    }
-
-    @Override
-    public void onSuccess(SuccessResult successResult) {
-
-    }
 }

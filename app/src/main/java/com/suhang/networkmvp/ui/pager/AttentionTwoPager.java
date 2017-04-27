@@ -4,16 +4,10 @@ import android.app.Activity;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.PagerScope;
-import com.suhang.networkmvp.dagger.module.AttentionOnStartModule;
+import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionTwoBinding;
-import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.domain.GithubBean;
-import com.suhang.networkmvp.event.SuccessResult;
 import com.suhang.networkmvp.interfaces.INetworkOtherService;
-import com.suhang.networkmvp.mvp.contract.IAttentionContract;
-import com.suhang.networkmvp.mvp.model.NetworkModel2;
-import com.suhang.networkmvp.mvp.presenter.AttentionPresenter;
-import com.suhang.networkmvp.utils.LogUtil;
+import com.suhang.networkmvp.mvp.model.NetworkModel;
 
 import javax.inject.Inject;
 
@@ -23,9 +17,9 @@ import javax.inject.Inject;
  */
 
 @PagerScope
-public class AttentionTwoPager extends BasePager<AttentionPresenter,PagerAttentionTwoBinding> implements IAttentionContract.IAttentionView {
+public class AttentionTwoPager extends BasePager<PagerAttentionTwoBinding>{
     @Inject
-    NetworkModel2<INetworkOtherService> mModel2;
+    NetworkModel<INetworkOtherService> mModel2;
 
     public AttentionTwoPager(Activity activity) {
         super(activity);
@@ -33,45 +27,21 @@ public class AttentionTwoPager extends BasePager<AttentionPresenter,PagerAttenti
     }
 
     @Override
+    protected void subscribeEvent() {
+
+    }
+
+    @Override
     protected void injectDagger() {
-        getBaseComponent().getAttentionOnStartComponent(new AttentionOnStartModule(this)).inject(this);
+        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
     }
 
     @Override
     public void initData() {
-//        addSubscribe(subscribe(SuccessResult.class).subscribe(successResult -> {
+//        addSubscribe(subscribeEvent(SuccessResult.class).subscribeEvent(successResult -> {
 //            getBinding().tv.setText(successResult.getResult(GithubBean.class).toString());
 //        }));
 //        mModel2.loadGetData(GithubBean.class,"2/1",null,100);
     }
 
-    @Override
-    public void showError(ErrorBean e, int tag) {
-
-    }
-
-    @Override
-    public void showLoading(int tag) {
-
-    }
-
-    @Override
-    public void hideLoading(int tag) {
-
-    }
-
-    @Override
-    public void log() {
-
-    }
-
-    @Override
-    public void setData(ErrorBean e, int tag) {
-
-    }
-
-    @Override
-    public void progress(int precent, int tag) {
-
-    }
 }
