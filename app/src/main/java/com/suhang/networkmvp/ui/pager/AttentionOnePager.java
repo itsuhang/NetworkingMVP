@@ -3,6 +3,7 @@ package com.suhang.networkmvp.ui.pager;
 import android.app.Activity;
 
 import com.suhang.networkmvp.R;
+import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
@@ -20,14 +21,14 @@ import javax.inject.Inject;
  */
 
 @PagerScope
-public class AttentionOnePager extends BasePager<PagerAttentionOneBinding> {
+public class AttentionOnePager extends BasePager {
+    @Binding(id = R.layout.pager_attention_one)
+    PagerAttentionOneBinding mBinding;
     @Inject
     NetworkModel<INetworkService> mModel2;
 
     public AttentionOnePager(Activity activity) {
         super(activity);
-        bind(R.layout.pager_attention_one);
-        LogUtil.i("啊啊啊"+mDisposables);
     }
 
     @Override

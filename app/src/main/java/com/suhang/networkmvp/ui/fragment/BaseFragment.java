@@ -6,16 +6,14 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.suhang.networkmvp.BR;
+import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -24,7 +22,6 @@ import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
 import com.suhang.networkmvp.event.ErrorResult;
 import com.suhang.networkmvp.function.RxBus;
-import com.suhang.networkmvp.utils.DialogHelp;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -43,7 +40,7 @@ import io.reactivex.disposables.Disposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
+public abstract class BaseFragment extends Fragment {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -55,9 +52,6 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
     //Rxjava事件集合，用于退出时取消事件
     @Inject
     CompositeDisposable mDisposables;
-
-    //databing类
-    private T mBinding;
 
     //进度对话框
     @Inject
@@ -78,6 +72,7 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
     protected boolean isCacheView;
 
     private boolean isRegisterEventBus;
+    private View mRootView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,8 +80,55 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
         mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
         subscribeEvent();
+        setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
+        }
+    }
+
+    /**
+     * 获得布局View,仅在onCreateView()方法中使用
+     * @return
+     */
+    protected View getRootView() {
+        if (cacheView == null) {
+            cacheView = mRootView;
+        } else {
+            isCacheView = true;
+            ViewGroup parent = (ViewGroup) cacheView.getParent();
+            if (parent != null) {
+                parent.removeView(cacheView);
+            }
+        }
+        return cacheView;
+    }
+
+    /**
+     * 找到被@Binding注解的ViewDataBinding属性,并赋值
+     */
+    //TODO 使用apt实现该功能
+    private void setLayout() {
+        boolean isExist = false;
+        for (Field field : getClass().getFields()) {
+            Binding annotation = field.getAnnotation(Binding.class);
+            if (annotation != null) {
+                isExist = true;
+                int id = annotation.id();
+                mRootView = View.inflate(mContext, id, null);
+                ViewDataBinding viewDataBinding = DataBindingUtil.bind(mRootView);
+                try {
+                    field.set(this, viewDataBinding);
+                    initData();
+                    initEvent();
+                } catch (IllegalAccessException e) {
+                    ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
+                    mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
+                }
+            }
+        }
+        if (!isExist) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
+            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -104,13 +146,6 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
     }
 
     /**
-     * 获取Binding类
-     */
-    protected T getBinding() {
-        return mBinding;
-    }
-
-    /**
      * 获取对话框
      */
     protected Dialog getDialog() {
@@ -122,26 +157,6 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
         super.onActivityCreated(savedInstanceState);
         initData();
         initEvent();
-    }
-
-    /**
-     * 绑定布局，在onCreateView（）中调用
-     */
-    protected View bind(LayoutInflater inflater, @Nullable ViewGroup container, @LayoutRes int id) {
-        View view = inflater.inflate(id, container, false);
-        mBinding = DataBindingUtil.bind(view);
-        setBindingEvent();
-        setBindingData();
-        if (cacheView == null) {
-            cacheView = view;
-        } else {
-            isCacheView = true;
-            ViewGroup parent = (ViewGroup) cacheView.getParent();
-            if (parent != null) {
-                parent.removeView(cacheView);
-            }
-        }
-        return cacheView;
     }
 
 
@@ -183,13 +198,6 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
 
 
     /**
-     * 获得根布局
-     */
-    public View getRootView() {
-        return mBinding.getRoot();
-    }
-
-    /**
      * 初始化数据
      */
     protected abstract void initData();
@@ -202,31 +210,31 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
 
     }
 
-    /**
-     * 绑定事件类(暂不使用)
-     */
-    protected void setBindingEvent() {
-        try {
-            Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
-            mBinding.setVariable(BR.event, mEvent.getType().newInstance());
-        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-        }
-    }
-
-    /**
-     * 绑定数据类(暂不使用)
-     */
-    protected void setBindingData() {
-        try {
-            Field mData = mBinding.getClass().getDeclaredField("mData");
-            mBinding.setVariable(BR.data, mData.getType().newInstance());
-        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-        }
-    }
+//    /**
+//     * 绑定事件类(暂不使用)
+//     */
+//    protected void setBindingEvent() {
+//        try {
+//            Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
+//            mBinding.setVariable(BR.event, mEvent.getType().newInstance());
+//        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
+//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+//            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
+//        }
+//    }
+//
+//    /**
+//     * 绑定数据类(暂不使用)
+//     */
+//    protected void setBindingData() {
+//        try {
+//            Field mData = mBinding.getClass().getDeclaredField("mData");
+//            mBinding.setVariable(BR.data, mData.getType().newInstance());
+//        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
+//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+//            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
+//        }
+//    }
 
     /**
      * 获取父Component(dagger2)

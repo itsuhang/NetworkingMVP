@@ -6,14 +6,13 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.suhang.networkmvp.BR;
+import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.App;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -41,7 +40,7 @@ import io.reactivex.disposables.Disposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatActivity{
+public abstract class BaseActivity extends AppCompatActivity{
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -53,9 +52,6 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
     //Rxjava事件集合，用于退出时取消事件
     @Inject
     CompositeDisposable mDisposables;
-
-    //databing类
-    private T mBinding;
 
     @Inject
     Activity mActivity;
@@ -78,8 +74,37 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
         mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
         subscribeEvent();
+        setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
+        }
+    }
+
+    /**
+     * 找到被@Binding注解的ViewDataBinding属性,并赋值
+     */
+    //TODO 使用apt实现该功能
+    private void setLayout() {
+        boolean isExist = false;
+        for (Field field : getClass().getFields()) {
+            Binding annotation = field.getAnnotation(Binding.class);
+            if (annotation != null) {
+                isExist = true;
+                int id = annotation.id();
+                ViewDataBinding viewDataBinding = DataBindingUtil.setContentView(mActivity,id);
+                try {
+                    field.set(this, viewDataBinding);
+                    initData();
+                    initEvent();
+                } catch (IllegalAccessException e) {
+                    ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
+                    mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
+                }
+            }
+        }
+        if (!isExist) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
+            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -98,29 +123,12 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
 
 
     /**
-     * 获取Binding类
-     */
-    protected T getBinding() {
-        return mBinding;
-    }
-
-    /**
      * 获取对话框
      */
     protected Dialog getDialog() {
         return mDialog;
     }
 
-    /**
-     * 绑定布局，在onCreate()中调用
-     */
-    protected void bind(@LayoutRes int id) {
-        mBinding = DataBindingUtil.setContentView(this, id);
-        setBindingEvent();
-        setBindingData();
-        initData();
-        initEvent();
-    }
 
     /**
      * EventBus事件(防崩溃,需要则重写)
@@ -155,13 +163,6 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
 
 
     /**
-     * 获得根布局
-     */
-    public View getRootView() {
-        return mBinding.getRoot();
-    }
-
-    /**
      * 初始化数据
      */
     protected abstract void initData();
@@ -174,31 +175,31 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
 
     }
 
-    /**
-     * 绑定事件类(暂不使用)
-     */
-    protected void setBindingEvent() {
-        try {
-            Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
-            mBinding.setVariable(BR.event, mEvent.getType().newInstance());
-        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
-
-    /**
-     * 绑定数据类(暂不使用)
-     */
-    protected void setBindingData() {
-        try {
-            Field mData = mBinding.getClass().getDeclaredField("mData");
-            mBinding.setVariable(BR.data, mData.getType().newInstance());
-        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
+//    /**
+//     * 绑定事件类(暂不使用)
+//     */
+//    protected void setBindingEvent() {
+//        try {
+//            Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
+//            mBinding.setVariable(BR.event, mEvent.getType().newInstance());
+//        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
+//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+//            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
+//        }
+//    }
+//
+//    /**
+//     * 绑定数据类(暂不使用)
+//     */
+//    protected void setBindingData() {
+//        try {
+//            Field mData = mBinding.getClass().getDeclaredField("mData");
+//            mBinding.setVariable(BR.data, mData.getType().newInstance());
+//        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
+//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+//            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
+//        }
+//    }
 
     /**
      * 获取父Component(dagger2)

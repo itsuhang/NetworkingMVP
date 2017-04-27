@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.AttentionPagerAdapter;
+import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentAttentionBinding;
@@ -22,12 +23,14 @@ import java.util.List;
  * Created by 苏杭 on 2017/1/24 15:31.
  */
 @FragmentScope
-public class AttentionFragment extends BaseFragment<FragmentAttentionBinding>{
+public class AttentionFragment extends BaseFragment{
+    @Binding(id = R.layout.fragment_attention)
+    FragmentAttentionBinding mBinding;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return bind(inflater, container, R.layout.fragment_attention);
+        return getRootView();
     }
 
     @Override
@@ -40,7 +43,7 @@ public class AttentionFragment extends BaseFragment<FragmentAttentionBinding>{
         List<BasePager> pagers = new ArrayList<>();
         pagers.add(new AttentionOnePager(getActivity()));
         pagers.add(new AttentionTwoPager(getActivity()));
-        getBinding().vpAttention.setAdapter(new AttentionPagerAdapter(pagers));
+        mBinding.vpAttention.setAdapter(new AttentionPagerAdapter(pagers));
     }
 
     @Override

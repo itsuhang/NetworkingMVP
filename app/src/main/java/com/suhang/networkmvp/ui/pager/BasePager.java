@@ -5,12 +5,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
-import android.support.annotation.LayoutRes;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.suhang.networkmvp.BR;
+import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.App;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -38,7 +37,7 @@ import io.reactivex.disposables.Disposable;
  * Fragment中不方便再嵌套Fragment时,用Pager页面
  */
 
-public abstract class BasePager<T extends ViewDataBinding>{
+public abstract class BasePager{
 	//基类内部错误tag
 	public static final int ERROR_TAG = -1;
 
@@ -50,9 +49,6 @@ public abstract class BasePager<T extends ViewDataBinding>{
 	//Rxjava事件集合，用于退出时取消事件
 	@Inject
 	CompositeDisposable mDisposables;
-
-	//databing类
-	private T mBinding;
 
 	//进度对话框
 	@Inject
@@ -68,13 +64,43 @@ public abstract class BasePager<T extends ViewDataBinding>{
     RxBus mRxBus;
 
 	private boolean isRegisterEventBus;
+	private View mRootView;
 
 	public BasePager(Activity activity) {
 		mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
 		injectDagger();
 		subscribeEvent();
+		setLayout();
 		if (mActivity == null) {
 			throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
+		}
+	}
+
+	/**
+	 * 找到被@Binding注解的ViewDataBinding属性,并赋值
+	 */
+	//TODO 使用apt实现该功能
+	private void setLayout() {
+		boolean isExist = false;
+		for (Field field : getClass().getFields()) {
+			Binding annotation = field.getAnnotation(Binding.class);
+			if (annotation != null) {
+				isExist = true;
+				int id = annotation.id();
+				mRootView = View.inflate(mContext, id, null);
+				ViewDataBinding viewDataBinding = DataBindingUtil.bind(mRootView);
+				try {
+					field.set(this, viewDataBinding);
+					initEvent();
+				} catch (IllegalAccessException e) {
+					ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
+					mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
+				}
+			}
+		}
+		if (!isExist) {
+			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
+			mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
 		}
 	}
 
@@ -125,26 +151,12 @@ public abstract class BasePager<T extends ViewDataBinding>{
 	}
 
 	/**
-	 * 获取Binding类
-	 */
-	protected T getBinding() {
-		return mBinding;
-	}
-
-	/**
 	 * 获取对话框
 	 */
 	protected Dialog getDialog() {
 		return mDialog;
 	}
 
-	protected void bind(@LayoutRes int id) {
-		View view = View.inflate(mContext, id, null);
-		mBinding = DataBindingUtil.bind(view);
-		setBindingEvent();
-		setBindingData();
-		initEvent();
-	}
 
 	/**
 	 * 获取父Component(dagger2)
@@ -164,7 +176,7 @@ public abstract class BasePager<T extends ViewDataBinding>{
 	 * 获得根布局
 	 */
 	public View getRootView() {
-		return mBinding.getRoot();
+		return mRootView;
 	}
 
 	/**
@@ -204,31 +216,31 @@ public abstract class BasePager<T extends ViewDataBinding>{
 		((InputMethodManager) getActivity().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(et, InputMethodManager.SHOW_FORCED);
 	}
 
-	/**
-	 * 绑定事件类(暂不使用)
-	 */
-	protected void setBindingEvent() {
-		try {
-			Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
-			mBinding.setVariable(BR.event, mEvent.getType().newInstance());
-		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-		}
-	}
-
-	/**
-	 * 绑定数据类(暂不使用)
-	 */
-	protected void setBindingData() {
-		try {
-			Field mData = mBinding.getClass().getDeclaredField("mData");
-			mBinding.setVariable(BR.data, mData.getType().newInstance());
-		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-		}
-	}
+//	/**
+//	 * 绑定事件类(暂不使用)
+//	 */
+//	protected void setBindingEvent() {
+//		try {
+//			Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
+//			mBinding.setVariable(BR.event, mEvent.getType().newInstance());
+//		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
+//			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+//			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
+//		}
+//	}
+//
+//	/**
+//	 * 绑定数据类(暂不使用)
+//	 */
+//	protected void setBindingData() {
+//		try {
+//			Field mData = mBinding.getClass().getDeclaredField("mData");
+//			mBinding.setVariable(BR.data, mData.getType().newInstance());
+//		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
+//			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+//			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
+//		}
+//	}
 
 	protected boolean isVisiable() {
 		return getRootView().isShown();

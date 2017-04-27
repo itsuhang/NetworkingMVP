@@ -21,7 +21,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-public abstract class BaseRvAdapter<T extends ViewDataBinding> extends RecyclerView.Adapter implements IAdapterHelper {
+public abstract class BaseRvAdapter extends RecyclerView.Adapter implements IAdapterHelper {
     //基类内部错误tag
     private static final int ERROR_TAG = -1;
     @Inject
@@ -51,7 +51,7 @@ public abstract class BaseRvAdapter<T extends ViewDataBinding> extends RecyclerV
         return mRxBus;
     }
 
-
+    @Inject
     public BaseRvAdapter() {
     }
 
@@ -65,13 +65,6 @@ public abstract class BaseRvAdapter<T extends ViewDataBinding> extends RecyclerV
         return getItemCount();
     }
 
-    protected MyViewHolder bind(@LayoutRes int id) {
-        View view = View.inflate(mContext, id, null);
-        T mBinding = DataBindingUtil.bind(view);
-//		setBindingEvent();
-//		setBindingData();
-        return new MyViewHolder(view, mBinding);
-    }
 
     @Override
     public int getMaxCount() {
@@ -103,9 +96,9 @@ public abstract class BaseRvAdapter<T extends ViewDataBinding> extends RecyclerV
 //    }
 
 
-    protected abstract MyViewHolder onCreateHolder(ViewGroup parent, int viewType);
+    protected abstract  MyViewHolder onCreateHolder(ViewGroup parent, int viewType);
 
-    protected abstract void onBindHolder(MyViewHolder holder, int position);
+    protected  abstract void onBindHolder(MyViewHolder holder, int position);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -115,16 +108,18 @@ public abstract class BaseRvAdapter<T extends ViewDataBinding> extends RecyclerV
         mMaxCount = setMaxCount();
     }
 
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return onCreateHolder(parent, viewType);
+
+        return null;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder<T extends ViewDataBinding> extends RecyclerView.ViewHolder {
         public T mBinding;
 
-        public MyViewHolder(View itemView, T binding) {
-            super(itemView);
+        public MyViewHolder( T binding) {
+            super(binding.getRoot());
             this.mBinding = binding;
             this.mBinding.executePendingBindings();
         }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.MainFragmentAdapter;
 import com.suhang.networkmvp.annotation.ActivityScope;
+import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
 import com.suhang.networkmvp.ui.fragment.AttentionFragment;
@@ -17,12 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ActivityScope
-public class MainActivity extends BaseActivity<ActivityMainBinding>{
+public class MainActivity extends BaseActivity{
+    @Binding(id = R.layout.activity_main)
+    ActivityMainBinding mBinding;
     private static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bind(R.layout.activity_main);
     }
 
     @Override
@@ -35,7 +37,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
         List<BaseFragment> fragments = new ArrayList<>();
         fragments.add(new HomeFragment());
         fragments.add(new AttentionFragment());
-        getBinding().vpMain.setAdapter(new MainFragmentAdapter(getSupportFragmentManager(),fragments));
+        mBinding.vpMain.setAdapter(new MainFragmentAdapter(getSupportFragmentManager(),fragments));
         new RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE).subscribe(aBoolean -> {
         });
     }
