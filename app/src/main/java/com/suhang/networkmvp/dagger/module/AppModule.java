@@ -35,9 +35,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class AppModule {
     private Application mApplication;
     private OkHttpClient mOkHttpClient;
+    private final Retrofit.Builder mBuilder;
+    private final Gson mGson;
+
     public AppModule(Application application) {
         mApplication = application;
         initOkHttpClient();
+        mBuilder = new Retrofit.Builder();
+        mGson = new Gson();
     }
 
     /**
@@ -63,7 +68,6 @@ public class AppModule {
 
     /**
      * 提供OkHttpClient(全局单例)
-     * @return
      */
     @Singleton
     @Provides
@@ -73,45 +77,41 @@ public class AppModule {
 
     /**
      * 提供网络Service(全局单例)
-     * @return
      */
     @Singleton
     @Provides
     INetworkService provideNetworkService() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
+        Retrofit retrofit = mBuilder.baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
         return retrofit.create(INetworkService.class);
     }
 
     /**
      * 提供网络Service(全局单例)
-     * @return
      */
     @Singleton
     @Provides
     INetworkOtherService provideNetworkOtherService() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL1).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
+        Retrofit retrofit = mBuilder.baseUrl(Constants.BASE_URL1).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
         return retrofit.create(INetworkOtherService.class);
     }
 
     /**
      * 提供上传Service(全局单例)
-     * @return
      */
     @Singleton
     @Provides
     IUploadService provideUploadService() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
+        Retrofit retrofit = mBuilder.baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
         return retrofit.create(IUploadService.class);
     }
 
     /**
      * 提供Gson(全局单例)
-     * @return
      */
     @Singleton
     @Provides
     Gson provideGson() {
-        return new Gson();
+        return mGson;
     }
 
     @Provides

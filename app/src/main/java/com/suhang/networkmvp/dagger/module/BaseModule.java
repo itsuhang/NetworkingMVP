@@ -27,9 +27,13 @@ import io.reactivex.disposables.CompositeDisposable;
 @Module
 public class BaseModule {
     private Activity mActivity;
+    private final Dialog mWaitDialog;
+    private final CompositeDisposable mCompositeDisposable;
 
     public BaseModule(Activity activity) {
         mActivity = activity;
+        mWaitDialog = DialogHelp.getWaitDialog(mActivity);
+        mCompositeDisposable = new CompositeDisposable();
     }
 
     @BaseScope
@@ -47,12 +51,12 @@ public class BaseModule {
     @BaseScope
     @Provides
     Dialog provideDialog() {
-        return DialogHelp.getWaitDialog(mActivity);
+        return mWaitDialog;
     }
 
     @Provides
     CompositeDisposable provideCD() {
-        return new CompositeDisposable();
+        return mCompositeDisposable;
     }
 
     /**

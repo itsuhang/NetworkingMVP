@@ -11,7 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.suhang.networkmvp.BR;
-import com.suhang.networkmvp.application.BaseApp;
+import com.suhang.networkmvp.application.App;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
@@ -70,7 +70,7 @@ public abstract class BasePager<T extends ViewDataBinding>{
 	private boolean isRegisterEventBus;
 
 	public BasePager(Activity activity) {
-		mBaseComponent = ((BaseApp) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
+		mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
 		injectDagger();
 		subscribeEvent();
 		if (mActivity == null) {

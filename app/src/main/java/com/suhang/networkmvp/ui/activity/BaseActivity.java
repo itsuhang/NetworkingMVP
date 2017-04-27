@@ -22,7 +22,6 @@ import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
 import com.suhang.networkmvp.event.ErrorResult;
 import com.suhang.networkmvp.function.RxBus;
-import com.suhang.networkmvp.utils.DialogHelp;
 import com.suhang.networkmvp.utils.InputLeakUtil;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
