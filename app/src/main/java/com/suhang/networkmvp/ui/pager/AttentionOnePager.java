@@ -1,8 +1,10 @@
 package com.suhang.networkmvp.ui.pager;
 
 import android.app.Activity;
+import android.util.ArrayMap;
 
 import com.suhang.networkmvp.R;
+import com.suhang.networkmvp.annotation.BaseScope;
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
@@ -19,7 +21,6 @@ import javax.inject.Inject;
 /**
  * Created by 苏杭 on 2017/1/24 16:28.
  */
-
 @PagerScope
 public class AttentionOnePager extends BasePager {
     @Binding(id = R.layout.pager_attention_one)
@@ -33,7 +34,7 @@ public class AttentionOnePager extends BasePager {
 
     @Override
     protected void subscribeEvent() {
-        subscribe(SuccessResult.class).subscribe(successResult -> {
+        getSm().subscribe(SuccessResult.class).subscribe(successResult -> {
             LogUtil.i("啊啊啊"+successResult.getResult(AppMain.class));
         });
     }
@@ -41,6 +42,13 @@ public class AttentionOnePager extends BasePager {
 
     @Override
     protected void initEvent() {
+        mBinding.button.setOnClickListener(v -> {
+            mModel2.loadPostDataWrap(AppMain.class, new ArrayMap<>(), false, 100);
+        });
+        mBinding.button1.setOnClickListener(v -> {
+            LogUtil.i("啊啊啊"+mDisposables.size()+" "+mDisposables);
+            mDisposables.dispose();
+        });
     }
 
     @Override
@@ -50,7 +58,6 @@ public class AttentionOnePager extends BasePager {
 
     @Override
     public void initData() {
-//        mModel2.loadPostDataWrap(AppMain.class, new ArrayMap<>(), false, 100);
     }
 
 }

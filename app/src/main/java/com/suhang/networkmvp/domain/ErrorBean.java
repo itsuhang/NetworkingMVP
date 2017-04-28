@@ -18,6 +18,15 @@ public class ErrorBean extends ErrorCode {
 
 	}
 
+	@Override
+	public String toString() {
+		return "ErrorBean{" +
+				"code='" + code + '\'' +
+				", desc='" + desc + '\'' +
+				", type='" + type + '\'' +
+				'}';
+	}
+
 	//错误代码
 	protected String code;
 	//错误描述

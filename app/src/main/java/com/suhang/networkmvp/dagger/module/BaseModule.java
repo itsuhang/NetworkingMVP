@@ -55,6 +55,7 @@ public class BaseModule {
     }
 
     @Provides
+    @BaseScope
     CompositeDisposable provideCD() {
         return mCompositeDisposable;
     }
@@ -64,6 +65,7 @@ public class BaseModule {
      * @return
      */
     @Provides
+    @BaseScope
     DiskLruCache provideDiskLruCache() {
         DiskLruCache diskLruCache = null;
         try {

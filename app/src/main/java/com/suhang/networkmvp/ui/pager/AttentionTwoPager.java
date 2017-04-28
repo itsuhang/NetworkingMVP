@@ -9,6 +9,7 @@ import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionTwoBinding;
 import com.suhang.networkmvp.interfaces.INetworkOtherService;
 import com.suhang.networkmvp.mvp.model.NetworkModel;
+import com.suhang.networkmvp.utils.LogUtil;
 
 import javax.inject.Inject;
 
@@ -18,7 +19,7 @@ import javax.inject.Inject;
  */
 
 @PagerScope
-public class AttentionTwoPager extends BasePager{
+public class AttentionTwoPager extends BasePager {
     @Binding(id = R.layout.pager_attention_two)
     PagerAttentionTwoBinding mBinding;
     @Inject
@@ -30,7 +31,6 @@ public class AttentionTwoPager extends BasePager{
 
     @Override
     protected void subscribeEvent() {
-
     }
 
     @Override

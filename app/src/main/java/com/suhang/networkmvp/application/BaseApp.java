@@ -6,7 +6,6 @@ import com.squareup.leakcanary.LeakCanary;
 import com.suhang.networkmvp.dagger.component.AppComponent;
 import com.suhang.networkmvp.dagger.component.DaggerAppComponent;
 import com.suhang.networkmvp.dagger.module.AppModule;
-import com.suhang.networkmvp.function.CrashHandler;
 import com.suhang.networkmvp.utils.LogUtil;
 
 
@@ -28,7 +27,7 @@ public class BaseApp extends Application {
         super.onCreate();
         sApp = this;
         LeakCanary.install(this);
-        CrashHandler.getInstance().init(this);
+//        CrashHandler.getInstance().init(this);
         if (isDebug) {
             LogUtil.changeLogSwitch(true);
         } else {

@@ -18,10 +18,10 @@ import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
 import com.suhang.networkmvp.event.ErrorResult;
-import com.suhang.networkmvp.function.RxBus;
+import com.suhang.networkmvp.function.SubscribeManager;
+import com.suhang.networkmvp.utils.LogUtil;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,10 +32,7 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
@@ -64,7 +61,7 @@ public abstract class BaseFragment extends Fragment {
     Context mContext;
 
     @Inject
-    RxBus mRxBus;
+    SubscribeManager mSm;
 
     //fragment布局缓存
     protected View cacheView;
@@ -118,17 +115,15 @@ public abstract class BaseFragment extends Fragment {
                 ViewDataBinding viewDataBinding = DataBindingUtil.bind(mRootView);
                 try {
                     field.set(this, viewDataBinding);
-                    initData();
-                    initEvent();
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
+                    mSm.post(new ErrorResult(errorBean, ERROR_TAG));
                 }
             }
         }
         if (!isExist) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
+            mSm.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -173,29 +168,9 @@ public abstract class BaseFragment extends Fragment {
      *
      * @return
      */
-    protected RxBus getRxBus() {
-        return mRxBus;
+    protected SubscribeManager getSm() {
+        return mSm;
     }
-
-    /**
-     * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
-     * @param aClass 继承BaseResult的结果类的字节码
-     * @param <V>
-     * @return
-     */
-    protected <V extends BaseResult> Flowable<V> subscribe(Class<V> aClass){
-        return getRxBus().toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop();
-    }
-
-    /**
-     * 添加rx事件到回收集合中,请尽量使用该方法把所有的事件添加到该集合中
-     *
-     * @param disposable
-     */
-    protected void addSubscribe(Disposable disposable) {
-        mDisposables.add(disposable);
-    }
-
 
     /**
      * 初始化数据

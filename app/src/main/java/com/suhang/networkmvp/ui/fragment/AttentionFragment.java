@@ -15,6 +15,7 @@ import com.suhang.networkmvp.databinding.FragmentAttentionBinding;
 import com.suhang.networkmvp.ui.pager.AttentionOnePager;
 import com.suhang.networkmvp.ui.pager.AttentionTwoPager;
 import com.suhang.networkmvp.ui.pager.BasePager;
+import com.suhang.networkmvp.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class AttentionFragment extends BaseFragment{
 
     @Override
     protected void initData() {
+        LogUtil.i("啊啊啊"+this);
         List<BasePager> pagers = new ArrayList<>();
         pagers.add(new AttentionOnePager(getActivity()));
         pagers.add(new AttentionTwoPager(getActivity()));

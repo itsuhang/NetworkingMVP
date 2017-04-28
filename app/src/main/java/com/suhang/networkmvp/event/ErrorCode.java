@@ -32,6 +32,10 @@ public class ErrorCode {
 	//没有找到被@Binding注解的属性ViewDatabinding
 	public static String ERROR_CODE_DATABINDING_NOFIELD = "-8007";
 	public static String ERROR_DESC_DATABINDING_NOFIELD = "(databinding)没有找到被@Binding注解的属性ViewDatabinding";
+
+	//事件订阅内部发送错误
+	public static String ERROR_CODE_SUBSCRIBE_INNER = "-8008";
+	public static String ERROR_DESC_SUBSCRIBE_INNER = "事件订阅内部发送错误";
 	//(data bind)布局中没有定义event或data变量,或者没有创建相关event和data类
 	public static String ERROR_CODE_REFLECT_BINDING = "-8010";
 	public static String ERROR_DESC_REFLECT_BINDING = "(databinding)布局中没有定义event或data变量或者变量名错误,或者没有创建相关event和data类（反射错误）";

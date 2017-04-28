@@ -34,7 +34,6 @@ public class HomeFragment extends BaseFragment {
 
 	@Override
 	protected void subscribeEvent() {
-
 	}
 
 	@Override
@@ -48,5 +47,9 @@ public class HomeFragment extends BaseFragment {
 		getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
 	}
 
-
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		mAdapter.destory();
+	}
 }

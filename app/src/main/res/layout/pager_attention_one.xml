@@ -10,14 +10,24 @@
                 type="com.suhang.networkmvp.binding.data.PagerAttentionOneData"/>
 
     </data>
-    <RelativeLayout
+    <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+        <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+        /><Button
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+        />
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="分类子页面一"
         />
-    </RelativeLayout>
+    </LinearLayout>
 </layout>
