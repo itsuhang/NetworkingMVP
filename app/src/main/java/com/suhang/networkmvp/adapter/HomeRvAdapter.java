@@ -7,7 +7,7 @@ import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
 import com.suhang.networkmvp.databinding.ItemHomeBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.ErrorResult;
+import com.suhang.networkmvp.event.result.ErrorResult;
 
 import javax.inject.Inject;
 

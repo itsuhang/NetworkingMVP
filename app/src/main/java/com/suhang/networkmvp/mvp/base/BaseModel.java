@@ -2,7 +2,7 @@ package com.suhang.networkmvp.mvp.base;
 
 import android.app.Activity;
 
-
+import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.IModel;
 
 import javax.inject.Inject;
@@ -16,12 +16,11 @@ import io.reactivex.disposables.CompositeDisposable;
 public abstract class BaseModel implements IModel {
     public static final String TAG = "BaseModel";
     @Inject
+    protected RxBus mRxBus;
+    @Inject
     CompositeDisposable mDisposables;
     @Inject
     Activity mActivity;
-
-    public BaseModel() {
-    }
 
     @Override
     public void destory() {

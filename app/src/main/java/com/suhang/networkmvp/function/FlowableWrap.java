@@ -1,11 +1,9 @@
 package com.suhang.networkmvp.function;
 
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.BaseResult;
+import com.suhang.networkmvp.event.result.BaseResult;
 import com.suhang.networkmvp.event.ErrorCode;
 import com.suhang.networkmvp.utils.LogUtil;
-
-import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;

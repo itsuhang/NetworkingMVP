@@ -1,18 +1,17 @@
 package com.suhang.networkmvp.ui.pager;
 
 import android.app.Activity;
-import android.util.ArrayMap;
 
 import com.suhang.networkmvp.R;
-import com.suhang.networkmvp.annotation.BaseScope;
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
 import com.suhang.networkmvp.domain.AppMain;
-import com.suhang.networkmvp.event.SuccessResult;
-import com.suhang.networkmvp.interfaces.INetworkService;
-import com.suhang.networkmvp.mvp.model.NetworkModel;
+import com.suhang.networkmvp.domain.GithubBean;
+import com.suhang.networkmvp.event.result.ErrorResult;
+import com.suhang.networkmvp.event.result.SuccessResult;
+import com.suhang.networkmvp.mvp.model.AttentionModel;
 import com.suhang.networkmvp.utils.LogUtil;
 
 import javax.inject.Inject;
@@ -26,7 +25,7 @@ public class AttentionOnePager extends BasePager {
     @Binding(id = R.layout.pager_attention_one)
     PagerAttentionOneBinding mBinding;
     @Inject
-    NetworkModel<INetworkService> mModel2;
+    AttentionModel mModel;
 
     public AttentionOnePager(Activity activity) {
         super(activity);
@@ -35,19 +34,26 @@ public class AttentionOnePager extends BasePager {
     @Override
     protected void subscribeEvent() {
         getSm().subscribe(SuccessResult.class).subscribe(successResult -> {
-            LogUtil.i("啊啊啊"+successResult.getResult(AppMain.class));
+            if (successResult.getTag() == AttentionModel.TAG_APP) {
+                mBinding.tv.setText(successResult.getResult(AppMain.class).toString());
+            } else {
+                mBinding.tv.setText(successResult.getResult(GithubBean.class).toString());
+            }
+        });
+
+        getSm().subscribe(ErrorResult.class).subscribe(errorResult -> {
+            LogUtil.i("啊啊啊" + errorResult.getResult());
         });
     }
 
 
     @Override
     protected void initEvent() {
-        mBinding.button.setOnClickListener(v -> {
-            mModel2.loadPostDataWrap(AppMain.class, new ArrayMap<>(), false, 100);
-        });
         mBinding.button1.setOnClickListener(v -> {
-            LogUtil.i("啊啊啊"+mDisposables.size()+" "+mDisposables);
-            mDisposables.dispose();
+            mModel.getGithubData();
+        });
+        mBinding.button.setOnClickListener(v -> {
+            mModel.getAppMainData();
         });
     }
 

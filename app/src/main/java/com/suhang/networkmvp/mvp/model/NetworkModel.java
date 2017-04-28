@@ -1,22 +1,20 @@
 package com.suhang.networkmvp.mvp.model;
 
+import com.google.gson.Gson;
+
 import android.text.TextUtils;
 
 import com.bumptech.glide.disklrucache.DiskLruCache;
-
-import com.google.gson.Gson;
-
 import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.domain.DownLoadBean;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.ErrorCode;
-import com.suhang.networkmvp.event.ErrorResult;
-import com.suhang.networkmvp.event.LoadingResult;
-import com.suhang.networkmvp.event.ProgressResult;
-import com.suhang.networkmvp.event.SuccessResult;
 import com.suhang.networkmvp.domain.WrapBean;
+import com.suhang.networkmvp.event.ErrorCode;
+import com.suhang.networkmvp.event.result.ErrorResult;
+import com.suhang.networkmvp.event.result.LoadingResult;
+import com.suhang.networkmvp.event.result.ProgressResult;
+import com.suhang.networkmvp.event.result.SuccessResult;
 import com.suhang.networkmvp.function.ProgressListener;
-import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.base.BaseModel;
 import com.suhang.networkmvp.utils.LogUtil;
 import com.suhang.networkmvp.utils.Md5Util;
@@ -56,8 +54,6 @@ public class NetworkModel<T> extends BaseModel {
     DiskLruCache sOpen;
     @Inject
     Gson mGson;
-    @Inject
-    RxBus mRxBus;
     @Inject
     CompositeDisposable mDisposable;
     private Map<Integer, Disposable> mSubscriptionMap = new HashMap<>();
@@ -332,7 +328,6 @@ public class NetworkModel<T> extends BaseModel {
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
     private void loadGet(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag) {
-        LogUtil.i("啊啊啊" + sOpen);
         mRxBus.post(new LoadingResult(true, tag));
         Flowable<? extends ErrorBean> flowable = null;
         try {
@@ -710,6 +705,7 @@ public class NetworkModel<T> extends BaseModel {
             mCallMap.get(tag).cancel();
         }
     }
+
 
     @Override
     public void destory() {

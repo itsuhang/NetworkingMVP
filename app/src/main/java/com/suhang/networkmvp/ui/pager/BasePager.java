@@ -15,9 +15,8 @@ import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.event.ErrorCode;
-import com.suhang.networkmvp.event.ErrorResult;
+import com.suhang.networkmvp.event.result.ErrorResult;
 import com.suhang.networkmvp.function.SubscribeManager;
-import com.suhang.networkmvp.utils.LogUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -72,6 +71,7 @@ public abstract class BasePager {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
         }
     }
+
 
     /**
      * 找到被@Binding注解的ViewDataBinding属性,并赋值

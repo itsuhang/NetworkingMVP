@@ -1,8 +1,7 @@
 package com.suhang.networkmvp.function;
 
 import com.suhang.networkmvp.annotation.BaseScope;
-import com.suhang.networkmvp.event.BaseResult;
-import com.suhang.networkmvp.utils.LogUtil;
+import com.suhang.networkmvp.event.result.BaseResult;
 
 import javax.inject.Inject;
 

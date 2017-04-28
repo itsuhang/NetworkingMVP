@@ -14,6 +14,7 @@ import java.io.File;
  */
 
 public class Constants {
+    public static final int INNER_ERROR = -1;
     public static final String URL = "URL";
     public static final String APP_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/suhang";
     public static final String CACHE_PATH = BaseApp.getInstance().getCacheDir().getAbsolutePath() + File.separator + "NetCache";

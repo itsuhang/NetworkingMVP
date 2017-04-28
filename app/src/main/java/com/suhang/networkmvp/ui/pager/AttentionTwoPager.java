@@ -7,11 +7,6 @@ import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionTwoBinding;
-import com.suhang.networkmvp.interfaces.INetworkOtherService;
-import com.suhang.networkmvp.mvp.model.NetworkModel;
-import com.suhang.networkmvp.utils.LogUtil;
-
-import javax.inject.Inject;
 
 
 /**
@@ -22,8 +17,6 @@ import javax.inject.Inject;
 public class AttentionTwoPager extends BasePager {
     @Binding(id = R.layout.pager_attention_two)
     PagerAttentionTwoBinding mBinding;
-    @Inject
-    NetworkModel<INetworkOtherService> mModel2;
 
     public AttentionTwoPager(Activity activity) {
         super(activity);
@@ -40,10 +33,6 @@ public class AttentionTwoPager extends BasePager {
 
     @Override
     public void initData() {
-//        addSubscribe(subscribeEvent(SuccessResult.class).subscribeEvent(successResult -> {
-//            getBinding().tv.setText(successResult.getResult(GithubBean.class).toString());
-//        }));
-//        mModel2.loadGetData(GithubBean.class,"2/1",null,100);
     }
 
 }
