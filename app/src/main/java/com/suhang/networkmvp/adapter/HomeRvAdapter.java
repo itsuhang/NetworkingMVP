@@ -8,7 +8,7 @@ import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
 import com.suhang.networkmvp.databinding.ItemHomeBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.mvp.translator.BlankTranslator;
+import com.suhang.networkmvp.mvp.translator.HomeTranslator;
 
 import javax.inject.Inject;
 
@@ -16,22 +16,22 @@ import javax.inject.Inject;
  * Created by 苏杭 on 2017/1/24 16:51.
  */
 
-public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,BlankTranslator>  {
+public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,HomeTranslator>  {
 
     @Inject
     public HomeRvAdapter() {
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        if (position == 5) {
-            getBm().post(new ErrorResult(new ErrorBean("100","我日哟"),100));
-        }
+    public int getCount() {
+        return 10;
     }
 
     @Override
-    public int getCount() {
-        return 10;
+    public void onBindHolder(MyViewHolder holder, int position) {
+        if (position == 5) {
+            getBm().post(new ErrorResult(new ErrorBean("100","我日哟"),100));
+        }
     }
 
     @Override
@@ -42,7 +42,7 @@ public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,Blan
 
     @Override
     public int getItemCount() {
-        return 10;
+        return 20;
     }
 
     @Override

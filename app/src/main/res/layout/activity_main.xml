@@ -3,8 +3,8 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
 >
     <data>
-        <!--<variable name="data" type="com.suhang.networkmvp.binding.data.ActivityMainData"/>-->
-        <!--<variable name="event" type="com.suhang.networkmvp.binding.event.ActivityMainEvent"/>-->
+        <variable name="data" type="com.suhang.networkmvp.binding.data.ActivityMainData"/>
+        <variable name="event" type="com.suhang.networkmvp.binding.event.BindingEvent"/>
     </data>
     <RelativeLayout
             android:id="@+id/activity_main"

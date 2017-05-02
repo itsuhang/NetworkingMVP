@@ -4,6 +4,7 @@ import com.suhang.networkmvp.function.FlowableWrap;
 import com.suhang.networkmvp.function.RxBus;
 import com.suhang.networkmvp.mvp.event.BaseEvent;
 import com.suhang.networkmvp.mvp.model.AttentionModel;
+import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.BaseResult;
 
 import javax.inject.Inject;
@@ -15,15 +16,15 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by 苏杭 on 2017/5/2 11:18.
  */
 
-public abstract class BaseTranslator {
+public abstract class BaseTranslator<T extends BaseModel> {
     @Inject
     RxBus mRxBus;
     @Inject
     CompositeDisposable mDisposable;
     @Inject
-    AttentionModel mModel;
+    T mModel;
 
-    public abstract void init();
+    public abstract void substribe();
 
     /**
      * 发送事件

@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.binding.event.BindingEvent;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -59,6 +61,9 @@ public abstract class BasePager<T extends BaseTranslator> {
     @Inject
     T mTranslator;
 
+    @Inject
+    BindingEvent<T> mEvent;
+
     private boolean isRegisterEventBus;
     private View mRootView;
 
@@ -66,7 +71,7 @@ public abstract class BasePager<T extends BaseTranslator> {
         mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
         injectDagger();
         subscribeEvent();
-        mTranslator.init();
+        mTranslator.substribe();
         setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
@@ -89,6 +94,8 @@ public abstract class BasePager<T extends BaseTranslator> {
                 ViewDataBinding viewDataBinding = DataBindingUtil.bind(mRootView);
                 try {
                     field.set(this, viewDataBinding);
+                    setBindingData(viewDataBinding);
+                    setBindingEvent(viewDataBinding);
                     initEvent();
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
@@ -193,31 +200,25 @@ public abstract class BasePager<T extends BaseTranslator> {
         ((InputMethodManager) getActivity().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(et, InputMethodManager.SHOW_FORCED);
     }
 
-//	/**
-//	 * 绑定事件类(暂不使用)
-//	 */
-//	protected void setBindingEvent() {
-//		try {
-//			Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
-//			mBinding.setVariable(BR.event, mEvent.getType().newInstance());
-//		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-//			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-//			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-//		}
-//	}
-//
-//	/**
-//	 * 绑定数据类(暂不使用)
-//	 */
-//	protected void setBindingData() {
-//		try {
-//			Field mData = mBinding.getClass().getDeclaredField("mData");
-//			mBinding.setVariable(BR.data, mData.getType().newInstance());
-//		} catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-//			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-//			mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-//		}
-//	}
+    /**
+     * 绑定事件类(暂不使用)
+     */
+    protected void setBindingEvent(ViewDataBinding binding) {
+        binding.setVariable(BR.event, mEvent);
+    }
+
+    /**
+     * 绑定数据类(暂不使用)
+     */
+    protected void setBindingData(ViewDataBinding binding) {
+        try {
+            Field mData = binding.getClass().getDeclaredField("mData");
+            binding.setVariable(BR.data, mData.getType().newInstance());
+        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+        }
+    }
 
     protected boolean isVisiable() {
         return getRootView().isShown();

@@ -13,8 +13,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.BaseApp;
+import com.suhang.networkmvp.binding.event.BindingEvent;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -62,6 +64,9 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
     @Inject
     T mTranslator;
 
+    @Inject
+    BindingEvent<T> mEvent;
+
     //fragment布局缓存
     protected View cacheView;
     //是否为缓存布局
@@ -76,6 +81,7 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
         mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
         subscribeEvent();
+        mTranslator.substribe();
         setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
@@ -84,7 +90,6 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
 
     /**
      * 获得布局View,仅在onCreateView()方法中使用
-     * @return
      */
     protected View getRootView() {
         if (cacheView == null) {
@@ -114,6 +119,8 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
                 ViewDataBinding viewDataBinding = DataBindingUtil.bind(mRootView);
                 try {
                     field.set(this, viewDataBinding);
+                    setBindingEvent(viewDataBinding);
+                    setBindingData(viewDataBinding);
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
                     mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
@@ -129,7 +136,7 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
     /**
      * 订阅事件
      */
-    protected abstract void  subscribeEvent();
+    protected abstract void subscribeEvent();
 
     /**
      * 注册事件总线
@@ -164,8 +171,6 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
 
     /**
      * 获取RxBus,可进行订阅操作
-     *
-     * @return
      */
     protected T getSm() {
         return mTranslator;
@@ -184,31 +189,26 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
 
     }
 
-//    /**
-//     * 绑定事件类(暂不使用)
-//     */
-//    protected void setBindingEvent() {
-//        try {
-//            Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
-//            mBinding.setVariable(BR.event, mEvent.getType().newInstance());
-//        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
-//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-//            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-//        }
-//    }
-//
-//    /**
-//     * 绑定数据类(暂不使用)
-//     */
-//    protected void setBindingData() {
-//        try {
-//            Field mData = mBinding.getClass().getDeclaredField("mData");
-//            mBinding.setVariable(BR.data, mData.getType().newInstance());
-//        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
-//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-//            mRxBus.post(new ErrorResult(errorBean,ERROR_TAG));
-//        }
-//    }
+    /**
+     * 绑定事件类(暂不使用)
+     */
+    protected void setBindingEvent(ViewDataBinding binding) {
+        binding.setVariable(BR.event, mEvent);
+
+    }
+
+    /**
+     * 绑定数据类(暂不使用)
+     */
+    protected void setBindingData(ViewDataBinding binding) {
+        try {
+            Field mData = binding.getClass().getDeclaredField("mData");
+            binding.setVariable(BR.data, mData.getType().newInstance());
+        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+        }
+    }
 
     /**
      * 获取父Component(dagger2)

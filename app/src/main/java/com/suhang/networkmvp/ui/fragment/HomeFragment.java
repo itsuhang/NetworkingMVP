@@ -13,7 +13,7 @@ import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentHomeBinding;
-import com.suhang.networkmvp.mvp.translator.BlankTranslator;
+import com.suhang.networkmvp.mvp.translator.HomeTranslator;
 
 import javax.inject.Inject;
 
@@ -21,7 +21,7 @@ import javax.inject.Inject;
  * Created by 苏杭 on 2017/1/24 15:31.
  */
 @FragmentScope
-public class HomeFragment extends BaseFragment<BlankTranslator> {
+public class HomeFragment extends BaseFragment<HomeTranslator> {
 	@Binding(id = R.layout.fragment_home)
 	FragmentHomeBinding mBinding;
 	@Inject

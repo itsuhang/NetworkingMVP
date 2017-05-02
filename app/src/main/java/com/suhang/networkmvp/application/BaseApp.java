@@ -27,7 +27,7 @@ public class BaseApp extends Application {
         super.onCreate();
         sApp = this;
         LeakCanary.install(this);
-//        CrashHandler.getInstance().init(this);
+//        CrashHandler.getInstance().substribe(this);
         if (isDebug) {
             LogUtil.changeLogSwitch(true);
         } else {

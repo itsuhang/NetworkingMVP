@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.binding.event.BindingEvent;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -36,7 +38,7 @@ import io.reactivex.disposables.CompositeDisposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatActivity{
+public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatActivity {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -64,12 +66,16 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
 
     private boolean isRegisterEventBus;
 
+    @Inject
+    BindingEvent<T> mEvent;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
         subscribeEvent();
+        mTranslator.substribe();
         setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
@@ -87,9 +93,11 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
             if (annotation != null) {
                 isExist = true;
                 int id = annotation.id();
-                ViewDataBinding viewDataBinding = DataBindingUtil.setContentView(mActivity,id);
+                ViewDataBinding viewDataBinding = DataBindingUtil.setContentView(mActivity, id);
                 try {
                     field.set(this, viewDataBinding);
+                    setBindingEvent(viewDataBinding);
+                    setBindingData(viewDataBinding);
                     initData();
                     initEvent();
                 } catch (IllegalAccessException e) {
@@ -107,7 +115,7 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
     /**
      * 订阅事件
      */
-    protected abstract void  subscribeEvent();
+    protected abstract void subscribeEvent();
 
     /**
      * 注册事件总线
@@ -154,31 +162,25 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
 
     }
 
-//    /**
-//     * 绑定事件类(暂不使用)
-//     */
-//    protected void setBindingEvent() {
-//        try {
-//            Field mEvent = mBinding.getClass().getDeclaredField("mEvent");
-//            mBinding.setVariable(BR.event, mEvent.getType().newInstance());
-//        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-//            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
-//        }
-//    }
-//
-//    /**
-//     * 绑定数据类(暂不使用)
-//     */
-//    protected void setBindingData() {
-//        try {
-//            Field mData = mBinding.getClass().getDeclaredField("mData");
-//            mBinding.setVariable(BR.data, mData.getType().newInstance());
-//        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-//            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-//            mRxBus.post(new ErrorResult(errorBean, ERROR_TAG));
-//        }
-//    }
+    /**
+     * 绑定事件类(暂不使用)
+     */
+    protected void setBindingEvent(ViewDataBinding binding) {
+        binding.setVariable(BR.event, mEvent);
+    }
+
+    /**
+     * 绑定数据类(暂不使用)
+     */
+    protected void setBindingData(ViewDataBinding binding) {
+        try {
+            Field mData = binding.getClass().getDeclaredField("mData");
+            binding.setVariable(BR.data, mData.getType().newInstance());
+        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+        }
+    }
 
     /**
      * 获取父Component(dagger2)

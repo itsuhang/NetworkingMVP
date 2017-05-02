@@ -42,7 +42,6 @@ public class AttentionFragment extends BaseFragment<BlankTranslator>{
 
     @Override
     protected void initData() {
-        LogUtil.i("啊啊啊"+this);
         List<BasePager> pagers = new ArrayList<>();
         pagers.add(new AttentionOnePager(getActivity()));
         pagers.add(new AttentionTwoPager(getActivity()));

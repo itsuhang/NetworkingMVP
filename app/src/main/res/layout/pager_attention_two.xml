@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="event"
-                type="com.suhang.networkmvp.binding.event.PagerAttentionTwoEvent"/>
+                type="com.suhang.networkmvp.binding.event.BindingEvent"/>
         <variable
                 name="data"
                 type="com.suhang.networkmvp.binding.data.PagerAttentionTwoData"/>
@@ -13,12 +13,19 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        <TextView
-                android:id="@+id/tv"
+        <Button
+                android:id="@+id/b1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="分类子页面二"
+                android:text="啊啊啊"
+        />
+        <Button
+                android:id="@+id/b2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="false"
+                android:text="呃呃呃"
         />
     </RelativeLayout>
 </layout>
