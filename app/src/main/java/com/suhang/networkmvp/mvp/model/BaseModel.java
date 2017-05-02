@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.mvp.base;
+package com.suhang.networkmvp.mvp.model;
 
 import android.app.Activity;
 

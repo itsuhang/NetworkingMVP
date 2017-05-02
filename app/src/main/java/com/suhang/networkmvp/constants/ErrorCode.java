@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.event;
+package com.suhang.networkmvp.constants;
 
 /**
  * Created by sh on 2016/10/28 14:58.

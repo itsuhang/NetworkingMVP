@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.event.result;
+package com.suhang.networkmvp.mvp.result;
 
 import com.suhang.networkmvp.domain.ErrorBean;
 

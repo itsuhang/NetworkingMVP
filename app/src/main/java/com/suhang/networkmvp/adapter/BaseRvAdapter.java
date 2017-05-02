@@ -6,9 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
-import com.suhang.networkmvp.function.RxBus;
-import com.suhang.networkmvp.function.SubscribeManager;
 import com.suhang.networkmvp.interfaces.IAdapterHelper;
+import com.suhang.networkmvp.mvp.translator.BaseTranslator;
 
 import javax.inject.Inject;
 
@@ -18,7 +17,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-public abstract class BaseRvAdapter<T extends BaseViewHolder> extends RecyclerView.Adapter<T> implements IAdapterHelper {
+public abstract class BaseRvAdapter<T extends BaseViewHolder,V extends BaseTranslator> extends RecyclerView.Adapter<T> implements IAdapterHelper {
     //基类内部错误tag
     private static final int ERROR_TAG = -1;
     @Inject
@@ -31,7 +30,7 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder> extends RecyclerVi
     CompositeDisposable mDisposables;
 
     @Inject
-    SubscribeManager mBm;
+     V mTranslator;
 
     private int mNetItemCount;
     private int mMaxCount = 1;
@@ -44,8 +43,8 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder> extends RecyclerVi
         return mContext;
     }
 
-    public SubscribeManager getBm() {
-        return mBm;
+    public V getBm() {
+        return mTranslator;
     }
 
     public BaseRvAdapter() {

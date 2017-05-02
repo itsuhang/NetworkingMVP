@@ -15,12 +15,12 @@ import android.widget.EditText;
 
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.BaseApp;
+import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.ErrorCode;
-import com.suhang.networkmvp.event.result.ErrorResult;
-import com.suhang.networkmvp.function.SubscribeManager;
+import com.suhang.networkmvp.mvp.result.ErrorResult;
+import com.suhang.networkmvp.mvp.translator.BaseTranslator;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -36,7 +36,7 @@ import io.reactivex.disposables.CompositeDisposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -60,7 +60,7 @@ public abstract class BaseFragment extends Fragment {
     Context mContext;
 
     @Inject
-    SubscribeManager mSm;
+    T mTranslator;
 
     //fragment布局缓存
     protected View cacheView;
@@ -116,13 +116,13 @@ public abstract class BaseFragment extends Fragment {
                     field.set(this, viewDataBinding);
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mSm.post(new ErrorResult(errorBean, ERROR_TAG));
+                    mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
                 }
             }
         }
         if (!isExist) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mSm.post(new ErrorResult(errorBean, ERROR_TAG));
+            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -167,8 +167,8 @@ public abstract class BaseFragment extends Fragment {
      *
      * @return
      */
-    protected SubscribeManager getSm() {
-        return mSm;
+    protected T getSm() {
+        return mTranslator;
     }
 
     /**

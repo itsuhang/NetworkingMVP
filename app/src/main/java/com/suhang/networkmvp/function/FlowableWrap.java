@@ -1,8 +1,8 @@
 package com.suhang.networkmvp.function;
 
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.result.BaseResult;
-import com.suhang.networkmvp.event.ErrorCode;
+import com.suhang.networkmvp.mvp.result.BaseResult;
+import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.utils.LogUtil;
 
 import io.reactivex.Flowable;
@@ -12,7 +12,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by 苏杭 on 2017/4/28 11:02.
  */
 
-public class FlowableWrap<T extends BaseResult> {
+public class FlowableWrap<T> {
     private Flowable<T> mFlowable;
     private CompositeDisposable mDisposable;
 

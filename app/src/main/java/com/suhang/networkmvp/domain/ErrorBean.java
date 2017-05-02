@@ -2,7 +2,7 @@ package com.suhang.networkmvp.domain;
 
 
 import com.suhang.networkmvp.constants.Constants;
-import com.suhang.networkmvp.event.ErrorCode;
+import com.suhang.networkmvp.constants.ErrorCode;
 
 /**
  * Created by sh on 2016/3/11 16:13.

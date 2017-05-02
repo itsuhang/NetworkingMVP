@@ -6,7 +6,6 @@ import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.GithubBean;
 import com.suhang.networkmvp.interfaces.INetworkOtherService;
 import com.suhang.networkmvp.interfaces.INetworkService;
-import com.suhang.networkmvp.mvp.base.BaseModel;
 
 import javax.inject.Inject;
 

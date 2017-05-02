@@ -7,6 +7,7 @@ import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionTwoBinding;
+import com.suhang.networkmvp.mvp.translator.AttentionTranslator;
 
 
 /**
@@ -14,7 +15,7 @@ import com.suhang.networkmvp.databinding.PagerAttentionTwoBinding;
  */
 
 @PagerScope
-public class AttentionTwoPager extends BasePager {
+public class AttentionTwoPager extends BasePager<AttentionTranslator> {
     @Binding(id = R.layout.pager_attention_two)
     PagerAttentionTwoBinding mBinding;
 

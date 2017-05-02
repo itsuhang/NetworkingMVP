@@ -11,12 +11,12 @@ import android.widget.EditText;
 
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.event.ErrorCode;
-import com.suhang.networkmvp.event.result.ErrorResult;
-import com.suhang.networkmvp.function.SubscribeManager;
+import com.suhang.networkmvp.mvp.result.ErrorResult;
+import com.suhang.networkmvp.mvp.translator.BaseTranslator;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,7 +33,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Fragment中不方便再嵌套Fragment时,用Pager页面
  */
 
-public abstract class BasePager {
+public abstract class BasePager<T extends BaseTranslator> {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -57,7 +57,7 @@ public abstract class BasePager {
     Context mContext;
 
     @Inject
-    SubscribeManager mSm;
+    T mTranslator;
 
     private boolean isRegisterEventBus;
     private View mRootView;
@@ -66,6 +66,7 @@ public abstract class BasePager {
         mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
         injectDagger();
         subscribeEvent();
+        mTranslator.init();
         setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
@@ -91,13 +92,13 @@ public abstract class BasePager {
                     initEvent();
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mSm.post(new ErrorResult(errorBean, ERROR_TAG));
+                    mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
                 }
             }
         }
         if (!isExist) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mSm.post(new ErrorResult(errorBean, ERROR_TAG));
+            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -122,8 +123,8 @@ public abstract class BasePager {
     /**
      * 获取SubscribeManager,可进行订阅操作
      */
-    protected SubscribeManager getSm() {
-        return mSm;
+    protected T getTranslator() {
+        return mTranslator;
     }
 
     /**

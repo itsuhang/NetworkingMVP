@@ -9,9 +9,11 @@ import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.GithubBean;
-import com.suhang.networkmvp.event.result.ErrorResult;
-import com.suhang.networkmvp.event.result.SuccessResult;
+import com.suhang.networkmvp.mvp.event.ClickEvent;
 import com.suhang.networkmvp.mvp.model.AttentionModel;
+import com.suhang.networkmvp.mvp.result.ErrorResult;
+import com.suhang.networkmvp.mvp.result.SuccessResult;
+import com.suhang.networkmvp.mvp.translator.AttentionTranslator;
 import com.suhang.networkmvp.utils.LogUtil;
 
 import javax.inject.Inject;
@@ -21,11 +23,10 @@ import javax.inject.Inject;
  * Created by 苏杭 on 2017/1/24 16:28.
  */
 @PagerScope
-public class AttentionOnePager extends BasePager {
+public class AttentionOnePager extends BasePager<AttentionTranslator> {
     @Binding(id = R.layout.pager_attention_one)
     PagerAttentionOneBinding mBinding;
-    @Inject
-    AttentionModel mModel;
+
 
     public AttentionOnePager(Activity activity) {
         super(activity);
@@ -33,7 +34,7 @@ public class AttentionOnePager extends BasePager {
 
     @Override
     protected void subscribeEvent() {
-        getSm().subscribe(SuccessResult.class).subscribe(successResult -> {
+        getTranslator().subscribeResult(SuccessResult.class).subscribe(successResult -> {
             if (successResult.getTag() == AttentionModel.TAG_APP) {
                 mBinding.tv.setText(successResult.getResult(AppMain.class).toString());
             } else {
@@ -41,7 +42,7 @@ public class AttentionOnePager extends BasePager {
             }
         });
 
-        getSm().subscribe(ErrorResult.class).subscribe(errorResult -> {
+        getTranslator().subscribeResult(ErrorResult.class).subscribe(errorResult -> {
             LogUtil.i("啊啊啊" + errorResult.getResult());
         });
     }
@@ -50,10 +51,12 @@ public class AttentionOnePager extends BasePager {
     @Override
     protected void initEvent() {
         mBinding.button1.setOnClickListener(v -> {
-            mModel.getGithubData();
+//            mModel.getGithubData();
+            mTranslator.post(new ClickEvent(v));
         });
         mBinding.button.setOnClickListener(v -> {
-            mModel.getAppMainData();
+            mTranslator.post(new ClickEvent(v));
+//            mModel.getAppMainData();
         });
     }
 
