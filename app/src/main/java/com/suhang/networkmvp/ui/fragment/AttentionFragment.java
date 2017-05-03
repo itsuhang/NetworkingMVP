@@ -12,11 +12,10 @@ import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentAttentionBinding;
-import com.suhang.networkmvp.mvp.translator.BlankTranslator;
+import com.suhang.networkmvp.mvp.model.BlankModel;
 import com.suhang.networkmvp.ui.pager.AttentionOnePager;
 import com.suhang.networkmvp.ui.pager.AttentionTwoPager;
 import com.suhang.networkmvp.ui.pager.BasePager;
-import com.suhang.networkmvp.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.List;
  * Created by 苏杭 on 2017/1/24 15:31.
  */
 @FragmentScope
-public class AttentionFragment extends BaseFragment<BlankTranslator>{
+public class AttentionFragment extends BaseFragment<BlankModel> {
     @Binding(id = R.layout.fragment_attention)
     FragmentAttentionBinding mBinding;
 

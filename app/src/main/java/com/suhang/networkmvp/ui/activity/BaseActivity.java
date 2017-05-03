@@ -20,8 +20,9 @@ import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.mvp.translator.BaseTranslator;
+import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.utils.InputLeakUtil;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
@@ -38,7 +39,7 @@ import io.reactivex.disposables.CompositeDisposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatActivity {
+public abstract class BaseActivity<T extends BaseModel> extends AppCompatActivity {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -62,12 +63,17 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
     Dialog mDialog;
 
     @Inject
-    T mTranslator;
+    T mModel;
+
+    @Inject
+    SubstribeManager mManager;
+
+    @Inject
+    BindingEvent mEvent;
 
     private boolean isRegisterEventBus;
 
     @Inject
-    BindingEvent<T> mEvent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,7 +81,6 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
         mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
         subscribeEvent();
-        mTranslator.substribe();
         setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
@@ -102,13 +107,13 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
                     initEvent();
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+                    mManager.post(new ErrorResult(errorBean, ERROR_TAG));
                 }
             }
         }
         if (!isExist) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -125,6 +130,9 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
         isRegisterEventBus = true;
     }
 
+    public T getModel() {
+        return mModel;
+    }
 
     /**
      * 获取对话框
@@ -145,8 +153,8 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
     /**
      * 获取RxBus,可进行订阅操作
      */
-    protected T getSm() {
-        return mTranslator;
+    protected SubstribeManager getSm() {
+        return mManager;
     }
 
     /**
@@ -166,7 +174,12 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
      * 绑定事件类(暂不使用)
      */
     protected void setBindingEvent(ViewDataBinding binding) {
-        binding.setVariable(BR.event, mEvent);
+        try {
+            binding.setVariable(BR.event,mEvent );
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
+        }
     }
 
     /**
@@ -178,7 +191,7 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
             binding.setVariable(BR.data, mData.getType().newInstance());
         } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -232,6 +245,7 @@ public abstract class BaseActivity<T extends BaseTranslator> extends AppCompatAc
             EventBus.getDefault().unregister(this);
         }
         //处理InputMethodManager导致的内存泄漏
+        mModel.destory();
         InputLeakUtil.fixInputMethodManager(this);
     }
 }

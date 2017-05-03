@@ -21,8 +21,9 @@ import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.mvp.translator.BaseTranslator;
+import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -38,7 +39,7 @@ import io.reactivex.disposables.CompositeDisposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
+public abstract class BaseFragment<T extends BaseModel> extends Fragment {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -62,10 +63,13 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
     Context mContext;
 
     @Inject
-    T mTranslator;
+    T mModel;
 
     @Inject
-    BindingEvent<T> mEvent;
+    SubstribeManager mManager;
+
+    @Inject
+    BindingEvent mEvent;
 
     //fragment布局缓存
     protected View cacheView;
@@ -81,7 +85,6 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
         mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
         subscribeEvent();
-        mTranslator.substribe();
         setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
@@ -104,6 +107,10 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
         return cacheView;
     }
 
+    public T getModel() {
+        return mModel;
+    }
+
     /**
      * 找到被@Binding注解的ViewDataBinding属性,并赋值
      */
@@ -123,13 +130,13 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
                     setBindingData(viewDataBinding);
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+                    mManager.post(new ErrorResult(errorBean, ERROR_TAG));
                 }
             }
         }
         if (!isExist) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -172,8 +179,8 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
     /**
      * 获取RxBus,可进行订阅操作
      */
-    protected T getSm() {
-        return mTranslator;
+    protected SubstribeManager getSm() {
+        return mManager;
     }
 
     /**
@@ -193,8 +200,12 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
      * 绑定事件类(暂不使用)
      */
     protected void setBindingEvent(ViewDataBinding binding) {
-        binding.setVariable(BR.event, mEvent);
-
+        try {
+            binding.setVariable(BR.event, mEvent);
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
+        }
     }
 
     /**
@@ -206,7 +217,7 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
             binding.setVariable(BR.data, mData.getType().newInstance());
         } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -257,6 +268,7 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
         if (mDisposables != null) {
             mDisposables.dispose();
         }
+        mModel.destory();
         EventBus.getDefault().unregister(this);
     }
 
@@ -274,5 +286,6 @@ public abstract class BaseFragment<T extends BaseTranslator> extends Fragment {
         if (isRegisterEventBus) {
             EventBus.getDefault().unregister(this);
         }
+        mModel.destory();
     }
 }

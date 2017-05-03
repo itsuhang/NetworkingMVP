@@ -9,7 +9,7 @@ import com.suhang.networkmvp.annotation.ActivityScope;
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
-import com.suhang.networkmvp.mvp.translator.BlankTranslator;
+import com.suhang.networkmvp.mvp.model.BlankModel;
 import com.suhang.networkmvp.ui.fragment.AttentionFragment;
 import com.suhang.networkmvp.ui.fragment.BaseFragment;
 import com.suhang.networkmvp.ui.fragment.HomeFragment;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ActivityScope
-public class MainActivity extends BaseActivity<BlankTranslator>{
+public class MainActivity extends BaseActivity<BlankModel>{
     @Binding(id = R.layout.activity_main)
     ActivityMainBinding mBinding;
     private static final String TAG = "MainActivity";

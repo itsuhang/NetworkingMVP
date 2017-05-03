@@ -7,8 +7,8 @@ import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
 import com.suhang.networkmvp.databinding.ItemHomeBinding;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.mvp.model.HomeModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.mvp.translator.HomeTranslator;
 
 import javax.inject.Inject;
 
@@ -16,7 +16,7 @@ import javax.inject.Inject;
  * Created by 苏杭 on 2017/1/24 16:51.
  */
 
-public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,HomeTranslator>  {
+public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,HomeModel>  {
 
     @Inject
     public HomeRvAdapter() {
@@ -30,7 +30,7 @@ public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,Home
     @Override
     public void onBindHolder(MyViewHolder holder, int position) {
         if (position == 5) {
-            getBm().post(new ErrorResult(new ErrorBean("100","我日哟"),100));
+            getSM().post(new ErrorResult(new ErrorBean("100","我日哟"),100));
         }
     }
 

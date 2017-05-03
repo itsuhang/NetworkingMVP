@@ -11,10 +11,10 @@ import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
 import com.suhang.networkmvp.binding.event.BindingAdapterEvent;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.interfaces.IAdapterHelper;
+import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.mvp.translator.BaseTranslator;
-import com.suhang.networkmvp.utils.LogUtil;
 
 import java.lang.reflect.Field;
 
@@ -26,7 +26,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-public abstract class BaseRvAdapter<T extends BaseViewHolder,V extends BaseTranslator> extends RecyclerView.Adapter<T> implements IAdapterHelper {
+public abstract class BaseRvAdapter<T extends BaseViewHolder,V extends BaseModel> extends RecyclerView.Adapter<T> implements IAdapterHelper {
     //基类内部错误tag
     private static final int ERROR_TAG = -1;
     @Inject
@@ -39,9 +39,14 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder,V extends BaseTrans
     CompositeDisposable mDisposables;
 
     @Inject
-     V mTranslator;
+     V mModel;
 
-    BindingAdapterEvent<V,T> mEvent;
+    @Inject
+    SubstribeManager mManager;
+
+    BindingAdapterEvent<T> mEvent;
+
+
 
     private int mNetItemCount;
     private int mMaxCount = 1;
@@ -54,10 +59,6 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder,V extends BaseTrans
         return mContext;
     }
 
-    public V getBm() {
-        return mTranslator;
-    }
-
     public BaseRvAdapter() {
     }
 
@@ -67,7 +68,7 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder,V extends BaseTrans
     protected void setBindingEvent(T t) {
         mEvent = new BindingAdapterEvent<>();
         mEvent.setHolder(t);
-        mEvent.setTranslator(mTranslator);
+        mEvent.setManager(mManager);
         t.mBinding.setVariable(BR.event, mEvent);
     }
 
@@ -80,8 +81,12 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder,V extends BaseTrans
             binding.setVariable(BR.data, mData.getType().newInstance());
         } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
+    }
+
+    public SubstribeManager getSM() {
+        return mManager;
     }
 
     public abstract int getCount();

@@ -7,10 +7,10 @@ import com.suhang.networkmvp.annotation.ActivityScope;
 import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivitySplashBinding;
-import com.suhang.networkmvp.mvp.translator.BlankTranslator;
+import com.suhang.networkmvp.mvp.model.BlankModel;
 
 @ActivityScope
-public class SplashActivity extends BaseActivity<BlankTranslator>{
+public class SplashActivity extends BaseActivity<BlankModel>{
     @Binding(id = R.layout.activity_main)
     ActivitySplashBinding mBinding;
 

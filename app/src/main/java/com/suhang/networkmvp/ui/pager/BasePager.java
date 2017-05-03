@@ -17,8 +17,9 @@ import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.mvp.translator.BaseTranslator;
+import com.suhang.networkmvp.function.SubstribeManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -35,7 +36,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Fragment中不方便再嵌套Fragment时,用Pager页面
  */
 
-public abstract class BasePager<T extends BaseTranslator> {
+public abstract class BasePager<T extends BaseModel> {
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -59,10 +60,13 @@ public abstract class BasePager<T extends BaseTranslator> {
     Context mContext;
 
     @Inject
-    T mTranslator;
+    T mModel;
 
     @Inject
-    BindingEvent<T> mEvent;
+    SubstribeManager mManager;
+
+    @Inject
+    BindingEvent mEvent;
 
     private boolean isRegisterEventBus;
     private View mRootView;
@@ -71,7 +75,6 @@ public abstract class BasePager<T extends BaseTranslator> {
         mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
         injectDagger();
         subscribeEvent();
-        mTranslator.substribe();
         setLayout();
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
@@ -99,14 +102,18 @@ public abstract class BasePager<T extends BaseTranslator> {
                     initEvent();
                 } catch (IllegalAccessException e) {
                     ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+                    mManager.post(new ErrorResult(errorBean, ERROR_TAG));
                 }
             }
         }
         if (!isExist) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
+    }
+
+    public T getModel() {
+        return mModel;
     }
 
     /**
@@ -130,8 +137,8 @@ public abstract class BasePager<T extends BaseTranslator> {
     /**
      * 获取SubscribeManager,可进行订阅操作
      */
-    protected T getTranslator() {
-        return mTranslator;
+    protected SubstribeManager getSM() {
+        return mManager;
     }
 
     /**
@@ -204,7 +211,12 @@ public abstract class BasePager<T extends BaseTranslator> {
      * 绑定事件类(暂不使用)
      */
     protected void setBindingEvent(ViewDataBinding binding) {
-        binding.setVariable(BR.event, mEvent);
+        try {
+            binding.setVariable(BR.event, mEvent);
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
+        }
     }
 
     /**
@@ -216,7 +228,7 @@ public abstract class BasePager<T extends BaseTranslator> {
             binding.setVariable(BR.data, mData.getType().newInstance());
         } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mTranslator.post(new ErrorResult(errorBean, ERROR_TAG));
+            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
     }
 
@@ -238,6 +250,8 @@ public abstract class BasePager<T extends BaseTranslator> {
         if (isRegisterEventBus) {
             EventBus.getDefault().unregister(this);
         }
+
+        mModel.destory();
     }
 
 }
