@@ -2,7 +2,9 @@ package com.suhang.networkmvp.interfaces;
 
 
 import com.suhang.networkmvp.domain.AppMain;
+import com.suhang.networkmvp.domain.DeleteHistoryBean;
 import com.suhang.networkmvp.domain.GithubBean;
+import com.suhang.networkmvp.domain.HomeBean;
 import com.suhang.networkmvp.domain.HuanPeng;
 
 import java.util.Map;
@@ -18,8 +20,16 @@ import retrofit2.http.Path;
  * Created by sh on 2016/10/24 16:01.
  */
 
-public interface INetworkService{
+public interface INetworkService {
     @POST(AppMain.URL)
     @FormUrlEncoded
     Flowable<HuanPeng<AppMain>> getAppMain(@FieldMap Map<String, String> params);
+
+    @POST(HomeBean.URL)
+    @FormUrlEncoded
+    Flowable<HuanPeng<HomeBean>> getHistoryInfo(@FieldMap Map<String, String> params);
+
+    @POST(DeleteHistoryBean.URL)
+    @FormUrlEncoded
+    Flowable<HuanPeng<DeleteHistoryBean>> deleteHistory(@FieldMap Map<String, String> params);
 }

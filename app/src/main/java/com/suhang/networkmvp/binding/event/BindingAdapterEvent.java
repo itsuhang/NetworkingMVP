@@ -10,7 +10,7 @@ import com.suhang.networkmvp.mvp.event.ItemClickEvent;
  * Created by 苏杭 on 2017/5/2 15:04.
  */
 public class BindingAdapterEvent<T extends BaseViewHolder> {
-    SubstribeManager mManager;
+    private SubstribeManager mManager;
 
     T mHolder;
 
@@ -23,7 +23,7 @@ public class BindingAdapterEvent<T extends BaseViewHolder> {
     }
 
     public void onClick(View view) {
-        ItemClickEvent clickEvent = new ItemClickEvent(mHolder.getAdapterPosition());
+        ItemClickEvent clickEvent = new ItemClickEvent(mHolder);
         mManager.post(clickEvent);
     }
 }

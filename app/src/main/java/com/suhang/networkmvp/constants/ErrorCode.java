@@ -42,6 +42,9 @@ public class ErrorCode {
     //(data bind)布局中没有定义event或data变量,或者没有创建相关event和data类
     public static String ERROR_CODE_REFLECT_BINDING = "-8010";
     public static String ERROR_DESC_REFLECT_BINDING = "(databinding)布局中没有定义event或data变量或者变量名错误,或者没有创建相关event和data类（反射错误）";
+    //BaseRvAdapter中onBindViewHolder()出现异常
+    public static String ERROR_CODE_RVADAPTER_BIND = "-8011";
+    public static String ERROR_DESC_RVADAPTER_BIND = "BaseRvAdapter中onBindViewHolder()出现异常(数据出错,一般情况可忽略该错误)";
     //网络访问错误，bean类中的URL和METHOD属性不正确
     public static String ERROR_CODE_NETWORK_PARAMS = "-8015";
     public static String ERROR_DESC_NETWORK_PARAMS = "网络访问错误，bean类中的URL和METHOD属性不正确:";

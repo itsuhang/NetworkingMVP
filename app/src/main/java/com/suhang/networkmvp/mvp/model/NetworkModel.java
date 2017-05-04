@@ -3,6 +3,7 @@ package com.suhang.networkmvp.mvp.model;
 import com.google.gson.Gson;
 
 import android.text.TextUtils;
+import android.util.ArrayMap;
 
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.suhang.networkmvp.constants.Constants;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +59,7 @@ public class NetworkModel<T> extends BaseModel {
     CompositeDisposable mDisposable;
     private Map<Integer, Disposable> mSubscriptionMap = new HashMap<>();
     private Map<Integer, Call> mCallMap = new HashMap<>();
-
+    private ArrayMap<Class<? extends ErrorBean>,Object> mMessages = new ArrayMap<>();
     @Inject
     public NetworkModel() {
     }
@@ -67,6 +69,15 @@ public class NetworkModel<T> extends BaseModel {
      */
     private void addDisposable(Disposable disposable, int tag) {
         mSubscriptionMap.put(tag, disposable);
+    }
+
+    /**
+     * 设置附加信息
+     * @param aClass
+     * @param o
+     */
+    public void setAppendMessage(Class<? extends ErrorBean> aClass,Object o) {
+        mMessages.put(aClass, o);
     }
 
     /**
@@ -232,6 +243,9 @@ public class NetworkModel<T> extends BaseModel {
         if (flowable != null) {
             Disposable disposable = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler()).subscribe(o -> {
                 mRxBus.post(new LoadingResult(false, tag));
+                Object message = mMessages.get(aClass);
+                o.setAppendMessage(message);
+                mMessages.remove(aClass);
                 if (o.getCode() != null) {
                     mRxBus.post(new ErrorResult(o, tag));
                 } else {
@@ -239,7 +253,7 @@ public class NetworkModel<T> extends BaseModel {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new ErrorResult(errorBean, tag));
@@ -294,6 +308,9 @@ public class NetworkModel<T> extends BaseModel {
         if (flowable != null) {
             Disposable disposable = flowable.onBackpressureDrop().compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler()).subscribe(o -> {
                 mRxBus.post(new LoadingResult(false, tag));
+                Object message = mMessages.get(aClass);
+                o.setAppendMessage(message);
+                mMessages.remove(aClass);
                 if (o.getCode() != null) {
                     mRxBus.post(new ErrorResult(o, tag));
                 } else {
@@ -301,7 +318,7 @@ public class NetworkModel<T> extends BaseModel {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
@@ -351,13 +368,16 @@ public class NetworkModel<T> extends BaseModel {
         if (flowable != null) {
             Disposable disposable = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler()).subscribe(o -> {
                 mRxBus.post(new LoadingResult(false, tag));
+                Object message = mMessages.get(aClass);
+                o.setAppendMessage(message);
+                mMessages.remove(aClass);
                 if (o.getCode() != null) {
                     mRxBus.post(new ErrorResult(o, tag));
                 } else {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new ErrorResult(errorBean, tag));
@@ -406,13 +426,16 @@ public class NetworkModel<T> extends BaseModel {
         if (flowable != null) {
             Disposable disposable = flowable.onBackpressureDrop().compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler()).subscribe(o -> {
                 mRxBus.post(new LoadingResult(false, tag));
+                Object message = mMessages.get(aClass);
+                o.setAppendMessage(message);
+                mMessages.remove(aClass);
                 if (o.getCode() != null) {
                     mRxBus.post(new ErrorResult(o, tag));
                 } else {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
@@ -457,10 +480,13 @@ public class NetworkModel<T> extends BaseModel {
         }
         if (flowable != null) {
             Disposable disposable = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler()).subscribe(o -> {
+                Object message = mMessages.get(aClass);
+                o.setAppendMessage(message);
+                mMessages.remove(aClass);
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new SuccessResult(o, tag));
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK);
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));

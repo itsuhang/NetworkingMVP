@@ -38,9 +38,8 @@ public class SubstribeManager {
     }
 
     /**
-     * 订阅成功事件(订阅后才可收到该事件,订阅要在获取数据之前进行)
      *
-     * @param aClass 继承BaseResult的结果类的字节码
+     *
      */
     public <T extends BaseEvent> FlowableWrap<T> subscribeEvent(Class<T> aClass) {
         return new FlowableWrap<>(mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable);

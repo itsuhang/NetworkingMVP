@@ -13,7 +13,17 @@ import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentHomeBinding;
+import com.suhang.networkmvp.domain.DeleteHistoryBean;
+import com.suhang.networkmvp.domain.HomeBean;
+import com.suhang.networkmvp.mvp.event.ClickEvent;
+import com.suhang.networkmvp.mvp.event.ItemClickEvent;
 import com.suhang.networkmvp.mvp.model.HomeModel;
+import com.suhang.networkmvp.mvp.result.ErrorResult;
+import com.suhang.networkmvp.mvp.result.SuccessResult;
+import com.suhang.networkmvp.utils.LogUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -22,35 +32,90 @@ import javax.inject.Inject;
  */
 @FragmentScope
 public class HomeFragment extends BaseFragment<HomeModel> {
-	@Binding(id = R.layout.fragment_home)
-	FragmentHomeBinding mBinding;
-	@Inject
-	HomeRvAdapter mAdapter;
+    @Binding(id = R.layout.fragment_home)
+    FragmentHomeBinding mBinding;
+    @Inject
+    HomeRvAdapter mAdapter;
+    public static final int TAG = 100;
+    public static final int TAG_LOADMORE = 101;
+    public static final int TAG_DELETE = 102;
+    public static final int TAG_LOADMORE_NORMAL = 103;
+    private List<Integer> mLs1 = new ArrayList<>();
+    private List<String> mLs2 = new ArrayList<>();
 
-	@Nullable
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		return getRootView();
-	}
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return getRootView();
+    }
 
-	@Override
-	protected void subscribeEvent() {
-	}
+    @Override
+    protected void subscribeEvent() {
+        getSm().subscribeEvent(ItemClickEvent.class).subscribe(itemClickEvent -> {
+            HomeRvAdapter.MyViewHolder holder = (HomeRvAdapter.MyViewHolder) itemClickEvent.getHolder();
+            //单个删除
+            //String s = holder.mBinding.getData().getLuid();
+            //getModel().deleteHistory(s, holder.getAdapterPosition());
+            holder.mBinding.getRoot().setBackgroundColor(0xff00ff00);
+            mLs1.add(holder.getAdapterPosition());
+            mLs2.add(holder.mBinding.getData().getLuid());
 
-	@Override
-	protected void initData() {
-		mBinding.rvHome.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-		mBinding.rvHome.setAdapter(mAdapter);
-	}
+        });
+        getSm().subscribeEvent(ClickEvent.class).subscribe(clickEvent -> {
+            switch (clickEvent.getId()) {
+                case R.id.button:
+                    getModel().getLoadMore(mAdapter.getNextPage());
+                    break;
+                case R.id.button1:
+                    LogUtil.i("啊啊啊"+mLs1+"   "+mLs2);
+                    getModel().deleteHistory(mLs2, mLs1);
+                    break;
+            }
+        });
+        getSm().subscribeResult(ErrorResult.class).subscribe(errorResult -> {
+            LogUtil.i("啊啊啊" + errorResult.getResult());
+        });
+        getSm().subscribeResult(SuccessResult.class).subscribe(successResult -> {
+            if (successResult.getTag() == TAG_LOADMORE) {
+                HomeBean result = successResult.getResult(HomeBean.class);
+                mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
+                mAdapter.loadMore(result.getList());
+            } else if (successResult.getTag() == TAG) {
+                HomeBean result = successResult.getResult(HomeBean.class);
+                mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
+                mAdapter.notifyDataSetChanged(result.getList());
+            } else if (successResult.getTag() == TAG_DELETE) {
+                DeleteHistoryBean result = successResult.getResult(DeleteHistoryBean.class);
+                if (result.getFailedList() != null && "".equals(result.getFailedList())) {
+                    getModel().getHomeData(mAdapter.getCurrentPage() * mAdapter.getPageSize(), (List<Integer>) result.getAppendMessage());
+                }
+            } else if (successResult.getTag() == TAG_LOADMORE_NORMAL) {
+                HomeBean result = successResult.getResult(HomeBean.class);
+                mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
+                mAdapter.notifyDelete((List<Integer>) result.getAppendMessage(), result.getList());
+                mLs1.clear();
+                mLs2.clear();
+            }
 
-	@Override
-	protected void injectDagger() {
-		getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
-	}
+        });
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		mAdapter.destory();
-	}
+    }
+
+    @Override
+    protected void initData() {
+        mBinding.rvHome.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        mBinding.rvHome.setAdapter(mAdapter);
+        mModel.getHomeData();
+    }
+
+    @Override
+    protected void injectDagger() {
+        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdapter.destory();
+    }
 }

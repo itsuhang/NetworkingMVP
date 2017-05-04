@@ -23,7 +23,7 @@ public class FlowableWrap<T> {
 
 
     public FlowableWrap<T> subscribe(Next<T> consumer) {
-        mDisposable.add(mFlowable.subscribe(consumer::onNext, throwable -> LogUtil.i("啊啊啊" + new ErrorBean(ErrorCode.ERROR_CODE_SUBSCRIBE_INNER, ErrorCode.ERROR_DESC_SUBSCRIBE_INNER))));
+        mDisposable.add(mFlowable.subscribe(consumer::onNext, throwable -> LogUtil.i("啊啊啊" + new ErrorBean(ErrorCode.ERROR_CODE_SUBSCRIBE_INNER, ErrorCode.ERROR_DESC_SUBSCRIBE_INNER+"\n"+throwable.getMessage()))));
         return this;
     }
 

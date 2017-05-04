@@ -6,23 +6,10 @@ package com.suhang.networkmvp.interfaces;
 
 public interface IAdapterHelper {
 	/**
-	 * 设置从网络获取了多少条数据
-	 * @return
-	 */
-	int setNetItemCount();
-
-
-	/**
-	 * 设置每一页显示多少条
-	 * @return
-	 */
-	int setMaxCount();
-
-	/**
 	 * 从网络获取了多少条数据
 	 * @return
      */
-	int getNetItemCount();
+	void setTotalCount(int count);
 
 	/**
 	 * 每一页显示多少条

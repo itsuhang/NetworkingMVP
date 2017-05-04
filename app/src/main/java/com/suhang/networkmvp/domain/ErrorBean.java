@@ -8,6 +8,15 @@ import com.suhang.networkmvp.constants.ErrorCode;
  * Created by sh on 2016/3/11 16:13.
  */
 public class ErrorBean extends ErrorCode {
+	private Object appendMessage;
+
+	public Object getAppendMessage() {
+		return appendMessage;
+	}
+
+	public void setAppendMessage(Object appendMessage) {
+		this.appendMessage = appendMessage;
+	}
 
 	public ErrorBean(String code, String desc) {
 		this.code = code;
