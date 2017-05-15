@@ -39,7 +39,7 @@ android {
      final RX_VERSION = '2.0.0'
      compile fileTree(include: ['*.jar'], dir: 'libs')
      compile "com.google.dagger:dagger:$DAGGER_VERSION"
-     provided "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
+     annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
      compile "io.reactivex.rxjava2:rxandroid:$RX_VERSION"
      compile "io.reactivex.rxjava2:rxjava:$RX_VERSION"
      compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
@@ -58,4 +58,7 @@ android {
      debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
      releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
      testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+     compile 'com.suhang:lazyannotation_annotation:1.0.0'
+     compile 'com.suhang:lazyannotation:1.0.0'
+     annotationProcessor 'com.suhang:lazyannotation_compiler:1.0.0'
  }

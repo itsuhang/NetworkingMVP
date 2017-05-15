@@ -3,29 +3,28 @@ package com.suhang.networkmvp.ui.pager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.suhang.layoutfinder.ContextProvider;
+import com.suhang.layoutfinder.LayoutFinder;
+import com.suhang.layoutfinderannotation.BindLayout;
 import com.suhang.networkmvp.BR;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.App;
 import com.suhang.networkmvp.binding.event.BindingEvent;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.function.SubstribeManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -36,7 +35,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Fragment中不方便再嵌套Fragment时,用Pager页面
  */
 
-public abstract class BasePager<T extends BaseModel> {
+public abstract class BasePager<T extends BaseModel,E extends ViewDataBinding> implements ContextProvider{
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -68,49 +67,32 @@ public abstract class BasePager<T extends BaseModel> {
     @Inject
     BindingEvent mEvent;
 
+    @BindLayout
+    E mBinding;
+
     private boolean isRegisterEventBus;
-    private View mRootView;
 
     public BasePager(Activity activity) {
         mBaseComponent = ((App) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
         injectDagger();
         subscribeEvent();
-        setLayout();
+        bind(bindLayout());
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
         }
     }
 
+    private void bind(int layout) {
+        LayoutFinder.find(this,layout);
+        setBindingEvent(mBinding);
+        initEvent();
+    }
 
     /**
-     * 找到被@Binding注解的ViewDataBinding属性,并赋值
+     * 绑定布局
+     * @return
      */
-    //TODO 使用apt实现该功能
-    private void setLayout() {
-        boolean isExist = false;
-        for (Field field : getClass().getFields()) {
-            Binding annotation = field.getAnnotation(Binding.class);
-            if (annotation != null) {
-                isExist = true;
-                int id = annotation.id();
-                mRootView = View.inflate(mContext, id, null);
-                ViewDataBinding viewDataBinding = DataBindingUtil.bind(mRootView);
-                try {
-                    field.set(this, viewDataBinding);
-                    setBindingData(viewDataBinding);
-                    setBindingEvent(viewDataBinding);
-                    initEvent();
-                } catch (IllegalAccessException e) {
-                    ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-                }
-            }
-        }
-        if (!isExist) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
+    protected abstract int bindLayout();
 
     public T getModel() {
         return mModel;
@@ -167,7 +149,7 @@ public abstract class BasePager<T extends BaseModel> {
      * 获得根布局
      */
     public View getRootView() {
-        return mRootView;
+        return mBinding.getRoot();
     }
 
     /**
@@ -219,19 +201,6 @@ public abstract class BasePager<T extends BaseModel> {
         }
     }
 
-    /**
-     * 绑定数据类(暂不使用)
-     */
-    protected void setBindingData(ViewDataBinding binding) {
-        try {
-            Field mData = binding.getClass().getDeclaredField("mData");
-            binding.setVariable(BR.data, mData.getType().newInstance());
-        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
-
     protected boolean isVisiable() {
         return getRootView().isShown();
     }
@@ -254,4 +223,8 @@ public abstract class BasePager<T extends BaseModel> {
         mModel.destory();
     }
 
+    @Override
+    public Context providerContext() {
+        return mContext;
+    }
 }

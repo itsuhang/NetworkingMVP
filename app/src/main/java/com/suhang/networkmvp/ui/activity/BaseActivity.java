@@ -3,34 +3,34 @@ package com.suhang.networkmvp.ui.activity;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.suhang.layoutfinder.ContextProvider;
+import com.suhang.layoutfinder.LayoutFinder;
+import com.suhang.layoutfinderannotation.BindLayout;
 import com.suhang.networkmvp.BR;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.App;
 import com.suhang.networkmvp.binding.event.BindingEvent;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.utils.InputLeakUtil;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -39,7 +39,7 @@ import io.reactivex.disposables.CompositeDisposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseActivity<T extends BaseModel> extends AppCompatActivity {
+public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBinding> extends AppCompatActivity implements ContextProvider{
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -65,6 +65,9 @@ public abstract class BaseActivity<T extends BaseModel> extends AppCompatActivit
     @Inject
     T mModel;
 
+    @BindLayout
+    E mBinding;
+
     @Inject
     SubstribeManager mManager;
 
@@ -81,40 +84,24 @@ public abstract class BaseActivity<T extends BaseModel> extends AppCompatActivit
         mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
         injectDagger();
         subscribeEvent();
-        setLayout();
+        bind(bindLayout());
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
         }
     }
 
     /**
-     * 找到被@Binding注解的ViewDataBinding属性,并赋值
+     * 根据提供的布局id进行绑定
+     * @return 布局id
      */
-    //TODO 使用apt实现该功能
-    private void setLayout() {
-        boolean isExist = false;
-        for (Field field : getClass().getFields()) {
-            Binding annotation = field.getAnnotation(Binding.class);
-            if (annotation != null) {
-                isExist = true;
-                int id = annotation.id();
-                ViewDataBinding viewDataBinding = DataBindingUtil.setContentView(mActivity, id);
-                try {
-                    field.set(this, viewDataBinding);
-                    setBindingEvent(viewDataBinding);
-                    setBindingData(viewDataBinding);
-                    initData();
-                    initEvent();
-                } catch (IllegalAccessException e) {
-                    ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-                }
-            }
-        }
-        if (!isExist) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
+    protected abstract int bindLayout();
+
+    protected void bind(@LayoutRes int layout) {
+        LayoutFinder.find(this, layout);
+        setContentView(mBinding.getRoot());
+        setBindingEvent(mBinding);
+        initData();
+        initEvent();
     }
 
     /**
@@ -175,21 +162,8 @@ public abstract class BaseActivity<T extends BaseModel> extends AppCompatActivit
      */
     protected void setBindingEvent(ViewDataBinding binding) {
         try {
-            binding.setVariable(BR.event,mEvent );
+            binding.setVariable(BR.event, mEvent);
         } catch (Exception e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
-
-    /**
-     * 绑定数据类(暂不使用)
-     */
-    protected void setBindingData(ViewDataBinding binding) {
-        try {
-            Field mData = binding.getClass().getDeclaredField("mData");
-            binding.setVariable(BR.data, mData.getType().newInstance());
-        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
             mManager.post(new ErrorResult(errorBean, ERROR_TAG));
         }
@@ -247,5 +221,10 @@ public abstract class BaseActivity<T extends BaseModel> extends AppCompatActivit
         //处理InputMethodManager导致的内存泄漏
         mModel.destory();
         InputLeakUtil.fixInputMethodManager(this);
+    }
+
+    @Override
+    public Context providerContext() {
+        return this;
     }
 }

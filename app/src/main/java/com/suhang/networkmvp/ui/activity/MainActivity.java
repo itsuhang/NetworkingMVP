@@ -6,7 +6,6 @@ import android.os.Bundle;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.MainFragmentAdapter;
 import com.suhang.networkmvp.annotation.ActivityScope;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;
@@ -19,13 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ActivityScope
-public class MainActivity extends BaseActivity<BlankModel>{
-    @Binding(id = R.layout.activity_main)
-    ActivityMainBinding mBinding;
+public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding>{
     private static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected int bindLayout() {
+        return R.layout.activity_main;
     }
 
     @Override
@@ -47,6 +49,5 @@ public class MainActivity extends BaseActivity<BlankModel>{
     protected void injectDagger() {
         getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
     }
-
 
 }

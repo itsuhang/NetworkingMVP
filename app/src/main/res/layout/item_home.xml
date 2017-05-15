@@ -3,11 +3,10 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable name="event" type="com.suhang.networkmvp.binding.event.BindingAdapterEvent"/>
-        <variable name="data" type="com.suhang.networkmvp.binding.data.ItemHomeData"/>
     </data>
     <RelativeLayout
             android:id="@+id/parent"
-            android:onClick="@{event.onClick}"
+            android:onClick="@{event::onClick}"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <TextView

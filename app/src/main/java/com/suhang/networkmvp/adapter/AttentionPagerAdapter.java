@@ -46,6 +46,9 @@ public class AttentionPagerAdapter extends PagerAdapter {
 		return view ==object;
 	}
 
+	/**
+	 * 回收资源
+	 */
 	public void destory() {
 		if (mPagers != null) {
 			for (BasePager pager : mPagers) {

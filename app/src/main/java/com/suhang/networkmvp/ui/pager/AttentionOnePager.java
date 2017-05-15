@@ -1,10 +1,8 @@
 package com.suhang.networkmvp.ui.pager;
 
 import android.app.Activity;
-import android.view.View;
 
 import com.suhang.networkmvp.R;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.PagerScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
@@ -21,12 +19,14 @@ import com.suhang.networkmvp.utils.LogUtil;
  * Created by 苏杭 on 2017/1/24 16:28.
  */
 @PagerScope
-public class AttentionOnePager extends BasePager<AttentionModel> {
-    @Binding(id = R.layout.pager_attention_one)
-    PagerAttentionOneBinding mBinding;
-
+public class AttentionOnePager extends BasePager<AttentionModel,PagerAttentionOneBinding> {
     public AttentionOnePager(Activity activity) {
         super(activity);
+    }
+
+    @Override
+    protected int bindLayout() {
+        return R.layout.pager_attention_one;
     }
 
     @Override

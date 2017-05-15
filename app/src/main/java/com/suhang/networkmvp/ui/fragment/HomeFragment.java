@@ -1,15 +1,9 @@
 package com.suhang.networkmvp.ui.fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.HomeRvAdapter;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentHomeBinding;
@@ -31,9 +25,7 @@ import javax.inject.Inject;
  * Created by 苏杭 on 2017/1/24 15:31.
  */
 @FragmentScope
-public class HomeFragment extends BaseFragment<HomeModel> {
-    @Binding(id = R.layout.fragment_home)
-    FragmentHomeBinding mBinding;
+public class HomeFragment extends BaseFragment<HomeModel,FragmentHomeBinding> {
     @Inject
     HomeRvAdapter mAdapter;
     public static final int TAG = 100;
@@ -43,22 +35,14 @@ public class HomeFragment extends BaseFragment<HomeModel> {
     private List<Integer> mLs1 = new ArrayList<>();
     private List<String> mLs2 = new ArrayList<>();
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return getRootView();
+    protected int bindLayout() {
+        return R.layout.fragment_home;
     }
 
     @Override
     protected void subscribeEvent() {
         getSm().subscribeEvent(ItemClickEvent.class).subscribe(itemClickEvent -> {
-            HomeRvAdapter.MyViewHolder holder = (HomeRvAdapter.MyViewHolder) itemClickEvent.getHolder();
-            //单个删除
-            //String s = holder.mBinding.getData().getLuid();
-            //getModel().deleteHistory(s, holder.getAdapterPosition());
-            holder.mBinding.getRoot().setBackgroundColor(0xff00ff00);
-            mLs1.add(holder.getAdapterPosition());
-            mLs2.add(holder.mBinding.getData().getLuid());
 
         });
         getSm().subscribeEvent(ClickEvent.class).subscribe(clickEvent -> {

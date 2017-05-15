@@ -4,19 +4,21 @@ import android.os.Bundle;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.ActivityScope;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivitySplashBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;
 
 @ActivityScope
-public class SplashActivity extends BaseActivity<BlankModel>{
-    @Binding(id = R.layout.activity_main)
-    ActivitySplashBinding mBinding;
+public class SplashActivity extends BaseActivity<BlankModel,ActivitySplashBinding>{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected int bindLayout() {
+        return R.layout.activity_splash;
     }
 
     @Override
@@ -26,12 +28,10 @@ public class SplashActivity extends BaseActivity<BlankModel>{
 
     @Override
     protected void initData() {
-        mBinding.getData().da.set(getIntent().getStringExtra("name")+"   "+getIntent().getStringExtra("age"));
     }
 
     @Override
     protected void injectDagger() {
         getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
     }
-
 }

@@ -87,18 +87,6 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends Recycle
         t.mBinding.setVariable(BR.event, mEvent);
     }
 
-    /**
-     * 绑定数据类(暂不使用)
-     */
-    protected void setBindingData(ViewDataBinding binding) {
-        try {
-            Field mData = binding.getClass().getDeclaredField("mData");
-            binding.setVariable(BR.data, mData.getType().newInstance());
-        } catch (NoSuchFieldException | InstantiationException | IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
 
     public SubstribeManager getSM() {
         return mManager;
@@ -116,7 +104,6 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends Recycle
     @Override
     public void onBindViewHolder(T holder, int position) {
         setBindingEvent(holder);
-        setBindingData(holder.mBinding);
         try {
             onBindHolder(holder, mList.get(position));
         } catch (Exception e) {
@@ -139,6 +126,11 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends Recycle
         notifyDataSetChanged();
     }
 
+    /**
+     * 单个删除
+     * @param position 要删除的位置
+     * @param beans 删除后从网络重新获取的数据集合
+     */
     public void notifyDelete(int position, List<V> beans) {
         mList.clear();
         mList.addAll(beans);
@@ -146,6 +138,11 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends Recycle
         notifyItemChanged(beans.size() - 1);
     }
 
+    /**
+     * 多个删除
+     * @param positions 要删除的位置
+     * @param beans 删除后从网络重新获取的数据集合
+     */
     public void notifyDelete(List<Integer> positions, List<V> beans) {
         int start = mList.size() - positions.size() - 1;
         mList.clear();
@@ -162,7 +159,6 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends Recycle
         for (Integer position : positions) {
             notifyItemRemoved(position);
         }
-        LogUtil.i("啊啊啊" + start + "   " + positions.size());
         notifyItemRangeChanged(start, positions.size());
     }
 

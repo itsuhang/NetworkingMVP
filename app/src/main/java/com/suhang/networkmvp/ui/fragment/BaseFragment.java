@@ -3,34 +3,34 @@ package com.suhang.networkmvp.ui.fragment;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.suhang.layoutfinder.ContextProvider;
+import com.suhang.layoutfinder.LayoutFinder;
+import com.suhang.layoutfinderannotation.BindLayout;
 import com.suhang.networkmvp.BR;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.binding.event.BindingEvent;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
 import com.suhang.networkmvp.domain.ErrorBean;
+import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.mvp.model.BaseModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
-import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -39,7 +39,7 @@ import io.reactivex.disposables.CompositeDisposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseFragment<T extends BaseModel> extends Fragment {
+public abstract class BaseFragment<T extends BaseModel,E extends ViewDataBinding> extends Fragment implements ContextProvider{
     //基类内部错误tag
     public static final int ERROR_TAG = -1;
 
@@ -65,6 +65,9 @@ public abstract class BaseFragment<T extends BaseModel> extends Fragment {
     @Inject
     T mModel;
 
+    @BindLayout
+    E mBinding;
+
     @Inject
     SubstribeManager mManager;
 
@@ -77,7 +80,6 @@ public abstract class BaseFragment<T extends BaseModel> extends Fragment {
     protected boolean isCacheView;
 
     private boolean isRegisterEventBus;
-    private View mRootView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,18 +87,46 @@ public abstract class BaseFragment<T extends BaseModel> extends Fragment {
         mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
         injectDagger();
         subscribeEvent();
-        setLayout();
+        bind(bindLayout());
         if (mActivity == null) {
             throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
         }
     }
 
+    private void bind(int layout) {
+        LayoutFinder.find(this,layout);
+        setBindingEvent(mBinding);
+    }
+
     /**
+     * 绑定布局
+     * @return
+     */
+    protected abstract int bindLayout();
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        onViewCreate(inflater,container,savedInstanceState);
+        return getRootView();
+    }
+
+    /**
+     * 需要在绑定布局之前(onCreateView之前)做处理则覆盖此方法
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     */
+    protected void onViewCreate(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    }
+
+    /**
+     * 缓存Fragment的布局
      * 获得布局View,仅在onCreateView()方法中使用
      */
     protected View getRootView() {
         if (cacheView == null) {
-            cacheView = mRootView;
+            cacheView = mBinding.getRoot();
         } else {
             isCacheView = true;
             ViewGroup parent = (ViewGroup) cacheView.getParent();
@@ -109,35 +139,6 @@ public abstract class BaseFragment<T extends BaseModel> extends Fragment {
 
     public T getModel() {
         return mModel;
-    }
-
-    /**
-     * 找到被@Binding注解的ViewDataBinding属性,并赋值
-     */
-    //TODO 使用apt实现该功能
-    private void setLayout() {
-        boolean isExist = false;
-        for (Field field : getClass().getFields()) {
-            Binding annotation = field.getAnnotation(Binding.class);
-            if (annotation != null) {
-                isExist = true;
-                int id = annotation.id();
-                mRootView = View.inflate(mContext, id, null);
-                ViewDataBinding viewDataBinding = DataBindingUtil.bind(mRootView);
-                try {
-                    field.set(this, viewDataBinding);
-                    setBindingEvent(viewDataBinding);
-                    setBindingData(viewDataBinding);
-                } catch (IllegalAccessException e) {
-                    ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_FIELD, ErrorCode.ERROR_DESC_DATABINDING_FIELD);
-                    mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-                }
-            }
-        }
-        if (!isExist) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_DATABINDING_NOFIELD, ErrorCode.ERROR_DESC_DATABINDING_NOFIELD);
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
     }
 
     /**
@@ -208,18 +209,6 @@ public abstract class BaseFragment<T extends BaseModel> extends Fragment {
         }
     }
 
-    /**
-     * 绑定数据类(暂不使用)
-     */
-    protected void setBindingData(ViewDataBinding binding) {
-        try {
-            Field mData = binding.getClass().getDeclaredField("mData");
-            binding.setVariable(BR.data, mData.getType().newInstance());
-        } catch (NoSuchFieldException | java.lang.InstantiationException | IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
 
     /**
      * 获取父Component(dagger2)
@@ -287,5 +276,10 @@ public abstract class BaseFragment<T extends BaseModel> extends Fragment {
             EventBus.getDefault().unregister(this);
         }
         mModel.destory();
+    }
+
+    @Override
+    public Context providerContext() {
+        return getContext();
     }
 }

@@ -1,14 +1,7 @@
 package com.suhang.networkmvp.ui.fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.AttentionPagerAdapter;
-import com.suhang.networkmvp.annotation.Binding;
 import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentAttentionBinding;
@@ -24,14 +17,10 @@ import java.util.List;
  * Created by 苏杭 on 2017/1/24 15:31.
  */
 @FragmentScope
-public class AttentionFragment extends BaseFragment<BlankModel> {
-    @Binding(id = R.layout.fragment_attention)
-    FragmentAttentionBinding mBinding;
-
-    @Nullable
+public class AttentionFragment extends BaseFragment<BlankModel,FragmentAttentionBinding> {
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return getRootView();
+    protected int bindLayout() {
+        return R.layout.fragment_attention;
     }
 
     @Override
