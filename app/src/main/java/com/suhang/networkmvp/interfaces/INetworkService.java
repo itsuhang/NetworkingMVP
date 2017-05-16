@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.interfaces;
 
 
+import com.suhang.layoutfinderannotation.FindMethod;
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.DeleteHistoryBean;
 import com.suhang.networkmvp.domain.GithubBean;
@@ -19,7 +20,7 @@ import retrofit2.http.Path;
 /**
  * Created by sh on 2016/10/24 16:01.
  */
-
+@FindMethod
 public interface INetworkService {
     @POST(AppMain.URL)
     @FormUrlEncoded

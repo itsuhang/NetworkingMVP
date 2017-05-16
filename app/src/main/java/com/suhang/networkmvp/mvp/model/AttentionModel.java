@@ -19,9 +19,7 @@ public class AttentionModel extends BaseModel {
     public static final int TAG_APP = 3;
     public static final int TAG_GIT = 4;
     @Inject
-    NetworkModel<INetworkService> mModel;
-    @Inject
-    NetworkModel<INetworkOtherService> mModel1;
+    NetworkModel mModel;
 
     @Inject
     public AttentionModel() {
@@ -29,10 +27,10 @@ public class AttentionModel extends BaseModel {
 
 
     public void getAppMainData() {
-        mModel.loadPostDataWrap(AppMain.class, new ArrayMap<>(), false, TAG_APP);
+        mModel.loadPostDataWrap(AppMain.class,  false, TAG_APP,new ArrayMap<>());
     }
 
     public void getGithubData() {
-        mModel1.loadGetData(GithubBean.class, "2/1", null, TAG_GIT);
+        mModel.loadGetData(GithubBean.class, TAG_GIT,"2/1");
     }
 }

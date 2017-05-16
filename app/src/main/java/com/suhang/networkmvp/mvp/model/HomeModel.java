@@ -4,7 +4,6 @@ import android.util.ArrayMap;
 
 import com.suhang.networkmvp.domain.DeleteHistoryBean;
 import com.suhang.networkmvp.domain.HomeBean;
-import com.suhang.networkmvp.interfaces.INetworkService;
 import com.suhang.networkmvp.ui.fragment.HomeFragment;
 
 import java.util.List;
@@ -18,7 +17,7 @@ import javax.inject.Inject;
 
 public class HomeModel extends BaseModel {
     @Inject
-    NetworkModel<INetworkService> mModel;
+    NetworkModel mModel;
 
     @Inject
     public HomeModel() {
@@ -29,24 +28,25 @@ public class HomeModel extends BaseModel {
         ls.put("uid", "2240");
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7");
         ls.put("size", "10");
-        mModel.loadPostDataWrap(HomeBean.class, ls, false, HomeFragment.TAG);
+        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG, ls);
     }
 
-    public void getHomeData(int count,int position) {
+    public void getHomeData(int count, int position) {
         ArrayMap<String, String> ls = new ArrayMap<>();
         ls.put("uid", "2240");
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7");
         ls.put("size", String.valueOf(count));
-        mModel.setAppendMessage(HomeBean.class,position);
-        mModel.loadPostDataWrap(HomeBean.class, ls, false, HomeFragment.TAG_LOADMORE_NORMAL);
+        mModel.setAppendMessage(HomeBean.class, position);
+        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
     }
-    public void getHomeData(int count,List<Integer> position) {
+
+    public void getHomeData(int count, List<Integer> position) {
         ArrayMap<String, String> ls = new ArrayMap<>();
         ls.put("uid", "2240");
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7");
         ls.put("size", String.valueOf(count));
-        mModel.setAppendMessage(HomeBean.class,position);
-        mModel.loadPostDataWrap(HomeBean.class, ls, false, HomeFragment.TAG_LOADMORE_NORMAL);
+        mModel.setAppendMessage(HomeBean.class, position);
+        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
     }
 
     public void getLoadMore(int page) {
@@ -55,19 +55,19 @@ public class HomeModel extends BaseModel {
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7");
         ls.put("size", "10");
         ls.put("page", String.valueOf(page));
-        mModel.loadPostDataWrap(HomeBean.class, ls, false, HomeFragment.TAG_LOADMORE);
+        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG_LOADMORE, ls);
     }
 
-    public void deleteHistory(String luid,int position) {
+    public void deleteHistory(String luid, int position) {
         Map<String, String> params = new ArrayMap<>();
         params.put("uid", "2240");
         params.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7");
         params.put("history", luid);
-        mModel.setAppendMessage(DeleteHistoryBean.class,position);
-        mModel.loadPostDataWrap(DeleteHistoryBean.class, params, false, HomeFragment.TAG_DELETE);
+        mModel.setAppendMessage(DeleteHistoryBean.class, position);
+        mModel.loadPostDataWrap(DeleteHistoryBean.class, false, HomeFragment.TAG_DELETE,params);
     }
 
-    public void deleteHistory(List<String> luids,List<Integer> positions) {
+    public void deleteHistory(List<String> luids, List<Integer> positions) {
         Map<String, String> params = new ArrayMap<>();
         params.put("uid", "2240");
         params.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7");
@@ -80,7 +80,7 @@ public class HomeModel extends BaseModel {
             }
         }
         params.put("history", sb.toString());
-        mModel.setAppendMessage(DeleteHistoryBean.class,positions);
-        mModel.loadPostDataWrap(DeleteHistoryBean.class, params, false, HomeFragment.TAG_DELETE);
+        mModel.setAppendMessage(DeleteHistoryBean.class, positions);
+        mModel.loadPostDataWrap(DeleteHistoryBean.class, false, HomeFragment.TAG_DELETE,params);
     }
 }

@@ -15,9 +15,9 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven {
-            url 'https://dl.bintray.com/suhang/maven'//这个地址在包的页面的右方
-        }
+//        maven {
+//            url 'https://dl.bintray.com/suhang/maven'//这个地址在包的页面的右方
+//        }
     }
 }
 

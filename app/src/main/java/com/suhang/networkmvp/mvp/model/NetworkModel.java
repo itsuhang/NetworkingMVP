@@ -4,21 +4,23 @@ import com.google.gson.Gson;
 
 import android.text.TextUtils;
 import android.util.ArrayMap;
+import android.webkit.MimeTypeMap;
 
 import com.bumptech.glide.disklrucache.DiskLruCache;
+import com.suhang.layoutfinder.MethodFinder;
 import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.domain.DownLoadBean;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.domain.WrapBean;
-import com.suhang.networkmvp.constants.ErrorCode;
+import com.suhang.networkmvp.function.ProgressListener;
+import com.suhang.networkmvp.function.UploadFileRequestBody;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
 import com.suhang.networkmvp.mvp.result.LoadingResult;
 import com.suhang.networkmvp.mvp.result.ProgressResult;
 import com.suhang.networkmvp.mvp.result.SuccessResult;
-import com.suhang.networkmvp.function.ProgressListener;
 import com.suhang.networkmvp.utils.LogUtil;
 import com.suhang.networkmvp.utils.Md5Util;
-import com.suhang.networkmvp.utils.RetrofitHelper;
 import com.suhang.networkmvp.utils.RxUtil;
 
 import java.io.File;
@@ -26,9 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,17 +40,17 @@ import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import okhttp3.Call;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
  * Created by sh on 2016/10/25 16:45.
  */
 
-public class NetworkModel<T> extends BaseModel {
-    @Inject
-    RetrofitHelper<T> mHelper;
+public class NetworkModel extends BaseModel {
     @Inject
     DiskLruCache sOpen;
     @Inject
@@ -59,7 +59,8 @@ public class NetworkModel<T> extends BaseModel {
     CompositeDisposable mDisposable;
     private Map<Integer, Disposable> mSubscriptionMap = new HashMap<>();
     private Map<Integer, Call> mCallMap = new HashMap<>();
-    private ArrayMap<Class<? extends ErrorBean>,Object> mMessages = new ArrayMap<>();
+    private ArrayMap<Class<? extends ErrorBean>, Object> mMessages = new ArrayMap<>();
+
     @Inject
     public NetworkModel() {
     }
@@ -73,10 +74,8 @@ public class NetworkModel<T> extends BaseModel {
 
     /**
      * 设置附加信息
-     * @param aClass
-     * @param o
      */
-    public void setAppendMessage(Class<? extends ErrorBean> aClass,Object o) {
+    public void setAppendMessage(Class<? extends ErrorBean> aClass, Object o) {
         mMessages.put(aClass, o);
     }
 
@@ -85,12 +84,12 @@ public class NetworkModel<T> extends BaseModel {
      *
      * @param aClass Bean类字节码
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param needCache 是否需要缓存
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag) {
-        loadPost(aClass, append, params, null, needCache, tag);
+    public void loadPostData(Class<? extends ErrorBean> aClass, String append, boolean needCache, int tag, Object... objects) {
+        loadPost(aClass, append, null, needCache, tag, objects);
     }
 
     /**
@@ -98,12 +97,12 @@ public class NetworkModel<T> extends BaseModel {
      *
      * @param aClass Bean类字节码
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param needCache 是否需要缓存
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, boolean needCache, int tag) {
-        loadPostWrap(aClass, append, params, null, needCache, tag);
+    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, String append, boolean needCache, int tag, Object... objects) {
+        loadPostWrap(aClass, append, null, needCache, tag, objects);
     }
 
     /**
@@ -111,12 +110,12 @@ public class NetworkModel<T> extends BaseModel {
      *
      * @param aClass Bean类字节码
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostData(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag) {
-        loadPost(aClass, append, params, cacheTag, true, tag);
+    public void loadPostData(Class<? extends ErrorBean> aClass, String append, String cacheTag, int tag, Object... objects) {
+        loadPost(aClass, append, cacheTag, true, tag, objects);
     }
 
     /**
@@ -124,60 +123,60 @@ public class NetworkModel<T> extends BaseModel {
      *
      * @param aClass Bean类字节码
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, int tag) {
-        loadPostWrap(aClass, append, params, cacheTag, true, tag);
+    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, String append, String cacheTag, int tag, Object... objects) {
+        loadPostWrap(aClass, append, cacheTag, true, tag, objects);
     }
 
     /**
      * 访问网络获取数据(POST)
      *
      * @param aClass Bean类字节码
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostData(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag) {
-        loadPost(aClass, null, params, cacheTag, true, tag);
+    public void loadPostData(Class<? extends ErrorBean> aClass, String cacheTag, int tag, Object... objects) {
+        loadPost(aClass, null, cacheTag, true, tag, objects);
     }
 
     /**
      * 访问网络获取数据(POST)(获取包裹类,并转换为所需bean类)
      *
      * @param aClass Bean类字节码
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, Map<String, String> params, String cacheTag, int tag) {
-        loadPostWrap(aClass, null, params, cacheTag, true, tag);
+    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, String cacheTag, int tag, Object... objects) {
+        loadPostWrap(aClass, null, cacheTag, true, tag, objects);
     }
 
     /**
      * 访问网络获取数据(POST)
      *
      * @param aClass Bean类字节码
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param needCache 是否需要缓存
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostData(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag) {
-        loadPost(aClass, null, params, null, needCache, tag);
+    public void loadPostData(Class<? extends ErrorBean> aClass, boolean needCache, int tag, Object... objects) {
+        loadPost(aClass, null, null, needCache, tag, objects);
     }
 
     /**
      * 访问网络获取数据(POST)(获取包裹类,并转换为所需bean类)
      *
      * @param aClass Bean类字节码
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param needCache 是否需要缓存
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, Map<String, String> params, boolean needCache, int tag) {
-        loadPostWrap(aClass, null, params, null, needCache, tag);
+    public void loadPostDataWrap(Class<? extends ErrorBean> aClass, boolean needCache, int tag, Object... objects) {
+        loadPostWrap(aClass, null, null, needCache, tag, objects);
     }
 
 
@@ -185,24 +184,44 @@ public class NetworkModel<T> extends BaseModel {
      * 访问网络获取数据(GET)
      *
      * @param aClass Bean类字节码
-     * @param path get请求路径
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadGetData(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag) {
-        loadGet(aClass, path, null, params, tag);
+    public void loadGetData(Class<? extends ErrorBean> aClass, int tag, Object... objects) {
+        loadGet(aClass, null, tag, objects);
     }
 
     /**
      * 访问网络获取数据(GET)(获取包裹类,并转换为所需bean类)
      *
      * @param aClass Bean类字节码
-     * @param path get请求路径
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    public void loadGetDataWrap(Class<? extends ErrorBean> aClass, String path, Map<String, String> params, int tag) {
-        loadGetWrap(aClass, path, null, params, tag);
+    public void loadGetDataWrap(Class<? extends ErrorBean> aClass, int tag, Object... objects) {
+        loadGetWrap(aClass, null, tag, objects);
+    }
+
+    /**
+     * 访问网络获取数据(GET)
+     *
+     * @param aClass Bean类字节码
+     * @param objects 接口参数
+     * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+     */
+    public void loadGetData(Class<? extends ErrorBean> aClass, String append,int tag, Object... objects) {
+        loadGet(aClass, append, tag, objects);
+    }
+
+    /**
+     * 访问网络获取数据(GET)(获取包裹类,并转换为所需bean类)
+     *
+     * @param aClass Bean类字节码
+     * @param objects 接口参数
+     * @param tag 标记,用于一个页面同时处理多个获取数据的请求
+     */
+    public void loadGetDataWrap(Class<? extends ErrorBean> aClass,String append, int tag, Object... objects) {
+        loadGetWrap(aClass, append, tag, objects);
     }
 
     /**
@@ -210,33 +229,28 @@ public class NetworkModel<T> extends BaseModel {
      *
      * @param aClass Bean类字节码
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
      * @param needCache 是否需要缓存
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    private void loadPost(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag) {
+    @SuppressWarnings("unchecked")
+    private void loadPost(Class<? extends ErrorBean> aClass, String append, String cacheTag, boolean needCache, int tag, Object... objects) {
         mRxBus.post(new LoadingResult(true, tag));
         if (needCache) {
             dealCache(aClass, append, cacheTag, null, tag);
         }
         Flowable<? extends ErrorBean> flowable = null;
         try {
-            flowable = fetch(aClass, append, params);
-        } catch (InvocationTargetException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchMethodException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_METHOD, ErrorCode.ERROR_DESC_NETWORK_METHOD + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchFieldException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage());
+            String url;
+            if (TextUtils.isEmpty(append)) {
+                url = (String) aClass.getField("URL").get(null);
+            } else {
+                url = (String) aClass.getField("URL" + append).get(null);
+            }
+            flowable = MethodFinder.find(url, objects);
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD + "\n" + e.getMessage());
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
@@ -253,7 +267,7 @@ public class NetworkModel<T> extends BaseModel {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new ErrorResult(errorBean, tag));
@@ -275,36 +289,32 @@ public class NetworkModel<T> extends BaseModel {
      *
      * @param aClass Bean类字节码
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param cacheTag 缓存附加标志,用于处理同一个URL,根据传入参数不同得到的数据不同时的缓存方案(POST请求)
      * @param needCache 是否需要缓存
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    private void loadPostWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params, String cacheTag, boolean needCache, int tag) {
+    @SuppressWarnings("unchecked")
+    private void loadPostWrap(Class<? extends ErrorBean> aClass, String append, String cacheTag, boolean needCache, int tag, Object... objects) {
         mRxBus.post(new LoadingResult(true, tag));
         if (needCache) {
             dealCache(aClass, append, cacheTag, null, tag);
         }
         Flowable<? extends WrapBean> flowable = null;
         try {
-            flowable = fetchWrap(aClass, append, params);
-        } catch (InvocationTargetException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchMethodException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_METHOD, ErrorCode.ERROR_DESC_NETWORK_METHOD + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchFieldException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage());
+            String url;
+            if (TextUtils.isEmpty(append)) {
+                url = (String) aClass.getField("URL").get(null);
+            } else {
+                url = (String) aClass.getField("URL" + append).get(null);
+            }
+            flowable = MethodFinder.find(url, objects);
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD + "\n" + e.getMessage());
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
+
         if (flowable != null) {
             Disposable disposable = flowable.onBackpressureDrop().compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler()).subscribe(o -> {
                 mRxBus.post(new LoadingResult(false, tag));
@@ -318,7 +328,7 @@ public class NetworkModel<T> extends BaseModel {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
@@ -338,33 +348,28 @@ public class NetworkModel<T> extends BaseModel {
      * 访问网络获取数据(GET)
      *
      * @param aClass Bean类字节码
-     * @param path get请求路径
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    private void loadGet(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag) {
+    @SuppressWarnings("unchecked")
+    private void loadGet(Class<? extends ErrorBean> aClass, String append, int tag, Object... objects) {
         mRxBus.post(new LoadingResult(true, tag));
         Flowable<? extends ErrorBean> flowable = null;
         try {
-            flowable = fetch(aClass, path, append, params);
-        } catch (InvocationTargetException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchMethodException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_METHOD, ErrorCode.ERROR_DESC_NETWORK_METHOD + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchFieldException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage());
+            String url;
+            if (TextUtils.isEmpty(append)) {
+                url = (String) aClass.getField("URL").get(null);
+            } else {
+                url = (String) aClass.getField("URL" + append).get(null);
+            }
+            flowable = MethodFinder.find(url, objects);
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD + "\n" + e.getMessage());
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
+
         if (flowable != null) {
             Disposable disposable = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler()).subscribe(o -> {
                 mRxBus.post(new LoadingResult(false, tag));
@@ -377,7 +382,7 @@ public class NetworkModel<T> extends BaseModel {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new ErrorResult(errorBean, tag));
@@ -395,31 +400,24 @@ public class NetworkModel<T> extends BaseModel {
      * 此方法将获取的包裹类转换为内容类并返回
      *
      * @param aClass Bean类字节码
-     * @param path get请求路径
      * @param append Bean类中URL字段后的附加字段(类似URL1,URL2),用于处理一个Bean类对应多个接口
-     * @param params 接口参数
+     * @param objects 接口参数
      * @param tag 标记,用于一个页面同时处理多个获取数据的请求
      */
-    private void loadGetWrap(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params, int tag) {
-        LogUtil.i("啊啊啊"+sOpen);
+    @SuppressWarnings("unchecked")
+    private void loadGetWrap(Class<? extends ErrorBean> aClass, String append, int tag, Object... objects) {
         mRxBus.post(new LoadingResult(true, tag));
         Flowable<? extends WrapBean> flowable = null;
         try {
-            flowable = fetchWrap(aClass, path, append, params);
-        } catch (InvocationTargetException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchMethodException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_METHOD, ErrorCode.ERROR_DESC_NETWORK_METHOD + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchFieldException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage());
+            String url;
+            if (TextUtils.isEmpty(append)) {
+                url = (String) aClass.getField("URL").get(null);
+            } else {
+                url = (String) aClass.getField("URL" + append).get(null);
+            }
+            flowable = MethodFinder.find(url, objects);
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD + "\n" + e.getMessage());
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
@@ -435,7 +433,7 @@ public class NetworkModel<T> extends BaseModel {
                     mRxBus.post(new SuccessResult(o, tag));
                 }
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
@@ -450,31 +448,41 @@ public class NetworkModel<T> extends BaseModel {
         }
     }
 
+    public String getMimeType(String path) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        if (extension != null) {
+            MimeTypeMap mime = MimeTypeMap.getSingleton();
+            type = mime.getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
+
+    private Map<String, RequestBody> getUpload(File file, Map<String, String> params, ProgressListener listener) {
+        Map<String, RequestBody> requestBodyMap = new HashMap<>();
+        UploadFileRequestBody fileRequestBody = new UploadFileRequestBody(file, MediaType.parse(getMimeType(file.getAbsolutePath())), listener);
+        requestBodyMap.put("file\"; filename=\"" + file.getName(), fileRequestBody);
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            requestBodyMap.put(entry.getKey(), RequestBody.create(null, entry.getValue()));
+        }
+        return requestBodyMap;
+    }
 
     /**
      * 上传文件
      *
      * @param aClass Bean类字节码
      */
+    @SuppressWarnings("unchecked")
     public void upload(Class<? extends ErrorBean> aClass, Map<String, String> params, File file, int tag) {
         mRxBus.post(new LoadingResult(true, tag));
         Flowable<? extends ErrorBean> flowable = null;
+        Map<String, RequestBody> upload = getUpload(file, params, (currentBytes, contentLength, done) -> mRxBus.post(new ProgressResult((int) (100f * currentBytes / contentLength), tag)));
         try {
-            flowable = fetchUpload(aClass, file, params, (currentBytes, contentLength, done) -> mRxBus.post(new ProgressResult((int) (100f * currentBytes / contentLength), tag)));
-        } catch (InvocationTargetException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getTargetException().getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (IllegalAccessException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_NETWORK, ErrorCode.ERROR_DESC_REFLECT_NETWORK + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchMethodException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_METHOD, ErrorCode.ERROR_DESC_NETWORK_METHOD + "\n" + e.getMessage());
-            mRxBus.post(new LoadingResult(false, tag));
-            mRxBus.post(new ErrorResult(errorBean, tag));
-        } catch (NoSuchFieldException e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.getMessage());
+            String url = (String) aClass.getField("URL").get(null);
+            flowable = MethodFinder.find(url, upload);
+        } catch (Exception e) {
+            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD + "\n" + e.getMessage());
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
@@ -486,7 +494,7 @@ public class NetworkModel<T> extends BaseModel {
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new SuccessResult(o, tag));
             }, throwable -> {
-                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK+"\n"+throwable.getMessage());
+                ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
                 errorBean.setType(Constants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
@@ -565,80 +573,6 @@ public class NetworkModel<T> extends BaseModel {
                 mRxBus.post(new SuccessResult(errorBean, tag));
             }
         }));
-    }
-
-
-    /**
-     * 通过Class来判断是否有该Bean类对应的抓取数据的方法(POST)
-     */
-    private Flowable<? extends ErrorBean> fetch(Class<? extends ErrorBean> aClass, String append, Map<String, String> params) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
-        Flowable<? extends ErrorBean> flowable;
-        String method;
-        if (TextUtils.isEmpty(append)) {
-            method = (String) aClass.getDeclaredField("METHOD").get(null);
-        } else {
-            method = (String) aClass.getDeclaredField("METHOD" + append).get(null);
-        }
-        flowable = mHelper.fetch(method, params);
-        return flowable;
-    }
-
-    /**
-     * 通过Class来判断是否有该Bean类对应的抓取数据的方法(POST)
-     * 此方法获取的是包裹类,需通转换为内容Bean类
-     */
-    private Flowable<? extends WrapBean> fetchWrap(Class<? extends ErrorBean> aClass, String append, Map<String, String> params) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
-        Flowable<? extends WrapBean> flowable;
-        String method;
-        if (TextUtils.isEmpty(append)) {
-            method = (String) aClass.getDeclaredField("METHOD").get(null);
-        } else {
-            method = (String) aClass.getDeclaredField("METHOD" + append).get(null);
-        }
-        flowable = mHelper.fetchWrap(method, params);
-        return flowable;
-    }
-
-    /**
-     * 通过Class来判断是否有该Bean类对应的抓取数据的方法(GET)
-     */
-    private Flowable<? extends ErrorBean> fetch(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
-        Flowable<? extends ErrorBean> flowable;
-        String method;
-        if (TextUtils.isEmpty(append)) {
-            method = (String) aClass.getDeclaredField("METHOD").get(null);
-        } else {
-            method = (String) aClass.getDeclaredField("METHOD" + append).get(null);
-        }
-        flowable = mHelper.fetch(method, path, params);
-        return flowable;
-    }
-
-    /**
-     * 通过Class来判断是否有该Bean类对应的抓取数据的方法(GET)
-     * 此方法获取的是包裹类,需通转换为内容Bean类
-     */
-    private Flowable<? extends WrapBean> fetchWrap(Class<? extends ErrorBean> aClass, String path, String append, Map<String, String> params) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
-        Flowable<? extends WrapBean> flowable;
-        String method;
-        if (TextUtils.isEmpty(append)) {
-            method = (String) aClass.getDeclaredField("METHOD").get(null);
-        } else {
-            method = (String) aClass.getDeclaredField("METHOD" + append).get(null);
-        }
-        flowable = mHelper.fetchWrap(method, path, params);
-        return flowable;
-    }
-
-    /**
-     * 通过Class来判断是否有该Bean类对应的抓取数据的方法(上传)
-     */
-    @SuppressWarnings("unchecked")
-    private Flowable<? extends ErrorBean> fetchUpload(Class<? extends ErrorBean> aClass, File file, Map<String, String> params, ProgressListener listener) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
-        Flowable<? extends ErrorBean> flowable;
-        String method = (String) aClass.getDeclaredField("METHOD").get(null);
-        flowable = mHelper.fetchUpload(method, file, params, listener);
-        return flowable;
     }
 
 

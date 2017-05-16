@@ -7,7 +7,7 @@ import java.util.List;
  */
 
 public class GithubBean extends ErrorBean{
-    public static final String METHOD = "getGithubData";
+    public static final String URL = "history/content/{user}";
 
     private boolean error;
 

@@ -45,6 +45,9 @@ public class ErrorCode {
     //BaseRvAdapter中onBindViewHolder()出现异常
     public static String ERROR_CODE_RVADAPTER_BIND = "-8011";
     public static String ERROR_DESC_RVADAPTER_BIND = "BaseRvAdapter中onBindViewHolder()出现异常(数据出错,一般情况可忽略该错误)";
+    //NetworkModel:根据参数查找Retrofit的Service中的方法时发生异常
+    public static String ERROR_CODE_NETWORK_FINDMETHOD = "-8012";
+    public static String ERROR_DESC_NETWORK_FINDMETHOD = "NetworkModel:根据参数查找Retrofit的Service中的方法时发生异常";
     //网络访问错误，bean类中的URL和METHOD属性不正确
     public static String ERROR_CODE_NETWORK_PARAMS = "-8015";
     public static String ERROR_DESC_NETWORK_PARAMS = "网络访问错误，bean类中的URL和METHOD属性不正确:";

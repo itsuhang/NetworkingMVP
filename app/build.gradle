@@ -58,7 +58,7 @@ android {
      debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
      releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
      testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-     compile 'com.suhang:lazyannotation_annotation:1.0.0'
-     compile 'com.suhang:lazyannotation:1.0.0'
-     annotationProcessor 'com.suhang:lazyannotation_compiler:1.0.0'
+     compile 'com.suhang:lazyannotation_annotation:1.0.2'
+     compile 'com.suhang:lazyannotation:1.0.2'
+     annotationProcessor 'com.suhang:lazyannotation_compiler:1.0.2'
  }
