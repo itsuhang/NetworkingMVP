@@ -17,7 +17,7 @@ import com.suhang.layoutfinder.LayoutFinder;
 import com.suhang.layoutfinderannotation.BindLayout;
 import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.application.App;
-import com.suhang.networkmvp.binding.event.BindingEvent;
+import com.suhang.networkmvp.binding.event.BaseData;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -39,192 +39,195 @@ import io.reactivex.disposables.CompositeDisposable;
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBinding> extends AppCompatActivity implements ContextProvider{
-    //基类内部错误tag
-    public static final int ERROR_TAG = -1;
+public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBinding> extends AppCompatActivity implements ContextProvider {
+	//基类内部错误tag
+	public static final int ERROR_TAG = -1;
 
-    /**
-     * 基主件,用于注册子主件(dagger2)
-     */
-    private BaseComponent mBaseComponent;
+	/**
+	 * 基主件,用于注册子主件(dagger2)
+	 */
+	private BaseComponent mBaseComponent;
 
-    //Rxjava事件集合，用于退出时取消事件
-    @Inject
-    CompositeDisposable mDisposables;
+	//Rxjava事件集合，用于退出时取消事件
+	@Inject
+	CompositeDisposable mDisposables;
 
-    @Inject
-    Activity mActivity;
+	@Inject
+	Activity mActivity;
 
-    @Inject
-    Context mContext;
+	@Inject
+	Context mContext;
 
-    //进度对话框
-    @Inject
-    Dialog mDialog;
+	//进度对话框
+	@Inject
+	Dialog mDialog;
 
-    @Inject
-    T mModel;
+	@Inject
+	T mModel;
 
-    @BindLayout
-    E mBinding;
+	@BindLayout
+	E mBinding;
 
-    @Inject
-    SubstribeManager mManager;
+	@Inject
+	SubstribeManager mManager;
 
-    @Inject
-    BindingEvent mEvent;
+	private boolean isRegisterEventBus;
 
-    private boolean isRegisterEventBus;
+	@Inject
 
-    @Inject
+	@Override
+	protected void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
+		injectDagger();
+		subscribeEvent();
+		bind(bindLayout());
+		if (mActivity == null) {
+			throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
+		}
+	}
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
-        injectDagger();
-        subscribeEvent();
-        bind(bindLayout());
-        if (mActivity == null) {
-            throw new RuntimeException("injectDagger()方法没有实现,或实现不正确");
-        }
-    }
+	/**
+	 * 根据提供的布局id进行绑定
+	 *
+	 * @return 布局id
+	 */
+	protected abstract int bindLayout();
 
-    /**
-     * 根据提供的布局id进行绑定
-     * @return 布局id
-     */
-    protected abstract int bindLayout();
+	protected void bind(@LayoutRes int layout) {
+		LayoutFinder.find(this, layout);
+		setContentView(mBinding.getRoot());
+		setBindingEvent(mBinding);
+		initData();
+		initEvent();
+	}
 
-    protected void bind(@LayoutRes int layout) {
-        LayoutFinder.find(this, layout);
-        setContentView(mBinding.getRoot());
-        setBindingEvent(mBinding);
-        initData();
-        initEvent();
-    }
+	/**
+	 * 订阅事件
+	 */
+	protected abstract void subscribeEvent();
 
-    /**
-     * 订阅事件
-     */
-    protected abstract void subscribeEvent();
+	/**
+	 * 注册事件总线
+	 */
+	protected void registerEventBus() {
+		EventBus.getDefault().register(this);
+		isRegisterEventBus = true;
+	}
 
-    /**
-     * 注册事件总线
-     */
-    protected void registerEventBus() {
-        EventBus.getDefault().register(this);
-        isRegisterEventBus = true;
-    }
+	public T getModel() {
+		return mModel;
+	}
 
-    public T getModel() {
-        return mModel;
-    }
-
-    /**
-     * 获取对话框
-     */
-    protected Dialog getDialog() {
-        return mDialog;
-    }
+	/**
+	 * 获取对话框
+	 */
+	protected Dialog getDialog() {
+		return mDialog;
+	}
 
 
-    /**
-     * EventBus事件(防崩溃,需要则重写)
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void event(Integer i) {
+	/**
+	 * EventBus事件(防崩溃,需要则重写)
+	 */
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void event(Integer i) {
 
-    }
+	}
 
-    /**
-     * 获取RxBus,可进行订阅操作
-     */
-    protected SubstribeManager getSm() {
-        return mManager;
-    }
+	/**
+	 * 获取RxBus,可进行订阅操作
+	 */
+	protected SubstribeManager getSm() {
+		return mManager;
+	}
 
-    /**
-     * 初始化数据
-     */
-    protected abstract void initData();
-
-
-    /**
-     * 初始化事件
-     */
-    protected void initEvent() {
-
-    }
-
-    /**
-     * 绑定事件类(暂不使用)
-     */
-    protected void setBindingEvent(ViewDataBinding binding) {
-        try {
-            binding.setVariable(BR.event, mEvent);
-        } catch (Exception e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
-
-    /**
-     * 获取父Component(dagger2)
-     */
-    protected BaseComponent getBaseComponent() {
-        return mBaseComponent;
-    }
-
-    /**
-     * dagger2绑定(需要则重写) ps: getBaseComponent().getMainComponent(new
-     * MainModule()).inject(this);
-     */
-    protected abstract void injectDagger();
-
-    /**
-     * 隐藏软键盘
-     */
-    protected void hideKeyboard() {
-        View view = getCurrentFocus();
-        if (view != null) {
-            ((InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE)).
-                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
-
-    /**
-     * 沉浸状态栏偏移
-     */
-    protected void immerseUI(View view) {
-        view.setPadding(0, ScreenUtils.getStatusBarHeight(this), 0, 0);
-    }
+	/**
+	 * 初始化数据
+	 */
+	protected abstract void initData();
 
 
-    /**
-     * 显示软键盘
-     */
-    protected void showKeyboard(EditText et) {
-        et.requestFocus();
-        ((InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
-    }
+	/**
+	 * 初始化事件
+	 */
+	protected void initEvent() {
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mDisposables != null) {
-            mDisposables.dispose();
-        }
-        if (isRegisterEventBus) {
-            EventBus.getDefault().unregister(this);
-        }
-        //处理InputMethodManager导致的内存泄漏
-        mModel.destory();
-        InputLeakUtil.fixInputMethodManager(this);
-    }
+	}
 
-    @Override
-    public Context providerContext() {
-        return this;
-    }
+	protected abstract BaseData getBindingData();
+
+	/**
+	 * 绑定事件类(暂不使用)
+	 */
+	protected void setBindingEvent(ViewDataBinding binding) {
+		if (getBindingData() != null) {
+			getBindingData().setManager(mManager);
+			try {
+				binding.setVariable(BR.event, getBindingData());
+			} catch (Exception e) {
+				ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+				mManager.post(new ErrorResult(errorBean, ERROR_TAG));
+			}
+		}
+	}
+
+	/**
+	 * 获取父Component(dagger2)
+	 */
+	protected BaseComponent getBaseComponent() {
+		return mBaseComponent;
+	}
+
+	/**
+	 * dagger2绑定(需要则重写) ps: getBaseComponent().getMainComponent(new
+	 * MainModule()).inject(this);
+	 */
+	protected abstract void injectDagger();
+
+	/**
+	 * 隐藏软键盘
+	 */
+	protected void hideKeyboard() {
+		View view = getCurrentFocus();
+		if (view != null) {
+			((InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE)).
+					hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		}
+	}
+
+	/**
+	 * 沉浸状态栏偏移
+	 */
+	protected void immerseUI(View view) {
+		view.setPadding(0, ScreenUtils.getStatusBarHeight(this), 0, 0);
+	}
+
+
+	/**
+	 * 显示软键盘
+	 */
+	protected void showKeyboard(EditText et) {
+		et.requestFocus();
+		((InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (mDisposables != null) {
+			mDisposables.dispose();
+		}
+		if (isRegisterEventBus) {
+			EventBus.getDefault().unregister(this);
+		}
+		//处理InputMethodManager导致的内存泄漏
+		mModel.destory();
+		InputLeakUtil.fixInputMethodManager(this);
+	}
+
+	@Override
+	public Context providerContext() {
+		return this;
+	}
 }

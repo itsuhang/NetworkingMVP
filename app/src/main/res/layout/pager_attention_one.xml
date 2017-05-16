@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-        xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
     <data>
+
         <variable
-                name="event"
-                type="com.suhang.networkmvp.binding.event.BindingEvent"/>
+            name="event"
+            type="com.suhang.networkmvp.binding.event.BaseData"/>
+
+        <variable
+            name="data"
+            type="com.suhang.networkmvp.binding.event.BindingAdapterEvent"/>
 
     </data>
+
     <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <Button
-                android:onClick="@{event::onClick}"
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-        /><Button
-                android:id="@+id/button1"
-                android:onClick="@{event::onClick}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-        />
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{event::onClick}"
+            />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{event::onClick}"
+            />
+
         <TextView
-                android:id="@+id/tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="分类子页面一"
-        />
+            android:id="@+id/tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="分类子页面一"
+            />
     </LinearLayout>
 </layout>

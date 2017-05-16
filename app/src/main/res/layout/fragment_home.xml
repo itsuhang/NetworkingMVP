@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="event"
-                type="com.suhang.networkmvp.binding.event.BindingEvent"/>
+                type="com.suhang.networkmvp.binding.event.BaseData"/>
 
     </data>
     <LinearLayout

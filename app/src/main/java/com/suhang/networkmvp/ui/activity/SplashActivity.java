@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.ActivityScope;
+import com.suhang.networkmvp.binding.event.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivitySplashBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;
@@ -28,6 +29,11 @@ public class SplashActivity extends BaseActivity<BlankModel,ActivitySplashBindin
 
     @Override
     protected void initData() {
+    }
+
+    @Override
+    protected BaseData getBindingData() {
+        return null;
     }
 
     @Override

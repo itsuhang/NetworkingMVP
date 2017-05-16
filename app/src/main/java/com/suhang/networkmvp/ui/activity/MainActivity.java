@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.MainFragmentAdapter;
 import com.suhang.networkmvp.annotation.ActivityScope;
+import com.suhang.networkmvp.binding.event.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;
@@ -43,6 +44,11 @@ public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding>{
         mBinding.vpMain.setAdapter(new MainFragmentAdapter(getSupportFragmentManager(),fragments));
         new RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE).subscribe(aBoolean -> {
         });
+    }
+
+    @Override
+    protected BaseData getBindingData() {
+        return null;
     }
 
     @Override

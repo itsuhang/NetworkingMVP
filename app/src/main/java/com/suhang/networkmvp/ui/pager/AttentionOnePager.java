@@ -4,11 +4,12 @@ import android.app.Activity;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.PagerScope;
+import com.suhang.networkmvp.binding.event.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.GithubBean;
-import com.suhang.networkmvp.mvp.event.ClickEvent;
+import com.suhang.networkmvp.mvp.event.BindingEvent;
 import com.suhang.networkmvp.mvp.model.AttentionModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
 import com.suhang.networkmvp.mvp.result.SuccessResult;
@@ -42,8 +43,8 @@ public class AttentionOnePager extends BasePager<AttentionModel,PagerAttentionOn
         getSM().subscribeResult(ErrorResult.class).subscribe(errorResult -> {
             LogUtil.i("啊啊啊" + errorResult.getResult());
         });
-        getSM().subscribeEvent(ClickEvent.class).subscribe(clickEvent -> {
-            switch (clickEvent.getId()) {
+        getSM().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {
+            switch (bindingEvent.getId()) {
                 case R.id.button:
                     getModel().getAppMainData();
                     break;
@@ -62,6 +63,11 @@ public class AttentionOnePager extends BasePager<AttentionModel,PagerAttentionOn
 
     @Override
     public void initData() {
+    }
+
+    @Override
+    protected BaseData getBindingData() {
+        return null;
     }
 
 }

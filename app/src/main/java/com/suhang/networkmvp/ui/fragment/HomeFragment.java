@@ -5,11 +5,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.HomeRvAdapter;
 import com.suhang.networkmvp.annotation.FragmentScope;
+import com.suhang.networkmvp.binding.event.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentHomeBinding;
 import com.suhang.networkmvp.domain.DeleteHistoryBean;
 import com.suhang.networkmvp.domain.HomeBean;
-import com.suhang.networkmvp.mvp.event.ClickEvent;
+import com.suhang.networkmvp.mvp.event.BindingEvent;
 import com.suhang.networkmvp.mvp.event.ItemClickEvent;
 import com.suhang.networkmvp.mvp.model.HomeModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
@@ -45,14 +46,13 @@ public class HomeFragment extends BaseFragment<HomeModel,FragmentHomeBinding> {
         getSm().subscribeEvent(ItemClickEvent.class).subscribe(itemClickEvent -> {
 
         });
-        getSm().subscribeEvent(ClickEvent.class).subscribe(clickEvent -> {
-            switch (clickEvent.getId()) {
+        getSm().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {
+            switch (bindingEvent.getId()) {
                 case R.id.button:
                     getModel().getLoadMore(mAdapter.getNextPage());
                     break;
-                case R.id.button1:
-                    LogUtil.i("啊啊啊"+mLs1+"   "+mLs2);
-                    getModel().deleteHistory(mLs2, mLs1);
+                case R.id.parent:
+                    LogUtil.i("啊啊啊"+ bindingEvent.getData());
                     break;
             }
         });
@@ -90,6 +90,11 @@ public class HomeFragment extends BaseFragment<HomeModel,FragmentHomeBinding> {
         mBinding.rvHome.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.rvHome.setAdapter(mAdapter);
         mModel.getHomeData();
+    }
+
+    @Override
+    protected BaseData getBindingData() {
+        return null;
     }
 
     @Override
