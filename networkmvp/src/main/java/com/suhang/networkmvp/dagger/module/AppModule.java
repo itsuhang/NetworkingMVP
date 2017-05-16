@@ -4,14 +4,10 @@ import com.google.gson.Gson;
 
 import android.app.Application;
 
-import com.suhang.layoutfinder.MethodFinder;
 import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.function.AddCookiesInterceptor;
 import com.suhang.networkmvp.function.CacheInterceptor;
 import com.suhang.networkmvp.function.ReceivedCookiesInterceptor;
-import com.suhang.networkmvp.interfaces.INetworkOtherService;
-import com.suhang.networkmvp.interfaces.INetworkService;
-import com.suhang.networkmvp.interfaces.IUploadService;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -23,8 +19,6 @@ import dagger.Provides;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by 苏杭 on 2017/1/22 17:32.
@@ -44,19 +38,6 @@ public class AppModule {
         initOkHttpClient();
         mBuilder = new Retrofit.Builder();
         mGson = new Gson();
-        initRetrofit();
-    }
-
-    private void initRetrofit() {
-        Retrofit retrofit = mBuilder.baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
-        INetworkService iNetworkService = retrofit.create(INetworkService.class);
-        MethodFinder.inject(iNetworkService,INetworkService.class);
-        retrofit = mBuilder.baseUrl(Constants.BASE_URL1).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
-        INetworkOtherService iNetworkOtherService = retrofit.create(INetworkOtherService.class);
-        MethodFinder.inject(iNetworkOtherService,INetworkOtherService.class);
-        retrofit = mBuilder.baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
-        IUploadService iUploadService = retrofit.create(IUploadService.class);
-        MethodFinder.inject(iUploadService,IUploadService.class);
     }
 
     /**

@@ -35,13 +35,12 @@ android {
 
  dependencies {
      final SUPPORT_LIBRARY_VERSION = '25.2.0'
-     final DAGGER_VERSION = '2.7'
-     final RX_VERSION = '2.0.0'
+     final DAGGER_VERSION = '2.10'
      compile fileTree(include: ['*.jar'], dir: 'libs')
      compile "com.google.dagger:dagger:$DAGGER_VERSION"
      annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
-     compile "io.reactivex.rxjava2:rxandroid:$RX_VERSION"
-     compile "io.reactivex.rxjava2:rxjava:$RX_VERSION"
+     compile "io.reactivex.rxjava2:rxandroid:2.0.1"
+     compile "io.reactivex.rxjava2:rxjava:2.1.0"
      compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
      compile 'org.greenrobot:eventbus:3.0.0'
      compile "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
@@ -52,12 +51,9 @@ android {
      compile 'com.squareup.okhttp3:okhttp:3.5.0'
      compile 'com.github.bumptech.glide:glide:3.7.0'
      compile 'com.squareup.retrofit2:retrofit:2.1.0'
-     compile 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
+     compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
      compile 'com.squareup.retrofit2:converter-gson:2.1.0'
      compile 'com.google.code.gson:gson:2.7'
-     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
-     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
      compile 'com.suhang:lazyannotation_annotation:1.0.2'
      compile 'com.suhang:lazyannotation:1.0.2'
      annotationProcessor 'com.suhang:lazyannotation_compiler:1.0.2'

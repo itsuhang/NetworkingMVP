@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NetworkMVP</string>
+    <string name="host">suhang</string>
+    <string name="adapter_tag">POSITION</string>
+</resources>
