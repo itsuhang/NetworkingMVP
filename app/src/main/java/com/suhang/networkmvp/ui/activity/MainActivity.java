@@ -6,7 +6,7 @@ import android.os.Bundle;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.MainFragmentAdapter;
 import com.suhang.networkmvp.annotation.ActivityScope;
-import com.suhang.networkmvp.binding.event.BaseData;
+import com.suhang.networkmvp.binding.data.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;

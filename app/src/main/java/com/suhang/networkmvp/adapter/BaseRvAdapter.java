@@ -8,13 +8,15 @@ import android.widget.Toast;
 
 import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
-import com.suhang.networkmvp.binding.event.BaseData;
+import com.suhang.networkmvp.binding.data.BaseData;
+import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.interfaces.IAdapterHelper;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,13 +75,21 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends Recycle
 	protected abstract BaseData getBindingData();
 
 	/**
-	 * 绑定事件类(暂不使用)
+	 * 绑定数据类(
 	 */
 	protected void setBindingEvent(T t) {
 		BaseData bindingData = getBindingData();
 		if (bindingData != null) {
 			bindingData.setManager(mManager);
-			t.mBinding.setVariable(BR.event, bindingData);
+			try {
+				Class<?> aClass = Class.forName(Constants.DATABINDING_BR);
+				Field field = aClass.getField(Constants.DATABINDING_DATA);
+				int id = (int) field.get(null);
+				t.mBinding.setVariable(id, bindingData);
+			} catch (Exception e) {
+				ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+				mManager.post(new ErrorResult(errorBean, ERROR_TAG));
+			}
 		}
 	}
 

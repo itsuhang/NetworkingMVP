@@ -11,9 +11,9 @@ import android.widget.EditText;
 import com.suhang.layoutfinder.ContextProvider;
 import com.suhang.layoutfinder.LayoutFinder;
 import com.suhang.layoutfinderannotation.BindLayout;
-import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.application.App;
-import com.suhang.networkmvp.binding.event.BaseData;
+import com.suhang.networkmvp.binding.data.BaseData;
+import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -25,6 +25,8 @@ import com.suhang.networkmvp.mvp.result.ErrorResult;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -190,13 +192,17 @@ public abstract class BasePager<T extends BaseModel, E extends ViewDataBinding> 
 	protected abstract BaseData getBindingData();
 
 	/**
-	 * 绑定事件类(暂不使用)
+	 * 绑定数据类
 	 */
 	protected void setBindingEvent(ViewDataBinding binding) {
-		if (getBindingData() != null) {
-			getBindingData().setManager(mManager);
-			try {
-				binding.setVariable(BR.event, getBindingData());
+        BaseData bindingData = getBindingData();
+        if (bindingData != null) {
+            bindingData.setManager(mManager);
+            try {
+                Class<?> aClass = Class.forName(Constants.DATABINDING_BR);
+                Field field = aClass.getField(Constants.DATABINDING_DATA);
+                int id = (int) field.get(null);
+                binding.setVariable(id, bindingData);
 			} catch (Exception e) {
 				ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
 				mManager.post(new ErrorResult(errorBean, ERROR_TAG));

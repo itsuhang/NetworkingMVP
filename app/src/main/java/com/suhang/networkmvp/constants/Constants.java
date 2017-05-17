@@ -21,6 +21,9 @@ public class Constants {
     public static final String CACHE_PATH_OKHTTP= BaseApp.getInstance().getCacheDir().getAbsolutePath() + File.separator + "NetCache_OKHTTP";
     public static final String BASE_URL = "http://www.huanpeng.com";
     public static final String BASE_URL1 = "http://gank.io/api/";
+
+    public static final String DATABINDING_DATA = "data";
+    public static final String DATABINDING_BR = BaseApp.getInstance().getPackageName()+".BR";
     /**
      * 错误类型1,不显示给用户
      */

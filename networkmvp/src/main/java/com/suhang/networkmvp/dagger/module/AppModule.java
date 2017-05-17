@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 
 import android.app.Application;
 
-import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.constants.BaseConstants;
 import com.suhang.networkmvp.function.AddCookiesInterceptor;
 import com.suhang.networkmvp.function.CacheInterceptor;
 import com.suhang.networkmvp.function.ReceivedCookiesInterceptor;
@@ -18,7 +18,6 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
 
 /**
  * Created by 苏杭 on 2017/1/22 17:32.
@@ -30,13 +29,11 @@ import retrofit2.Retrofit;
 public class AppModule {
     private Application mApplication;
     private OkHttpClient mOkHttpClient;
-    private final Retrofit.Builder mBuilder;
-    private final Gson mGson;
+    private Gson mGson;
 
     public AppModule(Application application) {
         mApplication = application;
         initOkHttpClient();
-        mBuilder = new Retrofit.Builder();
         mGson = new Gson();
     }
 
@@ -46,7 +43,7 @@ public class AppModule {
     private void initOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         int cacheSize = 100 * 1024 * 1024; // 100 MiB
-        Cache cache = new Cache(new File(Constants.CACHE_PATH_OKHTTP), cacheSize);
+        Cache cache = new Cache(new File(BaseConstants.CACHE_PATH_OKHTTP), cacheSize);
         //设置超时
         builder.cache(cache);
         builder.connectTimeout(10, TimeUnit.SECONDS);
@@ -69,42 +66,6 @@ public class AppModule {
     OkHttpClient provideOkHttpClient() {
         return mOkHttpClient;
     }
-
-//    /**
-//     * 提供网络Service(全局单例)
-//     */
-//    @Singleton
-//    @Provides
-//    INetworkService provideNetworkService() {
-//        Retrofit retrofit = mBuilder.baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
-//        INetworkService iNetworkService = retrofit.create(INetworkService.class);
-//        MethodFinder.inject(iNetworkService,INetworkService.class);
-//        return iNetworkService;
-//    }
-//
-//    /**
-//     * 提供网络Service(全局单例)
-//     */
-//    @Singleton
-//    @Provides
-//    INetworkOtherService provideNetworkOtherService() {
-//        Retrofit retrofit = mBuilder.baseUrl(Constants.BASE_URL1).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
-//        INetworkOtherService iNetworkOtherService = retrofit.create(INetworkOtherService.class);
-//        MethodFinder.inject(iNetworkOtherService,INetworkOtherService.class);
-//        return iNetworkOtherService;
-//    }
-//
-//    /**
-//     * 提供上传Service(全局单例)
-//     */
-//    @Singleton
-//    @Provides
-//    IUploadService provideUploadService() {
-//        Retrofit retrofit = mBuilder.baseUrl(Constants.BASE_URL).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mOkHttpClient).build();
-//        IUploadService iUploadService = retrofit.create(IUploadService.class);
-//        MethodFinder.inject(iUploadService,IUploadService.class);
-//        return iUploadService;
-//    }
 
     /**
      * 提供Gson(全局单例)

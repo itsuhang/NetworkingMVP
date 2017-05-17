@@ -8,5 +8,6 @@ public class App extends BaseApp{
     @Override
     public void onCreate() {
         super.onCreate();
+//        AppComponentw build = DaggerAppComponentw.builder().appComponent(getAppComponent()).appModule2(new AppModule2(this)).build();
     }
 }

@@ -8,7 +8,7 @@ import android.webkit.MimeTypeMap;
 
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.suhang.layoutfinder.MethodFinder;
-import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.constants.BaseConstants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.domain.DownLoadBean;
 import com.suhang.networkmvp.domain.ErrorBean;
@@ -268,7 +268,7 @@ public class NetworkModel extends BaseModel {
                 }
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
-                errorBean.setType(Constants.ERRORTYPE_TWO);
+                errorBean.setType(BaseConstants.ERRORTYPE_TWO);
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new ErrorResult(errorBean, tag));
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
@@ -276,7 +276,7 @@ public class NetworkModel extends BaseModel {
             addDisposable(disposable, tag);
         } else {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH);
-            errorBean.setType(Constants.ERRORTYPE_TWO);
+            errorBean.setType(BaseConstants.ERRORTYPE_TWO);
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
@@ -329,7 +329,7 @@ public class NetworkModel extends BaseModel {
                 }
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
-                errorBean.setType(Constants.ERRORTYPE_TWO);
+                errorBean.setType(BaseConstants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new ErrorResult(errorBean, tag));
@@ -337,7 +337,7 @@ public class NetworkModel extends BaseModel {
             addDisposable(disposable, tag);
         } else {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH);
-            errorBean.setType(Constants.ERRORTYPE_TWO);
+            errorBean.setType(BaseConstants.ERRORTYPE_TWO);
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
@@ -383,14 +383,14 @@ public class NetworkModel extends BaseModel {
                 }
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
-                errorBean.setType(Constants.ERRORTYPE_TWO);
+                errorBean.setType(BaseConstants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new ErrorResult(errorBean, tag));
             });
             addDisposable(disposable, tag);
         } else {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH);
-            errorBean.setType(Constants.ERRORTYPE_TWO);
+            errorBean.setType(BaseConstants.ERRORTYPE_TWO);
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
     }
@@ -434,7 +434,7 @@ public class NetworkModel extends BaseModel {
                 }
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
-                errorBean.setType(Constants.ERRORTYPE_TWO);
+                errorBean.setType(BaseConstants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new ErrorResult(errorBean, tag));
@@ -442,7 +442,7 @@ public class NetworkModel extends BaseModel {
             addDisposable(disposable, tag);
         } else {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH);
-            errorBean.setType(Constants.ERRORTYPE_TWO);
+            errorBean.setType(BaseConstants.ERRORTYPE_TWO);
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
@@ -495,7 +495,7 @@ public class NetworkModel extends BaseModel {
                 mRxBus.post(new SuccessResult(o, tag));
             }, throwable -> {
                 ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK + "\n" + throwable.getMessage());
-                errorBean.setType(Constants.ERRORTYPE_TWO);
+                errorBean.setType(BaseConstants.ERRORTYPE_TWO);
                 LogUtil.i("啊啊啊" + errorBean.getCode() + "   " + errorBean.getDesc() + "  " + throwable);
                 mRxBus.post(new LoadingResult(false, tag));
                 mRxBus.post(new ErrorResult(errorBean, tag));
@@ -503,7 +503,7 @@ public class NetworkModel extends BaseModel {
             addDisposable(disposable, tag);
         } else {
             ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH);
-            errorBean.setType(Constants.ERRORTYPE_TWO);
+            errorBean.setType(BaseConstants.ERRORTYPE_TWO);
             mRxBus.post(new LoadingResult(false, tag));
             mRxBus.post(new ErrorResult(errorBean, tag));
         }
@@ -523,9 +523,9 @@ public class NetworkModel extends BaseModel {
             try {
                 Field field;
                 if (TextUtils.isEmpty(append)) {
-                    field = aClass.getField(Constants.URL);
+                    field = aClass.getField(BaseConstants.URL);
                 } else {
-                    field = aClass.getField(Constants.URL + append);
+                    field = aClass.getField(BaseConstants.URL + append);
                 }
                 String url = (String) field.get(null);
                 String key;

@@ -18,7 +18,8 @@ import com.suhang.layoutfinder.LayoutFinder;
 import com.suhang.layoutfinderannotation.BindLayout;
 import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.application.BaseApp;
-import com.suhang.networkmvp.binding.event.BaseData;
+import com.suhang.networkmvp.binding.data.BaseData;
+import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -31,6 +32,8 @@ import com.suhang.networkmvp.utils.ScreenUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -202,10 +205,14 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 	 * 绑定事件类(暂不使用)
 	 */
 	protected void setBindingEvent(ViewDataBinding binding) {
-		if (getBindingData() != null) {
-			getBindingData().setManager(mManager);
+		BaseData bindingData = getBindingData();
+		if (bindingData != null) {
+			bindingData.setManager(mManager);
 			try {
-				binding.setVariable(BR.event, getBindingData());
+				Class<?> aClass = Class.forName(Constants.DATABINDING_BR);
+				Field field = aClass.getField(Constants.DATABINDING_DATA);
+				int id = (int) field.get(null);
+				binding.setVariable(id, bindingData);
 			} catch (Exception e) {
 				ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
 				mManager.post(new ErrorResult(errorBean, ERROR_TAG));

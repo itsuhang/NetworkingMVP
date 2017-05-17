@@ -3,7 +3,7 @@ package com.suhang.networkmvp.ui.fragment;
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.AttentionPagerAdapter;
 import com.suhang.networkmvp.annotation.FragmentScope;
-import com.suhang.networkmvp.binding.event.BaseData;
+import com.suhang.networkmvp.binding.data.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentAttentionBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;

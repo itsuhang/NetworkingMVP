@@ -62,6 +62,7 @@ public class DialogHelp {
 	}
 
 
+
 	/***
 	 * 获取一个信息对话框，注意需要自己手动调用show方法显示
 	 *

@@ -3,15 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
-        <variable
-            name="event"
-            type="com.suhang.networkmvp.binding.event.BaseData"/>
-
-        <variable
-            name="data"
-            type="com.suhang.networkmvp.binding.event.BindingAdapterEvent"/>
-
+        <variable name="data" type="com.suhang.networkmvp.binding.data.PagerAttentionOneData"/>
     </data>
 
     <LinearLayout
@@ -23,14 +15,14 @@
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{event::onClick}"
+            android:onClick="@{data::onEvent}"
             />
 
         <Button
             android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{event::onClick}"
+            android:onClick="@{data::onEvent}"
             />
 
         <TextView

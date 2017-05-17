@@ -1,9 +1,10 @@
-package com.suhang.networkmvp.binding.event;
+package com.suhang.networkmvp.binding.data;
 
 import android.view.View;
 
 import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.mvp.event.BindingEvent;
+import com.suhang.networkmvp.utils.LogUtil;
 
 /**
  * Created by 苏杭 on 2017/5/2 15:04.
@@ -21,11 +22,8 @@ public class BaseData {
         mManager = manager;
     }
 
-    public void onClick(View view) {
-        mManager.post(new BindingEvent(view.getId(),null));
-    }
-
     public void onEvent(View v) {
+        LogUtil.i("啊啊啊"+v);
         mManager.post(new BindingEvent(v.getId(),this));
     }
 }

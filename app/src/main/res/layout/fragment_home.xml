@@ -2,10 +2,7 @@
 <layout
         xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <variable
-                name="event"
-                type="com.suhang.networkmvp.binding.event.BaseData"/>
-
+        <variable name="data" type="com.suhang.networkmvp.binding.data.FragmentHomeData"/>
     </data>
     <LinearLayout
             android:orientation="vertical"
@@ -13,12 +10,12 @@
             android:layout_height="match_parent">
         <Button
                 android:id="@+id/button"
-                android:onClick="@{event::onClick}"
+                android:onClick="@{data::onEvent}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         <Button
                 android:id="@+id/button1"
-                android:onClick="@{event::onClick}"
+                android:onClick="@{data::onEvent}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         <android.support.v7.widget.RecyclerView

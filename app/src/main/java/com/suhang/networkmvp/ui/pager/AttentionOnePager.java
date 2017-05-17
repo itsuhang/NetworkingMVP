@@ -4,7 +4,8 @@ import android.app.Activity;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.annotation.PagerScope;
-import com.suhang.networkmvp.binding.event.BaseData;
+import com.suhang.networkmvp.binding.data.BaseData;
+import com.suhang.networkmvp.binding.data.PagerAttentionOneData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.PagerAttentionOneBinding;
 import com.suhang.networkmvp.domain.AppMain;
@@ -67,7 +68,7 @@ public class AttentionOnePager extends BasePager<AttentionModel,PagerAttentionOn
 
     @Override
     protected BaseData getBindingData() {
-        return null;
+        return new PagerAttentionOneData();
     }
 
 }

@@ -7,13 +7,15 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
-import com.suhang.networkmvp.binding.event.BindingAdapterEvent;
+import com.suhang.networkmvp.binding.data.BaseData;
+import com.suhang.networkmvp.constants.BaseConstants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.function.SubstribeManager;
 import com.suhang.networkmvp.interfaces.IAdapterHelper;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,196 +30,208 @@ import io.reactivex.disposables.CompositeDisposable;
  */
 
 public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends RecyclerView.Adapter<T> implements IAdapterHelper {
-    //基类内部错误tag
-    private static final int ERROR_TAG = -1;
-    @Inject
-    Context mContext;
-    @Inject
-    Activity mActivity;
+	//基类内部错误tag
+	private static final int ERROR_TAG = -1;
+	@Inject
+	Context mContext;
+	@Inject
+	Activity mActivity;
 
-    //Rxjava事件集合，用于退出时取消事件
-    @Inject
-    CompositeDisposable mDisposables;
+	//Rxjava事件集合，用于退出时取消事件
+	@Inject
+	CompositeDisposable mDisposables;
 
-    List<V> mList;
+	List<V> mList;
 
-    @Inject
-    SubstribeManager mManager;
+	@Inject
+	SubstribeManager mManager;
 
-    BindingAdapterEvent<T> mEvent;
+	private int mTotalCount = 0;
 
-    private int mTotalCount = 0;
+	private int mTotalPage = 0;
 
-    private int mTotalPage = 0;
+	public Activity getActivity() {
+		return mActivity;
+	}
 
-    public Activity getActivity() {
-        return mActivity;
-    }
-
-    public Context getContext() {
-        return mContext;
-    }
+	public Context getContext() {
+		return mContext;
+	}
 
 
-    public BaseRvAdapter() {
-        mList = new ArrayList<>();
-    }
+	public BaseRvAdapter() {
+		mList = new ArrayList<>();
+	}
 
-    public void notifyDataSetChanged(List<V> v) {
-        mList.clear();
-        if (v != null && v.size() > 0) {
-            mList.addAll(v);
-        }
-        notifyDataSetChanged();
-    }
+	public void notifyDataSetChanged(List<V> v) {
+		mList.clear();
+		if (v != null && v.size() > 0) {
+			mList.addAll(v);
+		}
+		notifyDataSetChanged();
+	}
 
-    /**
-     * 绑定事件类(暂不使用)
-     */
-    protected void setBindingEvent(T t) {
-        mEvent = new BindingAdapterEvent<>();
-        mEvent.setHolder(t);
-        mEvent.setManager(mManager);
-    }
+	protected abstract BaseData getBindingData();
 
-
-    public SubstribeManager getSM() {
-        return mManager;
-    }
-
-    @Override
-    public T onCreateViewHolder(ViewGroup parent, int viewType) {
-        return onCreateHolder(parent, viewType);
-    }
-
-    public abstract void onBindHolder(T holder, V v);
-
-    public abstract T onCreateHolder(ViewGroup parent, int viewType);
-
-    @Override
-    public void onBindViewHolder(T holder, int position) {
-        setBindingEvent(holder);
-        try {
-            onBindHolder(holder, mList.get(position));
-        } catch (Exception e) {
-            ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_RVADAPTER_BIND, ErrorCode.ERROR_DESC_RVADAPTER_BIND + "\n" + e.getMessage());
-            mManager.post(new ErrorResult(errorBean, ERROR_TAG));
-        }
-    }
-
-    /**
-     * 加载更多(合并数据)
-     */
-    public void loadMore(List<V> beans) {
-        if (getNextPage() > mTotalPage) {
-            Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_SHORT).show();
-        } else {
-            if (mList != null && mList.size() > 0) {
-                mList.addAll(beans);
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    /**
-     * 单个删除
-     * @param position 要删除的位置
-     * @param beans 删除后从网络重新获取的数据集合
-     */
-    public void notifyDelete(int position, List<V> beans) {
-        mList.clear();
-        mList.addAll(beans);
-        notifyItemRemoved(position);
-        notifyItemChanged(beans.size() - 1);
-    }
-
-    /**
-     * 多个删除
-     * @param positions 要删除的位置
-     * @param beans 删除后从网络重新获取的数据集合
-     */
-    public void notifyDelete(List<Integer> positions, List<V> beans) {
-        int start = mList.size() - positions.size() - 1;
-        mList.clear();
-        mList.addAll(beans);
-        Collections.sort(positions, (o1, o2) -> {
-            if (o1 > o2) {
-                return -1;
-            } else if (Objects.equals(o1, o2)) {
-                return 0;
-            } else {
-                return 1;
-            }
-        });
-        for (Integer position : positions) {
-            notifyItemRemoved(position);
-        }
-        notifyItemRangeChanged(start, positions.size());
-    }
-
-    /**
-     * 得到每页数据大小
-     */
-    public abstract int getPageSize();
-
-    @Override
-    public void setTotalCount(int count) {
-        try {
-            if (mTotalCount % getPageSize() == 0) {
-                mTotalPage = mTotalCount / getPageSize();
-            } else {
-                mTotalPage = mTotalCount / getPageSize() + 1;
-            }
-        } catch (Exception e) {
-        }
-        mTotalCount = count;
-    }
-
-    public int getTotalCount() {
-        return mTotalCount;
-    }
-
-    @Override
-    public int getCurrentCount() {
-        return getItemCount();
-    }
+	/**
+	 * 绑定数据类(
+	 */
+	protected void setBindingEvent(T t) {
+		BaseData bindingData = getBindingData();
+		if (bindingData != null) {
+			bindingData.setManager(mManager);
+			try {
+				Class<?> aClass = Class.forName(BaseConstants.DATABINDING_BR);
+				Field field = aClass.getField(BaseConstants.DATABINDING_DATA);
+				int id = (int) field.get(null);
+				t.mBinding.setVariable(id, bindingData);
+			} catch (Exception e) {
+				ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_REFLECT_BINDING, ErrorCode.ERROR_DESC_REFLECT_BINDING + "\n" + e.getMessage());
+				mManager.post(new ErrorResult(errorBean, ERROR_TAG));
+			}
+		}
+	}
 
 
-    /**
-     * 获取下一页页数
-     */
-    public int getNextPage() {
-        return getCurrentPage() + 1;
-    }
+	public SubstribeManager getSM() {
+		return mManager;
+	}
 
-    /**
-     * 获取当前所在页数
-     */
-    public int getCurrentPage() {
-        int page;
-        try {
-            if (getItemCount() % getPageSize() == 0) {
-                page = getItemCount() / getPageSize();
-            } else {
-                page = getItemCount() / getPageSize() + 1;
-            }
-        } catch (Exception e) {
-            page = 0;
-        }
-        return page;
-    }
+	@Override
+	public T onCreateViewHolder(ViewGroup parent, int viewType) {
+		return onCreateHolder(parent, viewType);
+	}
 
-    @Override
-    public int getItemCount() {
-        return mList.size();
-    }
+	public abstract void onBindHolder(T holder, V v);
 
-    @Override
-    public int getMaxCount() {
-        return getPageSize();
-    }
+	public abstract T onCreateHolder(ViewGroup parent, int viewType);
 
-    public void destory() {
-        mDisposables.dispose();
-    }
+	@Override
+	public void onBindViewHolder(T holder, int position) {
+		setBindingEvent(holder);
+		try {
+			onBindHolder(holder, mList.get(position));
+		} catch (Exception e) {
+			ErrorBean errorBean = new ErrorBean(ErrorCode.ERROR_CODE_RVADAPTER_BIND, ErrorCode.ERROR_DESC_RVADAPTER_BIND + "\n" + e.getMessage());
+			mManager.post(new ErrorResult(errorBean, ERROR_TAG));
+		}
+	}
+
+	/**
+	 * 加载更多(合并数据)
+	 */
+	public void loadMore(List<V> beans) {
+		if (getNextPage() > mTotalPage) {
+			Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_SHORT).show();
+		} else {
+			if (mList != null && mList.size() > 0) {
+				mList.addAll(beans);
+			}
+		}
+		notifyDataSetChanged();
+	}
+
+	/**
+	 * 单个删除
+	 *
+	 * @param position 要删除的位置
+	 * @param beans 删除后从网络重新获取的数据集合
+	 */
+	public void notifyDelete(int position, List<V> beans) {
+		mList.clear();
+		mList.addAll(beans);
+		notifyItemRemoved(position);
+		notifyItemChanged(beans.size() - 1);
+	}
+
+	/**
+	 * 多个删除
+	 *
+	 * @param positions 要删除的位置
+	 * @param beans 删除后从网络重新获取的数据集合
+	 */
+	public void notifyDelete(List<Integer> positions, List<V> beans) {
+		int start = mList.size() - positions.size() - 1;
+		mList.clear();
+		mList.addAll(beans);
+		Collections.sort(positions, (o1, o2) -> {
+			if (o1 > o2) {
+				return -1;
+			} else if (Objects.equals(o1, o2)) {
+				return 0;
+			} else {
+				return 1;
+			}
+		});
+		for (Integer position : positions) {
+			notifyItemRemoved(position);
+		}
+		notifyItemRangeChanged(start, positions.size());
+	}
+
+	/**
+	 * 得到每页数据大小
+	 */
+	public abstract int getPageSize();
+
+	@Override
+	public void setTotalCount(int count) {
+		try {
+			if (mTotalCount % getPageSize() == 0) {
+				mTotalPage = mTotalCount / getPageSize();
+			} else {
+				mTotalPage = mTotalCount / getPageSize() + 1;
+			}
+		} catch (Exception e) {
+		}
+		mTotalCount = count;
+	}
+
+	public int getTotalCount() {
+		return mTotalCount;
+	}
+
+	@Override
+	public int getCurrentCount() {
+		return getItemCount();
+	}
+
+
+	/**
+	 * 获取下一页页数
+	 */
+	public int getNextPage() {
+		return getCurrentPage() + 1;
+	}
+
+	/**
+	 * 获取当前所在页数
+	 */
+	public int getCurrentPage() {
+		int page;
+		try {
+			if (getItemCount() % getPageSize() == 0) {
+				page = getItemCount() / getPageSize();
+			} else {
+				page = getItemCount() / getPageSize() + 1;
+			}
+		} catch (Exception e) {
+			page = 0;
+		}
+		return page;
+	}
+
+	@Override
+	public int getItemCount() {
+		return mList.size();
+	}
+
+	@Override
+	public int getMaxCount() {
+		return getPageSize();
+	}
+
+	public void destory() {
+		mDisposables.dispose();
+	}
 }

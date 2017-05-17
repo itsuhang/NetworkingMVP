@@ -1,7 +1,7 @@
 package com.suhang.networkmvp.domain;
 
 
-import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.constants.BaseConstants;
 
 /**
  * Created by sh on 2016/3/11 16:13.
@@ -40,7 +40,7 @@ public class ErrorBean {
 	//错误描述
 	protected String desc;
 	//错误类型(如:是否需要提示给用户)
-	protected String type = Constants.ERRORTYPE_ONE;
+	protected String type = BaseConstants.ERRORTYPE_ONE;
 
 	public String getType() {
 		return type;

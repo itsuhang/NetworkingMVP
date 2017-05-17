@@ -2,10 +2,6 @@
 <layout
         xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <variable
-                name="event"
-                type="com.suhang.networkmvp.binding.event.BaseData"/>
-
     </data>
     <RelativeLayout
             android:layout_width="match_parent"

@@ -7,7 +7,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.util.Log;
 
-import com.suhang.networkmvp.constants.Constants;
+import com.suhang.networkmvp.constants.BaseConstants;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -155,7 +155,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
 		printWriter.close();
 		String result = writer.toString();
 		sb.append(result);
-		File dir = new File(Constants.APP_PATH);
+		File dir = new File(BaseConstants.APP_PATH);
 		File file = new File(dir,"log.txt");
 		if (!dir.exists()) {
 			dir.mkdir();
