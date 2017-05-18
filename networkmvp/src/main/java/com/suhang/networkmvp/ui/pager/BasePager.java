@@ -72,7 +72,7 @@ public abstract class BasePager<T extends BaseModel, E extends ViewDataBinding> 
 	private boolean isRegisterEventBus;
 
 	public BasePager(Activity activity) {
-		mBaseComponent = ((BaseApp) activity.getApplication()).getAppComponent().baseComponent(new BaseModule(activity));
+		mBaseComponent = ((BaseApp) activity.getApplication()).getAppComponent().providerBaseComponent(new BaseModule(activity));
 		injectDagger();
 		subscribeEvent();
 		bind(bindLayout());

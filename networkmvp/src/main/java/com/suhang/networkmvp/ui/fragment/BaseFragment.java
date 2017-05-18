@@ -83,7 +83,7 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
+		mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().providerBaseComponent(new BaseModule(getActivity()));
 		injectDagger();
 		subscribeEvent();
 		bind(bindLayout());

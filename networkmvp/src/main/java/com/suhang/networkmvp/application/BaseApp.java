@@ -3,10 +3,9 @@ package com.suhang.networkmvp.application;
 import android.app.Application;
 
 import com.suhang.layoutfinder.MethodFinder;
-import com.suhang.networkmvp.constants.BaseConstants;
-import com.suhang.networkmvp.dagger.component.AppComponent;
 import com.suhang.networkmvp.dagger.component.DaggerAppComponent;
 import com.suhang.networkmvp.dagger.module.AppModule;
+import com.suhang.networkmvp.dagger.component.AppComponent;
 import com.suhang.networkmvp.utils.LogUtil;
 
 import javax.inject.Inject;

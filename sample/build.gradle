@@ -34,6 +34,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.1'
     testCompile 'junit:junit:4.12'
-    compile project(':networkmvp')
     annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
+    compile 'com.suhang:lazyannotation_annotation:1.0.5'
+    annotationProcessor 'com.suhang:lazyannotation_compiler:1.0.5'
+    compile project(':networkmvp')
 }

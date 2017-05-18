@@ -80,7 +80,7 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mBaseComponent = ((BaseApp) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
+		mBaseComponent = ((BaseApp) getApplication()).getAppComponent().providerBaseComponent(new BaseModule(this));
 		injectDagger();
 		subscribeEvent();
 		bind(bindLayout());

@@ -49,7 +49,7 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.google.code.gson:gson:2.7'
-    compile 'com.suhang:lazyannotation_annotation:1.0.2'
-    compile 'com.suhang:lazyannotation:1.0.2'
-    annotationProcessor 'com.suhang:lazyannotation_compiler:1.0.2'
+    compile 'com.suhang:lazyannotation_annotation:1.0.5'
+    compile 'com.suhang:lazyannotation:1.0.5'
+    annotationProcessor 'com.suhang:lazyannotation_compiler:1.0.5'
 }
