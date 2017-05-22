@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.suhang.networkmvp.annotation.BaseScope;
+import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.constants.BaseConstants;
 import com.suhang.networkmvp.utils.SystemUtil;
 
@@ -25,6 +26,7 @@ import io.reactivex.disposables.CompositeDisposable;
 public class BaseModule {
     private Activity mActivity;
     private final CompositeDisposable mCompositeDisposable;
+
 
     public BaseModule(Activity activity) {
         mActivity = activity;
@@ -58,7 +60,7 @@ public class BaseModule {
     DiskLruCache provideDiskLruCache() {
         DiskLruCache diskLruCache = null;
         try {
-            diskLruCache = DiskLruCache.open(new File(BaseConstants.CACHE_PATH), SystemUtil.getAppVersion(), 1, 1024 * 1024 * 100);
+            diskLruCache = DiskLruCache.open(new File(BaseApp.CACHE_PATH), SystemUtil.getAppVersion(), 1, 1024 * 1024 * 100);
         } catch (IOException e) {
             e.printStackTrace();
         }

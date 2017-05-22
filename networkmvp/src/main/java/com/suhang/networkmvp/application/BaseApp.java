@@ -8,6 +8,8 @@ import com.suhang.networkmvp.dagger.module.AppModule;
 import com.suhang.networkmvp.dagger.component.AppComponent;
 import com.suhang.networkmvp.utils.LogUtil;
 
+import java.io.File;
+
 import javax.inject.Inject;
 
 import okhttp3.OkHttpClient;
@@ -21,22 +23,30 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public abstract class BaseApp extends Application {
-    private static BaseApp sApp;
+    private static Application sApp;
     private AppComponent mAppComponent;
     private boolean isDebug = true;
     @Inject
     OkHttpClient mHttpClient;
-
-    public static BaseApp getInstance() {
+    protected AppModule mModule;
+    public static  String DATABINDING_DATA = "data";
+    public static  String DATABINDING_BR ;
+    public static String CACHE_PATH_OKHTTP;
+    public static String CACHE_PATH;
+    public static Application getInstance() {
         return sApp;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        DATABINDING_BR = getPackageName() + ".BR";
+        CACHE_PATH_OKHTTP = getCacheDir().getAbsolutePath() + File.separator + "NetCache_OKHTTP";
+        CACHE_PATH = getCacheDir().getAbsolutePath() + File.separator + "NetCache";
+        mModule = new AppModule(this);
         sApp = this;
         changeForDebug();
-        mAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
+        mAppComponent = DaggerAppComponent.builder().appModule(mModule).build();
     }
 
     /**

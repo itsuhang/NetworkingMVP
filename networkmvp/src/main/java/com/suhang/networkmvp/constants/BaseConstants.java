@@ -16,11 +16,6 @@ public abstract class BaseConstants {
     public static final int INNER_ERROR = -1;
     public static final String URL = "URL";
     public static final String APP_PATH = providerAppPath();
-    public static final String CACHE_PATH = BaseApp.getInstance().getCacheDir().getAbsolutePath() + File.separator + "NetCache";
-    public static final String CACHE_PATH_OKHTTP = BaseApp.getInstance().getCacheDir().getAbsolutePath() + File.separator + "NetCache_OKHTTP";
-
-    public static final String DATABINDING_DATA = "data";
-    public static final String DATABINDING_BR = BaseApp.getInstance().getPackageName() + ".BR";
     /**
      * 错误类型1,不显示给用户
      */

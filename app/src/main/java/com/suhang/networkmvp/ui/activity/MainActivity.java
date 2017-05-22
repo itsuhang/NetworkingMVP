@@ -10,17 +10,23 @@ import com.suhang.networkmvp.binding.data.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;
+import com.suhang.networkmvp.mvp.model.INetworkModel;
 import com.suhang.networkmvp.ui.fragment.AttentionFragment;
 import com.suhang.networkmvp.ui.fragment.BaseFragment;
 import com.suhang.networkmvp.ui.fragment.HomeFragment;
+import com.suhang.networkmvp.utils.LogUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 @ActivityScope
 public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding>{
     private static final String TAG = "MainActivity";
+    @Inject
+    INetworkModel mModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +47,7 @@ public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding>{
         List<BaseFragment> fragments = new ArrayList<>();
         fragments.add(new HomeFragment());
         fragments.add(new AttentionFragment());
+        LogUtil.i("啊啊啊"+mModel);
         mBinding.vpMain.setAdapter(new MainFragmentAdapter(getSupportFragmentManager(),fragments));
         new RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE).subscribe(aBoolean -> {
         });

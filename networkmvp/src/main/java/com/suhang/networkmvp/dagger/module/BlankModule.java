@@ -9,5 +9,4 @@ import dagger.Module;
 public class BlankModule {
     public BlankModule() {
     }
-
 }

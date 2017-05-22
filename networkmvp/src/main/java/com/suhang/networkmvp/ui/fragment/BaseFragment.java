@@ -1,7 +1,6 @@
 package com.suhang.networkmvp.ui.fragment;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
@@ -54,10 +53,6 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 	@Inject
 	CompositeDisposable mDisposables;
 
-	//进度对话框
-	@Inject
-	Dialog mDialog;
-
 	@Inject
 	Activity mActivity;
 
@@ -83,7 +78,7 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().providerBaseComponent(new BaseModule(getActivity()));
+		mBaseComponent = ((BaseApp) getActivity().getApplication()).getAppComponent().baseComponent(new BaseModule(getActivity()));
 		injectDagger();
 		subscribeEvent();
 		bind(bindLayout());
@@ -155,13 +150,6 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 		isRegisterEventBus = true;
 	}
 
-	/**
-	 * 获取对话框
-	 */
-	protected Dialog getDialog() {
-		return mDialog;
-	}
-
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -208,8 +196,8 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 		if (bindingData != null) {
 			bindingData.setManager(mManager);
 			try {
-				Class<?> aClass = Class.forName(BaseConstants.DATABINDING_BR);
-				Field field = aClass.getField(BaseConstants.DATABINDING_DATA);
+				Class<?> aClass = Class.forName(BaseApp.DATABINDING_BR);
+				Field field = aClass.getField(BaseApp.DATABINDING_DATA);
 				int id = (int) field.get(null);
 				binding.setVariable(id, bindingData);
 			} catch (Exception e) {
@@ -278,10 +266,6 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 	public void destory() {
 		mDisposables.dispose();
 		//取消所有正在进行的网络任务
-		if (mDialog != null) {
-			mDialog.dismiss();
-			mDialog = null;
-		}
 		if (isRegisterEventBus) {
 			EventBus.getDefault().unregister(this);
 		}

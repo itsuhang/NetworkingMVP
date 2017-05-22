@@ -3,13 +3,13 @@ package com.suhang.sample;
 import android.os.Bundle;
 
 import com.suhang.networkmvp.binding.data.BaseData;
-import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.mvp.model.BlankModel;
 import com.suhang.networkmvp.ui.activity.BaseActivity;
 import com.suhang.networkmvp.utils.LogUtil;
 import com.suhang.sample.databinding.ActivityMainBinding;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import okhttp3.OkHttpClient;
 
@@ -20,6 +20,7 @@ public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding> {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtil.i("啊啊啊"+mOkHttpClient);
+
     }
 
     @Override
@@ -29,7 +30,6 @@ public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding> {
 
     @Override
     protected void subscribeEvent() {
-
     }
 
     @Override
@@ -44,5 +44,6 @@ public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding> {
 
     @Override
     protected void injectDagger() {
+        getBaseComponent().providerBC(new com.suhang.networkmvp.dagger.module.BlankModule()).inject(this);
     }
 }

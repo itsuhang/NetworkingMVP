@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 
 import android.app.Application;
 
-import com.suhang.networkmvp.constants.BaseConstants;
+import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.function.AddCookiesInterceptor;
 import com.suhang.networkmvp.function.CacheInterceptor;
 import com.suhang.networkmvp.function.ReceivedCookiesInterceptor;
@@ -43,7 +43,7 @@ public class AppModule {
     private void initOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         int cacheSize = 100 * 1024 * 1024; // 100 MiB
-        Cache cache = new Cache(new File(BaseConstants.CACHE_PATH_OKHTTP), cacheSize);
+        Cache cache = new Cache(new File(BaseApp.CACHE_PATH_OKHTTP), cacheSize);
         //设置超时
         builder.cache(cache);
         builder.connectTimeout(10, TimeUnit.SECONDS);

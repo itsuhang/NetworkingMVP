@@ -60,10 +60,6 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 	@Inject
 	Context mContext;
 
-	//进度对话框
-	@Inject
-	Dialog mDialog;
-
 	@Inject
 	T mModel;
 
@@ -80,7 +76,7 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mBaseComponent = ((BaseApp) getApplication()).getAppComponent().providerBaseComponent(new BaseModule(this));
+		mBaseComponent = ((BaseApp) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
 		injectDagger();
 		subscribeEvent();
 		bind(bindLayout());
@@ -119,13 +115,6 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 
 	public T getModel() {
 		return mModel;
-	}
-
-	/**
-	 * 获取对话框
-	 */
-	protected Dialog getDialog() {
-		return mDialog;
 	}
 
 
@@ -167,8 +156,8 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 		if (bindingData != null) {
 			bindingData.setManager(mManager);
 			try {
-				Class<?> aClass = Class.forName(BaseConstants.DATABINDING_BR);
-				Field field = aClass.getField(BaseConstants.DATABINDING_DATA);
+				Class<?> aClass = Class.forName(BaseApp.DATABINDING_BR);
+				Field field = aClass.getField(BaseApp.DATABINDING_DATA);
 				int id = (int) field.get(null);
 				binding.setVariable(id, bindingData);
 			} catch (Exception e) {
