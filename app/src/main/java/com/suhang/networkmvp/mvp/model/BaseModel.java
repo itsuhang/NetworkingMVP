@@ -13,7 +13,6 @@ import io.reactivex.disposables.CompositeDisposable;
  */
 
 public abstract class BaseModel  implements IBaseModel{
-    public static final String TAG = "BaseModel";
     @Inject
     protected RxBus mRxBus;
     @Inject

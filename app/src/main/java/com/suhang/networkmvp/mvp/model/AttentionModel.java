@@ -4,6 +4,7 @@ import android.util.ArrayMap;
 
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.GithubBean;
+import com.suhang.networkmvp.utils.LogUtil;
 
 import javax.inject.Inject;
 
@@ -25,6 +26,7 @@ public class AttentionModel extends BaseModel implements IAttentionModel{
 
 
     public void getAppMainData() {
+        LogUtil.i("啊啊啊" +"啊啊啊啊");
         mModel.loadPostDataWrap(AppMain.class,  false, TAG_APP,new ArrayMap<>());
     }
 

@@ -23,6 +23,8 @@ import com.suhang.networkmvp.utils.LogUtil;
 import com.suhang.networkmvp.utils.Md5Util;
 import com.suhang.networkmvp.utils.RxUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,7 +52,7 @@ import okhttp3.Response;
  * Created by sh on 2016/10/25 16:45.
  */
 
-public class NetworkModel extends BaseModel {
+public class NetworkModel extends BaseModel implements INetworkModel{
     @Inject
     DiskLruCache sOpen;
     @Inject
@@ -684,5 +686,10 @@ public class NetworkModel extends BaseModel {
             entry.getValue().cancel();
         }
         mCallMap.clear();
+    }
+
+    @Override
+    public void loadData(@NotNull Class<?> dataClass, @NotNull String append, boolean needCache, @NotNull String cacheTag, int whichTag, @NotNull Object... params) {
+
     }
 }

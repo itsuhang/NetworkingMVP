@@ -6,7 +6,7 @@ import com.suhang.networkmvp.annotation.Content;
  * Created by 苏杭 on 2017/4/24 16:30.
  */
 
-public class HuanPeng<T extends ErrorBean> extends WrapBean {
+public class HuanPeng<T extends ErrorBean> implements WrapBean {
     private String status;
     private T content;
 

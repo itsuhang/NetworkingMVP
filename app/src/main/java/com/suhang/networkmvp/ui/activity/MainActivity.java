@@ -9,7 +9,10 @@ import com.suhang.networkmvp.annotation.ActivityScope;
 import com.suhang.networkmvp.binding.data.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
+import com.suhang.networkmvp.domain.AppMain;
+import com.suhang.networkmvp.function.NetworkManager;
 import com.suhang.networkmvp.mvp.model.BlankModel;
+import com.suhang.networkmvp.mvp.model.NetworkModel;
 import com.suhang.networkmvp.ui.fragment.AttentionFragment;
 import com.suhang.networkmvp.ui.fragment.BaseFragment;
 import com.suhang.networkmvp.ui.fragment.HomeFragment;
@@ -18,6 +21,12 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 @ActivityScope
 public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding>{

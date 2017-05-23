@@ -6,5 +6,6 @@ package com.suhang.networkmvp.domain;
  * 包裹类中需将返回内容的get方法用@Content注解标记
  */
 
-public class WrapBean {
+public interface WrapBean {
+
 }
