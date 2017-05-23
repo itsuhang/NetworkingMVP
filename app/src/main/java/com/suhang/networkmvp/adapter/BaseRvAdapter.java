@@ -6,10 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
+import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.binding.data.BaseData;
-import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.function.SubstribeManager;
@@ -82,8 +81,8 @@ public abstract class BaseRvAdapter<T extends BaseViewHolder, V> extends Recycle
 		if (bindingData != null) {
 			bindingData.setManager(mManager);
 			try {
-				Class<?> aClass = Class.forName(Constants.DATABINDING_BR);
-				Field field = aClass.getField(Constants.DATABINDING_DATA);
+				Class<?> aClass = Class.forName(BaseApp.DATABINDING_BR);
+				Field field = aClass.getField(BaseApp.DATABINDING_DATA);
 				int id = (int) field.get(null);
 				t.mBinding.setVariable(id, bindingData);
 			} catch (Exception e) {

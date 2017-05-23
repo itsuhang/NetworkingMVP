@@ -14,9 +14,5 @@ import dagger.Subcomponent;
 @BaseScope
 @Subcomponent(modules = BaseModule.class)
 public interface BaseComponent {
-    /**
-     * 暴露子Component
-     */
-    BlankComponent getBlankComponent(BlankModule module);
-
+    BlankComponent providerBlankComponent(BlankModule blankModule);
 }

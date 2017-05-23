@@ -14,8 +14,8 @@ import dagger.Subcomponent;
 public interface BlankComponent {
     void inject(MainActivity activity);
     void inject(SplashActivity activity);
-    void inject(AttentionFragment activity);
-    void inject(HomeFragment activity);
-    void inject(AttentionOnePager activity);
-    void inject(AttentionTwoPager activity);
+    void inject(AttentionFragment fragment);
+    void inject(HomeFragment fragment);
+    void inject(AttentionOnePager pager);
+    void inject(AttentionTwoPager pager);
 }

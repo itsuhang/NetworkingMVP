@@ -3,6 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
 >
     <data>
+        <variable name="data" type="com.suhang.networkmvp.binding.data.BaseData"/>
     </data>
     <RelativeLayout
             android:id="@+id/activity_main"

@@ -1,8 +1,6 @@
 package com.suhang.networkmvp.function;
 
 
-import com.suhang.networkmvp.utils.LogUtil;
-
 import java.io.IOException;
 
 import io.reactivex.Flowable;
@@ -23,11 +21,8 @@ public class ReceivedCookiesInterceptor implements Interceptor {
 			Flowable.fromIterable(originalResponse.headers("Set-Cookie")).map(s -> {
 				String[] cookieArray = s.split(";");
 				return cookieArray[0];
-			}).subscribe(s -> {
-				cookieBuffer.append(s).append(";");
-			});
+			}).subscribe(s -> cookieBuffer.append(s).append(";"));
 			SharedPrefUtil.putString("Cookie",cookieBuffer.toString());
-			LogUtil.i("啊啊啊"+cookieBuffer.toString());
 		}
 
 		return originalResponse;

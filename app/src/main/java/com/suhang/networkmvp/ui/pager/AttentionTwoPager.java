@@ -32,7 +32,7 @@ public class AttentionTwoPager extends BasePager<AttentionModel,PagerAttentionTw
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
+        getBaseComponent().providerBlankComponent(new BlankModule()).inject(this);
     }
 
     @Override

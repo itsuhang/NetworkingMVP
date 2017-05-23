@@ -7,9 +7,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.util.Log;
 
-
 import com.suhang.networkmvp.constants.Constants;
-import com.suhang.networkmvp.utils.LogUtil;
 
 import java.io.File;
 import java.io.FileWriter;

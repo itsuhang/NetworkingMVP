@@ -1,7 +1,6 @@
 package com.suhang.networkmvp.ui.activity;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
@@ -15,10 +14,8 @@ import android.widget.EditText;
 import com.suhang.layoutfinder.ContextProvider;
 import com.suhang.layoutfinder.LayoutFinder;
 import com.suhang.layoutfinderannotation.BindLayout;
-import com.suhang.networkmvp.BR;
-import com.suhang.networkmvp.application.App;
+import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.binding.data.BaseData;
-import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -61,10 +58,6 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 	@Inject
 	Context mContext;
 
-	//进度对话框
-	@Inject
-	Dialog mDialog;
-
 	@Inject
 	T mModel;
 
@@ -81,7 +74,7 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mBaseComponent = ((App) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
+		mBaseComponent = ((BaseApp) getApplication()).getAppComponent().baseComponent(new BaseModule(this));
 		injectDagger();
 		subscribeEvent();
 		bind(bindLayout());
@@ -120,13 +113,6 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 
 	public T getModel() {
 		return mModel;
-	}
-
-	/**
-	 * 获取对话框
-	 */
-	protected Dialog getDialog() {
-		return mDialog;
 	}
 
 
@@ -168,8 +154,8 @@ public abstract class BaseActivity<T extends BaseModel, E extends ViewDataBindin
 		if (bindingData != null) {
 			bindingData.setManager(mManager);
 			try {
-				Class<?> aClass = Class.forName(Constants.DATABINDING_BR);
-				Field field = aClass.getField(Constants.DATABINDING_DATA);
+				Class<?> aClass = Class.forName(BaseApp.DATABINDING_BR);
+				Field field = aClass.getField(BaseApp.DATABINDING_DATA);
 				int id = (int) field.get(null);
 				binding.setVariable(id, bindingData);
 			} catch (Exception e) {

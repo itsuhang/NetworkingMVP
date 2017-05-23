@@ -1,8 +1,6 @@
 package com.suhang.networkmvp.function;
 
 
-import com.suhang.networkmvp.utils.LogUtil;
-
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -19,7 +17,6 @@ public class AddCookiesInterceptor implements Interceptor {
 		final Request.Builder builder = chain.request().newBuilder();
 		String cookie = SharedPrefUtil.getString("Cookie", null);
 		if (cookie != null) {
-			LogUtil.i("啊啊啊"+cookie);
 			builder.addHeader("Cookie", cookie);
 		}
 		return chain.proceed(builder.build());

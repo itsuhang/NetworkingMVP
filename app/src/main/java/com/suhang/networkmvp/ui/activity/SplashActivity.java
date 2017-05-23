@@ -38,6 +38,6 @@ public class SplashActivity extends BaseActivity<BlankModel,ActivitySplashBindin
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
+        getBaseComponent().providerBlankComponent(new BlankModule()).inject(this);
     }
 }

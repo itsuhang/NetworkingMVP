@@ -8,6 +8,7 @@ import io.reactivex.Flowable;
 import io.reactivex.processors.FlowableProcessor;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.subscribers.SerializedSubscriber;
+
 @BaseScope
 public class RxBus {
     //相当于Rxjava1.x中的Subject

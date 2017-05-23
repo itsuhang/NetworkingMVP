@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 
 import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder;
-import com.suhang.networkmvp.binding.data.AdapterHomeRvData;
 import com.suhang.networkmvp.binding.data.BaseData;
 import com.suhang.networkmvp.databinding.ItemHomeBinding;
 import com.suhang.networkmvp.domain.HomeBean;
@@ -24,7 +23,7 @@ public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,Home
 
     @Override
     protected BaseData getBindingData() {
-        return new AdapterHomeRvData();
+        return null;
     }
 
 

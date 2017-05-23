@@ -1,7 +1,6 @@
 package com.suhang.networkmvp.ui.fragment;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
@@ -16,10 +15,8 @@ import android.widget.EditText;
 import com.suhang.layoutfinder.ContextProvider;
 import com.suhang.layoutfinder.LayoutFinder;
 import com.suhang.layoutfinderannotation.BindLayout;
-import com.suhang.networkmvp.BR;
 import com.suhang.networkmvp.application.BaseApp;
 import com.suhang.networkmvp.binding.data.BaseData;
-import com.suhang.networkmvp.constants.Constants;
 import com.suhang.networkmvp.constants.ErrorCode;
 import com.suhang.networkmvp.dagger.component.BaseComponent;
 import com.suhang.networkmvp.dagger.module.BaseModule;
@@ -54,10 +51,6 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 	//Rxjava事件集合，用于退出时取消事件
 	@Inject
 	CompositeDisposable mDisposables;
-
-	//进度对话框
-	@Inject
-	Dialog mDialog;
 
 	@Inject
 	Activity mActivity;
@@ -156,13 +149,6 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 		isRegisterEventBus = true;
 	}
 
-	/**
-	 * 获取对话框
-	 */
-	protected Dialog getDialog() {
-		return mDialog;
-	}
-
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -209,8 +195,8 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 		if (bindingData != null) {
 			bindingData.setManager(mManager);
 			try {
-				Class<?> aClass = Class.forName(Constants.DATABINDING_BR);
-				Field field = aClass.getField(Constants.DATABINDING_DATA);
+				Class<?> aClass = Class.forName(BaseApp.DATABINDING_BR);
+				Field field = aClass.getField(BaseApp.DATABINDING_DATA);
 				int id = (int) field.get(null);
 				binding.setVariable(id, bindingData);
 			} catch (Exception e) {
@@ -279,10 +265,6 @@ public abstract class BaseFragment<T extends BaseModel, E extends ViewDataBindin
 	public void destory() {
 		mDisposables.dispose();
 		//取消所有正在进行的网络任务
-		if (mDialog != null) {
-			mDialog.dismiss();
-			mDialog = null;
-		}
 		if (isRegisterEventBus) {
 			EventBus.getDefault().unregister(this);
 		}

@@ -23,7 +23,6 @@ public class BaseData {
     }
 
     public void onEvent(View v) {
-        LogUtil.i("啊啊啊"+v);
         mManager.post(new BindingEvent(v.getId(),this));
     }
 }

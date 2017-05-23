@@ -1,8 +1,7 @@
 package com.suhang.networkmvp.function;
 
-import com.suhang.networkmvp.domain.ErrorBean;
-import com.suhang.networkmvp.mvp.result.BaseResult;
 import com.suhang.networkmvp.constants.ErrorCode;
+import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.utils.LogUtil;
 
 import io.reactivex.Flowable;

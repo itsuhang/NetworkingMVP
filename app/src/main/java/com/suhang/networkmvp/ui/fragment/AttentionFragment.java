@@ -44,6 +44,6 @@ public class AttentionFragment extends BaseFragment<BlankModel,FragmentAttention
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
+        getBaseComponent().providerBlankComponent(new BlankModule()).inject(this);
     }
 }

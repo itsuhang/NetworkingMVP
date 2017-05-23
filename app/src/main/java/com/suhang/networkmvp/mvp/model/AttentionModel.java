@@ -4,9 +4,6 @@ import android.util.ArrayMap;
 
 import com.suhang.networkmvp.domain.AppMain;
 import com.suhang.networkmvp.domain.GithubBean;
-import com.suhang.networkmvp.interfaces.INetworkOtherService;
-import com.suhang.networkmvp.interfaces.INetworkService;
-import com.suhang.networkmvp.mvp.IModel;
 
 import javax.inject.Inject;
 
@@ -35,13 +32,4 @@ public class AttentionModel extends BaseModel implements IAttentionModel{
         mModel.loadGetData(GithubBean.class, TAG_GIT,"2/1");
     }
 
-    @Override
-    public AppMain getData() {
-        return null;
-    }
-
-    @Override
-    public void getAppMain() {
-
-    }
 }

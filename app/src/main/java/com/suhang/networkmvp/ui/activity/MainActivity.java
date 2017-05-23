@@ -10,7 +10,6 @@ import com.suhang.networkmvp.binding.data.BaseData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.ActivityMainBinding;
 import com.suhang.networkmvp.mvp.model.BlankModel;
-import com.suhang.networkmvp.mvp.model.INetworkModel;
 import com.suhang.networkmvp.ui.fragment.AttentionFragment;
 import com.suhang.networkmvp.ui.fragment.BaseFragment;
 import com.suhang.networkmvp.ui.fragment.HomeFragment;
@@ -20,13 +19,9 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 @ActivityScope
 public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding>{
     private static final String TAG = "MainActivity";
-    @Inject
-    INetworkModel mModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +55,7 @@ public class MainActivity extends BaseActivity<BlankModel,ActivityMainBinding>{
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
+        getBaseComponent().providerBlankComponent(new BlankModule()).inject(this);
     }
 
 }

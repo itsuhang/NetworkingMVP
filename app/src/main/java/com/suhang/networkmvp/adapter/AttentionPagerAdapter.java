@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 
 
 import com.suhang.networkmvp.ui.pager.BasePager;
-import com.suhang.networkmvp.utils.LogUtil;
 
 import java.util.List;
 

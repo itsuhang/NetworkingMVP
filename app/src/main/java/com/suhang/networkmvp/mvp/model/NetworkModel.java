@@ -15,7 +15,6 @@ import com.suhang.networkmvp.domain.ErrorBean;
 import com.suhang.networkmvp.domain.WrapBean;
 import com.suhang.networkmvp.function.ProgressListener;
 import com.suhang.networkmvp.function.UploadFileRequestBody;
-import com.suhang.networkmvp.mvp.IModel;
 import com.suhang.networkmvp.mvp.result.ErrorResult;
 import com.suhang.networkmvp.mvp.result.LoadingResult;
 import com.suhang.networkmvp.mvp.result.ProgressResult;
@@ -34,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -52,7 +50,7 @@ import okhttp3.Response;
  * Created by sh on 2016/10/25 16:45.
  */
 
-public class NetworkModel extends BaseModel{
+public class NetworkModel extends BaseModel {
     @Inject
     DiskLruCache sOpen;
     @Inject

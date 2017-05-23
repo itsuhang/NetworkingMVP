@@ -6,7 +6,6 @@ import com.suhang.networkmvp.R;
 import com.suhang.networkmvp.adapter.HomeRvAdapter;
 import com.suhang.networkmvp.annotation.FragmentScope;
 import com.suhang.networkmvp.binding.data.BaseData;
-import com.suhang.networkmvp.binding.data.FragmentHomeData;
 import com.suhang.networkmvp.dagger.module.BlankModule;
 import com.suhang.networkmvp.databinding.FragmentHomeBinding;
 import com.suhang.networkmvp.domain.DeleteHistoryBean;
@@ -91,12 +90,12 @@ public class HomeFragment extends BaseFragment<HomeModel,FragmentHomeBinding>  {
 
     @Override
     protected BaseData getBindingData() {
-        return new FragmentHomeData();
+        return null;
     }
 
     @Override
     protected void injectDagger() {
-        getBaseComponent().getBlankComponent(new BlankModule()).inject(this);
+        getBaseComponent().providerBlankComponent(new BlankModule()).inject(this);
     }
 
     @Override
