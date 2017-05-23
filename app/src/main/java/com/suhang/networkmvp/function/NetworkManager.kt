@@ -5,8 +5,7 @@ import android.text.TextUtils
 import android.util.ArrayMap
 import com.bumptech.glide.disklrucache.DiskLruCache
 import com.google.gson.Gson
-import com.suhang.networkmvp.constants.Constants
-import com.suhang.networkmvp.constants.ErrorCode
+import com.suhang.networkmvp.constants.*
 import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.mvp.model.INetworkModel
 import com.suhang.networkmvp.mvp.result.ErrorResult
@@ -81,68 +80,63 @@ class NetworkManager : INetworkModel, AnkoLogger {
      * *
      * @param o 网络返回的结果Bean类
      */
-    private fun dealCache(aClass: Class<*>, append: String, cacheTag: String?, o: Any?, tag: Int) {
+    private fun dealCache(url: String, cacheTag: String? = null, o: Any? = null, tag: Int = DEFAULT_TAG) {
+        val loadingResult = LoadingResult(false, tag)
+        val errorResult = ErrorResult(tag = tag)
         mDisposables?.add(Flowable.create(FlowableOnSubscribe<Any> { e ->
-            var at = o
+            var result: Any? = null
             try {
-                val field: Field
-                if (TextUtils.isEmpty(append)) {
-                    field = aClass.getField(Constants.URL)
-                } else {
-                    field = aClass.getField(Constants.URL + append)
-                }
-                val url = field.get(null) as String
                 val key: String
-                if (cacheTag != null) {
-                    key = Md5Util.getMD5(url + cacheTag)
-                } else {
+                if (cacheTag.isNullOrBlank()) {
                     key = Md5Util.getMD5(url)
-                }
-                val value = sOpen?.get(key)
-                if (o != null) {
-                    val s = mGson?.toJson(o)
-                    if (value == null || s != value.getString(0)) {
-                        val edit = sOpen?.edit(key)
-                        edit?.set(0, s)
-                        edit?.commit()
-                        at = o
-                    }
                 } else {
-                    if (value != null) {
-                        at = mGson?.fromJson(value.getString(0), aClass)
-                    }
+                    key = Md5Util.getMD5(url + cacheTag)
+                }
+                if (o != null) {
+                    val aClass: Class<Any> = o.javaClass
+                    val s = mGson?.toJson(o)
+                    val edit = sOpen?.edit(key)
+                    edit?.set(0, "${s}@${aClass.canonicalName}")
+                    edit?.commit()
+                    result = o
+                } else {
+                    val value = sOpen?.get(key)
+                    val split = value?.getString(0)?.split("@")
+                    val name = Class.forName(split?.get(1))
+                    result = mGson?.fromJson(split?.get(0), name)
                 }
             } catch (e: IOException) {
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_CACHEWR, ErrorCode.ERROR_DESC_CACHEWR + "\n" + e.toString())
-                mRxBus?.post(LoadingResult(false, tag))
-                mRxBus?.post(ErrorResult(errorBean, tag))
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_CACHEWR, ErrorCode.ERROR_DESC_CACHEWR, errorMessage(e))
+                mRxBus?.post(loadingResult)
+                mRxBus?.post(errorResult.apply { result = errorBean })
             } catch (e: IllegalAccessException) {
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL + "\n" + e.toString())
-                mRxBus?.post(LoadingResult(false, tag))
-                mRxBus?.post(ErrorResult(errorBean, tag))
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL, errorMessage(e))
+                mRxBus?.post(loadingResult)
+                mRxBus?.post(errorResult.apply { result = errorBean })
             } catch (e: NoSuchFieldException) {
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL + "\n" + e.toString())
-                mRxBus?.post(LoadingResult(false, tag))
-                mRxBus?.post(ErrorResult(errorBean, tag))
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL, errorMessage(e))
+                mRxBus?.post(loadingResult)
+                mRxBus?.post(errorResult.apply { result = errorBean })
             } catch (e: NoSuchAlgorithmException) {
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_ALGORITHM, ErrorCode.ERROR_DESC_ALGORITHM + "\n" + e.toString())
-                mRxBus?.post(LoadingResult(false, tag))
-                mRxBus?.post(ErrorResult(errorBean, tag))
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_ALGORITHM, ErrorCode.ERROR_DESC_ALGORITHM, errorMessage(e))
+                mRxBus?.post(loadingResult)
+                mRxBus?.post(errorResult.apply { result = errorBean })
             } catch (e: Exception) {
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS + "\n" + e.toString())
-                mRxBus?.post(LoadingResult(false, tag))
-                mRxBus?.post(ErrorResult(errorBean, tag))
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS, errorMessage(e))
+                mRxBus?.post(loadingResult)
+                mRxBus?.post(errorResult.apply { result = errorBean })
             }
 
-            if (at != null) {
-                e.onNext(at)
+            if (result != null) {
+                e.onNext(result)
             }
-        }, BackpressureStrategy.BUFFER).compose(RxUtil.fixScheduler<Any>()).subscribe { errorBean ->
+        }, BackpressureStrategy.BUFFER).compose(RxUtil.fixScheduler<Any>()).subscribe { error ->
             if (o == null) {
-                mRxBus?.post(SuccessResult(errorBean, tag))
+                mRxBus?.post(SuccessResult(error, tag))
             }
         })
     }
+
 
     /**
      * 添加网络任务到队列,以便于取消任务

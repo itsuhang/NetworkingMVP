@@ -9,7 +9,7 @@ import com.suhang.networkmvp.domain.ErrorBean;
 
 public class SuccessResult extends BaseResult{
     //返回的结果类
-    private ErrorBean result;
+    private Object result;
     //用于判断是哪一个请求
     private int tag;
     /**
@@ -26,7 +26,7 @@ public class SuccessResult extends BaseResult{
         return tag;
     }
 
-    public void setResult(ErrorBean result) {
+    public void setResult(Object result) {
         this.result = result;
     }
 
@@ -34,7 +34,7 @@ public class SuccessResult extends BaseResult{
         this.tag = tag;
     }
 
-    public SuccessResult(ErrorBean result,int tag) {
+    public SuccessResult(Object result,int tag) {
         this.result = result;
         this.tag = tag;
     }
