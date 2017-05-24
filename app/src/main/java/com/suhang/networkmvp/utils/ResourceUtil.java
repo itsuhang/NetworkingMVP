@@ -15,11 +15,11 @@ import java.lang.reflect.Field;
 
 public class ResourceUtil {
 	public static String s(@StringRes int id) {
-		return BaseApp.getInstance().getResources().getString(id);
+		return BaseApp.instance.getResources().getString(id);
 	}
 
 	public static int c(@ColorRes int id) {
-		return BaseApp.getInstance().getResources().getColor(id);
+		return BaseApp.instance.getResources().getColor(id);
 	}
 
 	public static int getZBRank(String rank) {

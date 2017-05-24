@@ -76,7 +76,7 @@ public abstract class AutoHeightLayout extends SoftKeyboardSizeWatchLayout imple
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mConfigurationChangedFlag = true;
-        mScreenHeight = 0;
+        setMScreenHeight(0);
     }
 
     @Override
@@ -85,10 +85,10 @@ public abstract class AutoHeightLayout extends SoftKeyboardSizeWatchLayout imple
             mConfigurationChangedFlag = false;
             Rect r = new Rect();
             ((Activity) mContext).getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
-            if (mScreenHeight == 0) {
-                mScreenHeight = r.bottom;
+            if (getMScreenHeight() == 0) {
+                setMScreenHeight(r.bottom);
             }
-            int mNowh = mScreenHeight - r.bottom;
+            int mNowh = getMScreenHeight() - r.bottom;
             mMaxParentHeight = mNowh;
         }
 

@@ -29,9 +29,9 @@ public class HomeRvAdapter extends BaseRvAdapter<HomeRvAdapter.MyViewHolder,Home
 
     @Override
     public void onBindHolder(MyViewHolder holder, HomeBean.ListEntity listEntity) {
-        holder.mBinding.getData();
-        holder.mBinding.tv.setText(listEntity.getNick());
-        holder.mBinding.getRoot().setBackgroundColor(0xffffffff);
+        holder.getMBinding().getData();
+        holder.getMBinding().tv.setText(listEntity.getNick());
+        holder.getMBinding().getRoot().setBackgroundColor(0xffffffff);
     }
 
 

@@ -155,7 +155,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
 		printWriter.close();
 		String result = writer.toString();
 		sb.append(result);
-		File dir = new File(Constants.APP_PATH);
+		File dir = new File(Constants.Companion.getAPP_PATH());
 		File file = new File(dir,"log.txt");
 		if (!dir.exists()) {
 			dir.mkdir();

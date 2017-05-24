@@ -1,6 +1,6 @@
 package com.suhang.networkmvp.mvp.result
 
-import com.suhang.networkmvp.constants.DEFAULT_TAG
+import com.suhang.networkmvp.domain.ErrorBean
 
 /**
  * Created by 苏杭 on 2017/4/25 16:17.
@@ -8,11 +8,4 @@ import com.suhang.networkmvp.constants.DEFAULT_TAG
  */
 
 class ErrorResult(//返回的错误结果类
-        var result: Any? = null,var tag: Int = 0) : BaseResult {
-
-    init {
-        if (tag == 0) {
-            tag = DEFAULT_TAG
-        }
-    }
-}
+        var result: ErrorBean, tag: Int) : BaseResult(tag)

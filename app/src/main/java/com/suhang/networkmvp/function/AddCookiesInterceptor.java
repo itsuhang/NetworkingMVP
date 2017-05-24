@@ -15,7 +15,7 @@ public class AddCookiesInterceptor implements Interceptor {
 	@Override
 	public Response intercept(Chain chain) throws IOException {
 		final Request.Builder builder = chain.request().newBuilder();
-		String cookie = SharedPrefUtil.getString("Cookie", null);
+		String cookie = SharedPrefUtil.INSTANCE.getString("Cookie", null);
 		if (cookie != null) {
 			builder.addHeader("Cookie", cookie);
 		}

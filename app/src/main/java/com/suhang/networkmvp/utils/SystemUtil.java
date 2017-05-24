@@ -6,7 +6,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 
-
 import com.suhang.networkmvp.application.BaseApp;
 
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
 public class SystemUtil {
 	public static int getAppVersion() {
 		try {
-			PackageInfo info = BaseApp.getInstance().getPackageManager().getPackageInfo(BaseApp.getInstance().getPackageName(), 0);
+			PackageInfo info = BaseApp.instance.getPackageManager().getPackageInfo(BaseApp.instance.getPackageName(), 0);
 			return info.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
@@ -33,12 +32,9 @@ public class SystemUtil {
 	 */
 	public static boolean isNetworkAvailable() {
 		// 得到网络连接信息
-		ConnectivityManager manager = (ConnectivityManager) BaseApp.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager manager = (ConnectivityManager) BaseApp.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
 		// 去进行判断网络是否连接
-		if (manager.getActiveNetworkInfo() != null) {
-			return manager.getActiveNetworkInfo().isAvailable();
-		}
-		return false;
+		return manager.getActiveNetworkInfo() != null && manager.getActiveNetworkInfo().isAvailable();
 	}
 
 	/**
