@@ -48,6 +48,9 @@ public class ErrorCode {
     //NetworkModel:根据参数查找Retrofit的Service中的方法时发生异常
     public static String ERROR_CODE_NETWORK_FINDMETHOD = "-8012";
     public static String ERROR_DESC_NETWORK_FINDMETHOD = "NetworkModel:根据参数查找Retrofit的Service中的方法时发生异常";
+    //BaseApp:初始化Retrofit出错
+    public static String ERROR_CODE_BASEAPP_RETROFIT= "-8013";
+    public static String ERROR_DESC_BASEAPP_RETROFIT = "BaseApp:初始化Retrofit出错";
     //网络访问错误，bean类中的URL和METHOD属性不正确
     public static String ERROR_CODE_NETWORK_PARAMS = "-8015";
     public static String ERROR_DESC_NETWORK_PARAMS = "网络访问错误，bean类中的URL和METHOD属性不正确:";
