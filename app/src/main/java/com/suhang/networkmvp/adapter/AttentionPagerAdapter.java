@@ -29,14 +29,14 @@ public class AttentionPagerAdapter extends PagerAdapter {
 	@Override
 	public Object instantiateItem(ViewGroup container, int position) {
 		BasePager basePager = mPagers.get(position);
-		container.addView(basePager.getRootView());
+		container.addView(basePager.root);
 		basePager.initData();
-		return basePager.getRootView();
+		return basePager.root;
 	}
 
 	@Override
 	public void destroyItem(ViewGroup container, int position, Object object) {
-		mPagers.get(position).destory();
+		mPagers.get(position).destroy();
 		container.removeView((View) object);
 	}
 
@@ -52,7 +52,7 @@ public class AttentionPagerAdapter extends PagerAdapter {
 		if (mPagers != null) {
 			for (BasePager pager : mPagers) {
 				if (pager != null) {
-					pager.destory();
+					pager.destroy();
 				}
 			}
 		}

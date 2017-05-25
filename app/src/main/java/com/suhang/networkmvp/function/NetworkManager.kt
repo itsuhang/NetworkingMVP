@@ -1,6 +1,5 @@
 package com.suhang.networkmvp.function
 
-import android.app.Activity
 import android.util.ArrayMap
 import com.bumptech.glide.disklrucache.DiskLruCache
 import com.google.gson.Gson
@@ -32,7 +31,9 @@ import javax.inject.Inject
  */
 
 class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
-
+    companion object{
+        val pattern:String = "@packname@"
+    }
     @Inject
     lateinit var mRxBus: RxBus
     @Inject
@@ -43,10 +44,13 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
     lateinit var mGson: Gson
 
     private val mSubscriptionMap = ArrayMap<Int, Disposable>()
-    private val mCallMap = ArrayMap<Int, Call>()
+//    private val mCallMap = ArrayMap<Int, Call>()
 
     private fun load(requestWay: Int, url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, isWrap: Boolean = false, vararg params: Any) {
         mRxBus.post(LoadingResult(true, whichTag))
+        if (needCache && requestWay == POST) {
+            dealCache(url, cacheTag, tag = whichTag)
+        }
         var flowable: Flowable<Any>? = null
         try {
             flowable = MethodFinder.find(url, *params)
@@ -55,15 +59,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
             mRxBus.post(LoadingResult(false, whichTag))
             mRxBus.post(ErrorResult(errorBean, whichTag))
         }
-        if (needCache && requestWay == POST) {
-            dealCache(url, cacheTag, tag = whichTag)
-        }
         if (flowable != null) {
             val compose: Flowable<Any>
             if (isWrap) {
-                compose = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler())
-            } else {
                 compose = flowable.onBackpressureDrop().compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler())
+            } else {
+                compose = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler())
             }
             val disposable = compose.subscribe({ o ->
                 mRxBus.post(LoadingResult(false, whichTag))
@@ -74,9 +75,8 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
                 }
                 mRxBus.post(SuccessResult(o, whichTag))
             }, { throwable ->
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, errorMessage(throwable))
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK,errorMessage(throwable), url.hashCode(),ErrorBean.TYPE_SHOW)
                 errorBean.run {
-                    type = Constants.ERRORTYPE_TWO
                     mRxBus.post(LoadingResult(false, whichTag))
                     mRxBus.post(ErrorResult(this, whichTag))
                     warn(toString())
@@ -84,10 +84,9 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
             })
             addDisposable(disposable, whichTag)
         } else {
-            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH)
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH,"flowable is null",url.hashCode(),ErrorBean.TYPE_SHOW)
             errorBean.run {
                 mRxBus.post(LoadingResult(false, whichTag))
-                type = Constants.ERRORTYPE_TWO
                 mRxBus.post(ErrorResult(this, whichTag))
                 warn(toString())
             }
@@ -134,12 +133,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
                     val aClass: Class<Any> = o.javaClass
                     val s = mGson.toJson(o)
                     val edit = sOpen.edit(key)
-                    edit?.set(0, "$s@${aClass.canonicalName}")
+                    edit?.set(0, "$s$pattern${aClass.canonicalName}")
                     edit?.commit()
                     result = o
                 } else {
                     val value = sOpen.get(key)
-                    val split = value?.getString(0)?.split("@")
+                    val split = value?.getString(0)?.split(pattern)
                     val name = Class.forName(split?.get(1))
                     result = mGson.fromJson(split?.get(0), name)
                 }
@@ -178,9 +177,10 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
             if (result != null) {
                 e.onNext(result)
             }
-        }, BackpressureStrategy.BUFFER).compose(RxUtil.fixScheduler()).subscribe { error ->
+        }, BackpressureStrategy.BUFFER).compose(RxUtil.fixScheduler()).subscribe { success ->
+            //o==null为读取缓存,o!=null 为写缓存操作,写缓存不需要通过这里发送成功结果
             if (o == null) {
-                mRxBus.post(SuccessResult(error, tag))
+                mRxBus.post(SuccessResult(success, tag))
             }
         })
     }
@@ -203,14 +203,14 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
         }
     }
 
-    /**
-     * 取消制定的下载任务
-     */
-    fun cancelDownload(tag: Int) {
-        if (mCallMap[tag] != null) {
-            mCallMap[tag]?.cancel()
-        }
-    }
+//    /**
+//     * 取消制定的下载任务
+//     */
+//    fun cancelDownload(tag: Int) {
+//        if (mCallMap[tag]. null) {
+//            mCallMap[tag]?.cancel()
+//        }
+//    }
 
 
     /**
@@ -221,17 +221,17 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
             value.dispose()
         }
         mSubscriptionMap.clear()
-        for ((_, value) in mCallMap) {
-            value.cancel()
-        }
-        mCallMap.clear()
+//        for ((_, value) in mCallMap) {
+//            value.cancel()
+//        }
+//        mCallMap.clear()
     }
 
 
     /**
      * 资源回收
      */
-    fun destory() {
+    fun destroy() {
         mDisposables.dispose()
         cancelAll()
     }

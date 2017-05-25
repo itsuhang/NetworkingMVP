@@ -1,8 +1,10 @@
 package com.suhang.networkmvp.mvp.model
 
+import android.util.ArrayMap
 import com.suhang.networkmvp.domain.AppMain
 import com.suhang.networkmvp.domain.GithubBean
 import com.suhang.networkmvp.function.NetworkManager
+import org.jetbrains.anko.info
 import javax.inject.Inject
 
 /**
@@ -16,7 +18,8 @@ constructor() : BaseModel(), IAttentionModel {
 
 
     fun getAppMainData() {
-        mManager.loadPostDataWrap(AppMain.URL)
+        info("啊啊啊啊")
+        mManager.loadPostDataWrap(AppMain.URL,needCache = true,params = ArrayMap<Any,Any>())
     }
 
     fun getGithubData() {

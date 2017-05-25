@@ -1,8 +1,6 @@
 package com.suhang.networkmvp.ui.fragment
 
-import android.app.Activity
 import android.content.Context
-import android.databinding.ViewDataBinding
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -10,30 +8,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-
-import com.suhang.layoutfinder.ContextProvider
-import com.suhang.layoutfinder.LayoutFinder
-import com.suhang.layoutfinderannotation.BindLayout
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule
 import com.suhang.networkmvp.function.SubstribeManager
 import com.suhang.networkmvp.mvp.model.BaseModel
 import com.suhang.networkmvp.utils.ScreenUtils
-
+import io.reactivex.disposables.CompositeDisposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-
-import javax.inject.Inject
-
-import io.reactivex.disposables.CompositeDisposable
 import org.jetbrains.anko.AnkoLogger
+import javax.inject.Inject
 
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-abstract class BaseFragment<T : BaseModel, E : ViewDataBinding> : Fragment(), ContextProvider ,AnkoLogger{
+abstract class BaseFragment<T : BaseModel> : Fragment(), AnkoLogger {
 
     /**
      * 基主件,用于注册子主件(dagger2)
@@ -45,19 +36,10 @@ abstract class BaseFragment<T : BaseModel, E : ViewDataBinding> : Fragment(), Co
 
     //Rxjava事件集合，用于退出时取消事件
     @Inject
-    lateinit var mDisposables: CompositeDisposable
-
-    @Inject
-    lateinit var mActivity: Activity
-
-    @Inject
-    lateinit var mContext: Context
+    lateinit var disposables: CompositeDisposable
 
     @Inject
     lateinit var model: T
-
-    @BindLayout
-    lateinit var mBinding: E
 
     /**
      * 获取RxBus,可进行订阅操作
@@ -65,10 +47,10 @@ abstract class BaseFragment<T : BaseModel, E : ViewDataBinding> : Fragment(), Co
     @Inject
     lateinit var sm: SubstribeManager
 
-    //fragment布局缓存
-    protected var cacheView: View? = null
     //是否为缓存布局
-    protected var isCacheView: Boolean = false
+    private var isCacheView: Boolean = false
+
+    lateinit var root: View
 
     private var isRegisterEventBus: Boolean = false
 
@@ -77,23 +59,15 @@ abstract class BaseFragment<T : BaseModel, E : ViewDataBinding> : Fragment(), Co
         baseComponent = (activity.application as BaseApp).appComponent.baseComponent(BaseModule(activity))
         injectDagger()
         subscribeEvent()
-        bind(bindLayout())
     }
 
-    private fun bind(layout: Int) {
-        LayoutFinder.find(this, layout)
+    fun bind(layout: Int) {
+        root = View.inflate(context, layout, null)
     }
-
-    /**
-     * 绑定布局
-
-     * @return
-     */
-    protected abstract fun bindLayout(): Int
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         onViewCreate(inflater, container, savedInstanceState)
-        return rootView
+        return root
     }
 
     /**
@@ -107,21 +81,6 @@ abstract class BaseFragment<T : BaseModel, E : ViewDataBinding> : Fragment(), Co
      */
     protected fun onViewCreate(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) {}
 
-    /**
-     * 缓存Fragment的布局
-     * 获得布局View,仅在onCreateView()方法中使用
-     */
-    protected val rootView: View?
-        get() {
-            if (cacheView == null) {
-                cacheView = mBinding.root
-            } else {
-                isCacheView = true
-                val parent = cacheView!!.parent as ViewGroup
-                parent.removeView(cacheView)
-            }
-            return cacheView
-        }
 
     /**
      * 订阅事件
@@ -199,8 +158,8 @@ abstract class BaseFragment<T : BaseModel, E : ViewDataBinding> : Fragment(), Co
 
     override fun onDestroy() {
         super.onDestroy()
-        mDisposables.dispose()
-        model.destory()
+        disposables.dispose()
+        model.destroy()
         EventBus.getDefault().unregister(this)
     }
 
@@ -209,20 +168,11 @@ abstract class BaseFragment<T : BaseModel, E : ViewDataBinding> : Fragment(), Co
      * 有时会有Activity给关闭而内部Fragment不走onDestory()方法,则可手动调用此方法销毁数据
      */
     fun destory() {
-        mDisposables.dispose()
+        disposables.dispose()
         //取消所有正在进行的网络任务
         if (isRegisterEventBus) {
             EventBus.getDefault().unregister(this)
         }
-        model.destory()
-    }
-
-    override fun providerContext(): Context {
-        return context
-    }
-
-    companion object {
-        //基类内部错误tag
-        val ERROR_TAG = -1
+        model.destroy()
     }
 }

@@ -1,6 +1,7 @@
  apply plugin: 'com.android.application'
  apply plugin: 'kotlin-android'
  apply plugin: 'kotlin-kapt'
+ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -22,9 +23,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    dataBinding {
-        enabled = true
     }
 }
 
@@ -51,9 +49,9 @@ android {
      compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
      compile 'com.squareup.retrofit2:converter-gson:2.1.0'
      compile 'com.google.code.gson:gson:2.7'
-     compile 'com.suhang:lazyannotation_annotation:1.0.2'
-     compile 'com.suhang:lazyannotation:1.0.2'
-     kapt 'com.suhang:lazyannotation_compiler:1.0.2'
+     compile 'com.suhang:lazyannotation_annotation:1.0.7'
+     compile 'com.suhang:lazyannotation:1.0.7'
+     kapt 'com.suhang:lazyannotation_compiler:1.0.7'
      compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
      compile "org.jetbrains.anko:anko-commons:$anko_version"
      kapt 'com.android.databinding:compiler:2.3.0'

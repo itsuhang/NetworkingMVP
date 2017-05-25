@@ -21,7 +21,7 @@ abstract class BaseModel : IBaseModel ,AnkoLogger{
     @Inject
     lateinit var mActivity: Activity
 
-    override fun destory() {
+    override fun destroy() {
         mDisposables.dispose()
     }
 }

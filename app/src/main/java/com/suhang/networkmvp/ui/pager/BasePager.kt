@@ -2,35 +2,27 @@ package com.suhang.networkmvp.ui.pager
 
 import android.app.Activity
 import android.content.Context
-import android.databinding.ViewDataBinding
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-
-import com.suhang.layoutfinder.ContextProvider
-import com.suhang.layoutfinder.LayoutFinder
-import com.suhang.layoutfinderannotation.BindLayout
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule
 import com.suhang.networkmvp.function.SubstribeManager
 import com.suhang.networkmvp.mvp.model.BaseModel
-
+import io.reactivex.disposables.CompositeDisposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-
-import javax.inject.Inject
-
-import io.reactivex.disposables.CompositeDisposable
 import org.jetbrains.anko.AnkoLogger
+import javax.inject.Inject
 
 /**
  * Created by 苏杭 on 2017/1/24 15:12.
  * Fragment中不方便再嵌套Fragment时,用Pager页面
  */
 
-abstract class BasePager<T : BaseModel, E : ViewDataBinding>(activity: Activity) : ContextProvider,AnkoLogger {
+abstract class BasePager<T : BaseModel>(activity: Activity) :AnkoLogger {
 
     /**
      * 基主件,用于注册子主件(dagger2)
@@ -59,8 +51,7 @@ abstract class BasePager<T : BaseModel, E : ViewDataBinding>(activity: Activity)
     @Inject
     lateinit var sm: SubstribeManager
 
-    @BindLayout
-    lateinit var mBinding: E
+    lateinit var root:View
 
     private var isRegisterEventBus: Boolean = false
 
@@ -71,16 +62,11 @@ abstract class BasePager<T : BaseModel, E : ViewDataBinding>(activity: Activity)
     }
 
     private fun bind(layout: Int) {
-        LayoutFinder.find(this, layout)
+        root = View.inflate(context,layout,null)
         initEvent()
     }
 
-    /**
-     * 绑定布局
-
-     * @return
-     */
-    protected abstract fun bindLayout(): Int
+    abstract fun bindLayout():Int
 
     /**
      * 订阅事件
@@ -106,12 +92,6 @@ abstract class BasePager<T : BaseModel, E : ViewDataBinding>(activity: Activity)
      * MainModule()).inject(this);
      */
     protected abstract fun injectDagger()
-
-    /**
-     * 获得根布局
-     */
-    val rootView: View
-        get() = mBinding.root
 
     /**
      * 初始化事件
@@ -142,28 +122,19 @@ abstract class BasePager<T : BaseModel, E : ViewDataBinding>(activity: Activity)
     }
 
 
-    protected var isVisiable: Boolean
-        get() = rootView.isShown
-        set(visiable) {
-            rootView.visibility = if (visiable) View.VISIBLE else View.INVISIBLE
+    protected var visible: Boolean
+        get() = root.isShown
+        set(visible) {
+            root.visibility = if (visible) View.VISIBLE else View.INVISIBLE
         }
 
-    fun destory() {
+    fun destroy() {
         mDisposables.dispose()
         //取消所有正在进行的网络任务
         if (isRegisterEventBus) {
             EventBus.getDefault().unregister(this)
         }
 
-        model.destory()
-    }
-
-    override fun providerContext(): Context {
-        return context
-    }
-
-    companion object {
-        //基类内部错误tag
-        val ERROR_TAG = -1
+        model.destroy()
     }
 }

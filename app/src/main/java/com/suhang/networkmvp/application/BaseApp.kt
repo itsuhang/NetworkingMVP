@@ -86,7 +86,7 @@ abstract class BaseApp : Application(), AnkoLogger {
     }
 
     companion object {
-        lateinit var instance: Application
+        lateinit var instance: BaseApp
         var DATABINDING_DATA = "data"
         var DATABINDING_BR: String? = null
         var CACHE_PATH_OKHTTP: String? = null

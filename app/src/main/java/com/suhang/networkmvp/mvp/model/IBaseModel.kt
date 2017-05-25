@@ -5,5 +5,5 @@ package com.suhang.networkmvp.mvp.model
  */
 
 interface IBaseModel {
-    fun destory()
+    fun destroy()
 }
