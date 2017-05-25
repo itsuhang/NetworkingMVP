@@ -1,8 +1,8 @@
 package com.suhang.networkmvp.function
 
 import android.util.ArrayMap
-import com.bumptech.glide.disklrucache.DiskLruCache
 import com.google.gson.Gson
+import com.jakewharton.disklrucache.DiskLruCache
 import com.suhang.layoutfinder.MethodFinder
 import com.suhang.networkmvp.constants.*
 import com.suhang.networkmvp.domain.ErrorBean
@@ -19,7 +19,6 @@ import io.reactivex.Flowable
 import io.reactivex.FlowableOnSubscribe
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import okhttp3.Call
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.warn
 import java.io.IOException
@@ -31,9 +30,10 @@ import javax.inject.Inject
  */
 
 class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
-    companion object{
-        val pattern:String = "@packname@"
+    companion object {
+        val pattern: String = "@packname@"
     }
+
     @Inject
     lateinit var mRxBus: RxBus
     @Inject
@@ -75,16 +75,16 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
                 }
                 mRxBus.post(SuccessResult(o, whichTag))
             }, { throwable ->
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK,errorMessage(throwable), url.hashCode(),ErrorBean.TYPE_SHOW)
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
                     mRxBus.post(LoadingResult(false, whichTag))
                     mRxBus.post(ErrorResult(this, whichTag))
-                    warn(toString())
+                    warn(errorMessage(throwable))
                 }
             })
             addDisposable(disposable, whichTag)
         } else {
-            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH,"flowable is null",url.hashCode(),ErrorBean.TYPE_SHOW)
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
             errorBean.run {
                 mRxBus.post(LoadingResult(false, whichTag))
                 mRxBus.post(ErrorResult(this, whichTag))
@@ -139,8 +139,10 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
                 } else {
                     val value = sOpen.get(key)
                     val split = value?.getString(0)?.split(pattern)
-                    val name = Class.forName(split?.get(1))
-                    result = mGson.fromJson(split?.get(0), name)
+                    if (split?.get(1) != null) {
+                        val name = Class.forName(split[1])
+                        result = mGson.fromJson(split[0], name)
+                    }
                 }
             } catch (e: IOException) {
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_CACHEWR, ErrorCode.ERROR_DESC_CACHEWR, errorMessage(e))

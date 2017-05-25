@@ -4,7 +4,7 @@ package com.suhang.networkmvp.domain
 /**
  * Created by sh on 2016/3/11 16:13.
  */
-open class ErrorBean(
+data class ErrorBean(
         //错误代码
         var code: String = "",
         //错误描述
@@ -12,7 +12,7 @@ open class ErrorBean(
 
         var errorCase: String = "",
 
-        var showCode: Int = 0,
+        var showCode: String = "",
 
         var type: Int = ErrorBean.TYPE_HIDDEN
 ){

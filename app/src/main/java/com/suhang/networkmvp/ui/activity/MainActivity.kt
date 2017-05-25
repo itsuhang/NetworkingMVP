@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 @ActivityScope
 class MainActivity : BaseActivity<BlankModel>() {
+    lateinit var adapter:MainFragmentAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bind(R.layout.activity_main)
@@ -26,11 +27,17 @@ class MainActivity : BaseActivity<BlankModel>() {
         val fragments = ArrayList<BaseFragment<*>>()
         fragments.add(HomeFragment())
         fragments.add(AttentionFragment())
-        vp_main.adapter = MainFragmentAdapter(supportFragmentManager, fragments)
+        adapter = MainFragmentAdapter(supportFragmentManager, fragments)
+        vp_main.adapter = adapter
     }
 
 
     override fun injectDagger() {
         baseComponent.providerBlankComponent(BlankModule()).inject(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.destroy()
     }
 }

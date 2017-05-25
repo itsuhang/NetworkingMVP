@@ -45,7 +45,7 @@ abstract class BaseFragment<T : BaseModel> : Fragment(), AnkoLogger {
      * 获取RxBus,可进行订阅操作
      */
     @Inject
-    lateinit var sm: SubstribeManager
+    lateinit var manager: SubstribeManager
 
     //是否为缓存布局
     private var isCacheView: Boolean = false
@@ -167,7 +167,7 @@ abstract class BaseFragment<T : BaseModel> : Fragment(), AnkoLogger {
     /**
      * 有时会有Activity给关闭而内部Fragment不走onDestory()方法,则可手动调用此方法销毁数据
      */
-    fun destory() {
+    fun destroy() {
         disposables.dispose()
         //取消所有正在进行的网络任务
         if (isRegisterEventBus) {

@@ -1,16 +1,29 @@
 package com.suhang.networkmvp.constants
 
 import com.suhang.networkmvp.application.BaseApp
+import java.lang.StringBuilder
 
 /**
  * Created by 苏杭 on 2017/5/23 17:30.
  */
 
 fun Any.errorMessage(e: Exception) :String{
-    return e.toString()+"\n"+e.message
+    val sb:StringBuilder = StringBuilder()
+    sb.append(e.toString()+"\n")
+    sb.append(e.message+"\n")
+    e.stackTrace.forEach {
+        sb.append(it.toString()+"\n")
+    }
+    return sb.toString()
 }
 fun Any.errorMessage(e: Throwable) :String{
-    return e.toString()+"\n"+e.message
+    val sb:StringBuilder = StringBuilder()
+    sb.append(e.toString()+"\n")
+    sb.append(e.message+"\n")
+    e.stackTrace.forEach {
+        sb.append(it.toString()+"\n")
+    }
+    return sb.toString()
 }
 
 fun Any.dip2px(dpValue: Float): Int {

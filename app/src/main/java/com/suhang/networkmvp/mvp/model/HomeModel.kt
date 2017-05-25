@@ -2,10 +2,7 @@ package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
 
-import com.suhang.networkmvp.domain.DeleteHistoryBean
-import com.suhang.networkmvp.domain.HomeBean
 import com.suhang.networkmvp.function.NetworkManager
-import com.suhang.networkmvp.ui.fragment.HomeFragment
 
 import javax.inject.Inject
 
@@ -23,7 +20,7 @@ constructor() : BaseModel() {
         ls.put("uid", "2240")
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", "10")
-        //        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG, ls);
+        //        mModel.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG, ls);
     }
 
     fun getHomeData(count: Int, position: Int) {
@@ -31,8 +28,8 @@ constructor() : BaseModel() {
         ls.put("uid", "2240")
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", count.toString())
-        //        mModel.setAppendMessage(HomeBean.class, position);
-        //        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
+        //        mModel.setAppendMessage(HistoryBean.class, position);
+        //        mModel.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
     }
 
     fun getHomeData(count: Int, position: List<Int>) {
@@ -40,8 +37,8 @@ constructor() : BaseModel() {
         ls.put("uid", "2240")
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", count.toString())
-        //        mModel.setAppendMessage(HomeBean.class, position);
-        //        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
+        //        mModel.setAppendMessage(HistoryBean.class, position);
+        //        mModel.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
     }
 
     fun getLoadMore(page: Int) {
@@ -50,7 +47,7 @@ constructor() : BaseModel() {
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", "10")
         ls.put("page", page.toString())
-        //        mModel.loadPostDataWrap(HomeBean.class, false, HomeFragment.TAG_LOADMORE, ls);
+        //        mModel.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG_LOADMORE, ls);
     }
 
     fun deleteHistory(luid: String, position: Int) {

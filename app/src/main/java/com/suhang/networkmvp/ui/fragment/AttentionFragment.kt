@@ -17,6 +17,7 @@ import java.util.*
  */
 @FragmentScope
 class AttentionFragment : BaseFragment<BlankModel>() {
+    lateinit var adapter:AttentionPagerAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bind(R.layout.fragment_attention)
@@ -29,11 +30,17 @@ class AttentionFragment : BaseFragment<BlankModel>() {
         val pagers = ArrayList<BasePager<*>>()
         pagers.add(AttentionOnePager(activity))
         pagers.add(AttentionTwoPager(activity))
-        vp_attention.adapter = AttentionPagerAdapter(pagers)
+        adapter = AttentionPagerAdapter(pagers)
+        vp_attention.adapter = adapter
     }
 
 
     override fun injectDagger() {
         baseComponent.providerBlankComponent(BlankModule()).inject(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.destroy()
     }
 }

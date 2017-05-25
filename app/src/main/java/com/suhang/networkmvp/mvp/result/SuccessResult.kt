@@ -6,21 +6,4 @@ package com.suhang.networkmvp.mvp.result
  */
 
 class SuccessResult(//返回的结果类
-        private var result: Any, tag: Int) : BaseResult(tag) {
-    /**
-     * 处理成需要的bean类
-     * @param tClass
-     * *
-     * @param <T>
-     * *
-     * @return
-    </T> */
-    fun <T> getResult(tClass: Class<T>): T {
-        return tClass.cast(result)
-    }
-
-
-    fun setResult(result: Any) {
-        this.result = result
-    }
-}
+        var result: Any, tag: Int) : BaseResult(tag)

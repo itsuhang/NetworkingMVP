@@ -5,10 +5,10 @@ import com.suhang.networkmvp.R
 import com.suhang.networkmvp.annotation.PagerScope
 import com.suhang.networkmvp.dagger.module.BlankModule
 import com.suhang.networkmvp.domain.AppMain
+import com.suhang.networkmvp.domain.GithubBean
 import com.suhang.networkmvp.function.FlowableWrap
 import com.suhang.networkmvp.mvp.model.AttentionModel
 import com.suhang.networkmvp.mvp.result.SuccessResult
-import com.suhang.networkmvp.utils.LogUtil
 import kotlinx.android.synthetic.main.pager_attention_one.view.*
 import org.jetbrains.anko.info
 
@@ -22,39 +22,29 @@ class AttentionOnePager(activity: Activity) : BasePager<AttentionModel>(activity
     }
 
     override fun subscribeEvent() {
-        sm.subscribeResult(SuccessResult::class.java).subscribe(object : FlowableWrap.Next<SuccessResult> {
+        manager.subscribeResult(SuccessResult::class.java).subscribe(object : FlowableWrap.Next<SuccessResult> {
             override fun onNext(t: SuccessResult) {
-                val result = t.getResult(AppMain::class.java)
-                LogUtil.i("啊啊啊" + result)
+                val result = t.result
+                when (result) {
+                    is AppMain -> {
+                        info(result)
+                    }
+
+                    is GithubBean -> {
+                        info(result)
+                    }
+
+                }
             }
         })
-        //        getSM().subscribeResult(SuccessResult.class).subscribe(successResult -> {
-        //            if (successResult.getTag() == AttentionModel.Companion.getTAG_APP()) {
-        //                mBinding.tv.setText(successResult.getResult(AppMain.class).toString());
-        //            } else {
-        //                mBinding.tv.setText(successResult.getResult(GithubBean.class).toString());
-        //            }
-        //        });
-        //
-        //        getSM().subscribeResult(ErrorResult.class).subscribe(errorResult -> {
-        //            LogUtil.i("啊啊啊" + errorResult.getResult());
-        //        });
-        //        getSM().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {
-        //            switch (bindingEvent.getId()) {
-        //                case R.id.button:
-        //                    getModel().getAppMainData();
-        //                    break;
-        //                case R.id.button1:
-        //                    getModel().getGithubData();
-        //                    break;
-        //            }
-        //        });
     }
 
     override fun initEvent() {
         root.button.setOnClickListener {
-            info("额鹅鹅鹅")
             model.getAppMainData()
+        }
+        root.button1.setOnClickListener {
+            model.getGithubData()
         }
     }
 

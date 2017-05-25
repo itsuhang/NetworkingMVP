@@ -37,10 +37,6 @@ public class SubstribeManager {
         return new FlowableWrap<>(mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable);
     }
 
-    /**
-     *
-     *
-     */
     public <T extends BaseEvent> FlowableWrap<T> subscribeEvent(Class<T> aClass) {
         return new FlowableWrap<>(mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable);
     }

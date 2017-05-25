@@ -39,11 +39,11 @@ class HomeFragment : BaseFragment<HomeModel>() {
 //                });
 //                getManager().subscribeResult(SuccessResult.class).subscribe(successResult -> {
 //                    if (successResult.getTag() == TAG_LOADMORE) {
-//                        HomeBean result = successResult.getResult(HomeBean.class);
+//                        HistoryBean result = successResult.getResult(HistoryBean.class);
 //                        mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
 //                        mAdapter.loadMore(result.getList());
 //                    } else if (successResult.getTag() == TAG) {
-//                        HomeBean result = successResult.getResult(HomeBean.class);
+//                        HistoryBean result = successResult.getResult(HistoryBean.class);
 //                        mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
 //                        mAdapter.notifyDataSetChanged(result.getList());
 //                    } else if (successResult.getTag() == TAG_DELETE) {
@@ -52,7 +52,7 @@ class HomeFragment : BaseFragment<HomeModel>() {
 //                            getModel().getHomeData(mAdapter.getCurrentPage() * mAdapter.getPageSize(), (List<Integer>) result.getAppendMessage());
 //                        }
 //                    } else if (successResult.getTag() == TAG_LOADMORE_NORMAL) {
-//                        HomeBean result = successResult.getResult(HomeBean.class);
+//                        HistoryBean result = successResult.getResult(HistoryBean.class);
 //                        mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
 //                        mAdapter.notifyDelete((List<Integer>) result.getAppendMessage(), result.getList());
 //                        mLs1.clear();

@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.domain;
+package com.suhang.networkmvp.domain
 
 /**
  * Created by 苏杭 on 2017/1/23 14:31.
@@ -6,6 +6,4 @@ package com.suhang.networkmvp.domain;
  * 包裹类中需将返回内容的get方法用@Content注解标记
  */
 
-public interface WrapBean {
-
-}
+interface WrapBean

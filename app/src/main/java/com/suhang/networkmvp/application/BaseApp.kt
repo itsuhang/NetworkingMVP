@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.application
 
 import android.app.Application
+import android.os.Environment
 import android.os.Handler
 
 import com.suhang.layoutfinder.MethodFinder
@@ -40,14 +41,35 @@ abstract class BaseApp : Application(), AnkoLogger {
 
     override fun onCreate() {
         super.onCreate()
-        DATABINDING_BR = packageName + ".BR"
         CACHE_PATH_OKHTTP = cacheDir.absolutePath + File.separator + "NetCache_OKHTTP"
         CACHE_PATH = cacheDir.absolutePath + File.separator + "NetCache"
+        APP_PATH = Environment.getExternalStorageDirectory().absolutePath + "/suhang"
         appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()
         inject()
         instance = this
         changeForDebug()
         initRetrofitService()
+    }
+
+    /**
+     * 设置Okhttp缓存路径
+     */
+    fun setCachePathOfOkhttp(path: String) {
+        CACHE_PATH_OKHTTP = path
+    }
+
+    /**
+     * 设置硬盘缓存路径
+     */
+    fun setCachePath(path: String) {
+        CACHE_PATH = path
+    }
+
+    /**
+     * 设置应用SD卡路径
+     */
+    fun setAppPath(path: String) {
+        APP_PATH = path
     }
 
     /**
@@ -73,7 +95,7 @@ abstract class BaseApp : Application(), AnkoLogger {
             val o = retrofit.create(aClass)
             MethodFinder.inject(o, aClass)
         } catch (e: Exception) {
-            warn(ErrorBean(ErrorCode.ERROR_CODE_BASEAPP_RETROFIT,ErrorCode.ERROR_DESC_BASEAPP_RETROFIT,errorMessage(e)))
+            warn(ErrorBean(ErrorCode.ERROR_CODE_BASEAPP_RETROFIT, ErrorCode.ERROR_DESC_BASEAPP_RETROFIT, errorMessage(e)))
         }
     }
 
@@ -87,9 +109,8 @@ abstract class BaseApp : Application(), AnkoLogger {
 
     companion object {
         lateinit var instance: BaseApp
-        var DATABINDING_DATA = "data"
-        var DATABINDING_BR: String? = null
-        var CACHE_PATH_OKHTTP: String? = null
-        var CACHE_PATH: String? = null
+        lateinit var CACHE_PATH_OKHTTP: String
+        lateinit var CACHE_PATH: String
+        lateinit var APP_PATH: String
     }
 }

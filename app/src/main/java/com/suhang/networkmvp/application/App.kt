@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.application
 
-import com.suhang.networkmvp.constants.Constants
+import com.suhang.networkmvp.constants.URLS
+import com.suhang.networkmvp.interfaces.INetworkOtherService
 import com.suhang.networkmvp.interfaces.INetworkService
 
 /**
@@ -17,6 +18,7 @@ class App : BaseApp() {
     }
 
     override fun initRetrofitService() {
-        setRetrofit(Constants.BASE_URL, INetworkService::class.java)
+        setRetrofit(URLS.URL_BASE, INetworkService::class.java)
+        setRetrofit(URLS.URL_BASE_1, INetworkOtherService::class.java)
     }
 }

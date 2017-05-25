@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder
 import com.suhang.networkmvp.constants.ERROR_TAG
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
@@ -21,7 +20,7 @@ import javax.inject.Inject
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-abstract class BaseRvAdapter<T : BaseViewHolder, V> : RecyclerView.Adapter<T>(), IAdapterHelper {
+abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adapter<T>(), IAdapterHelper {
     @Inject
     lateinit var context: Context
     @Inject

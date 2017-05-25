@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
+import com.suhang.networkmvp.constants.URLS
 import com.suhang.networkmvp.domain.AppMain
 import com.suhang.networkmvp.domain.GithubBean
 import com.suhang.networkmvp.function.NetworkManager
@@ -18,11 +19,10 @@ constructor() : BaseModel(), IAttentionModel {
 
 
     fun getAppMainData() {
-        info("啊啊啊啊")
-        mManager.loadPostDataWrap(AppMain.URL,needCache = true,params = ArrayMap<Any,Any>())
+        mManager.loadPostDataWrap(URLS.URL_APPMAIN,needCache = true,params = ArrayMap<Any,Any>())
     }
 
     fun getGithubData() {
-        mManager.loadGetData(GithubBean.URL, params = "2/1")
+        mManager.loadGetData(URLS.URL_GITHUB, params = "2/1")
     }
 }

@@ -2,14 +2,13 @@ package com.suhang.networkmvp.dagger.module
 
 import android.app.Activity
 import android.content.Context
+import com.jakewharton.disklrucache.DiskLruCache
 
-import com.bumptech.glide.disklrucache.DiskLruCache
 import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.utils.SystemUtil
 
 import java.io.File
-import java.io.IOException
 
 import dagger.Module
 import dagger.Provides

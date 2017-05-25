@@ -1,11 +1,11 @@
 package com.suhang.networkmvp.adapter
 
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 
 import com.suhang.networkmvp.R
-import com.suhang.networkmvp.adapter.viewholder.BaseViewHolder
-import com.suhang.networkmvp.domain.HomeBean
+import com.suhang.networkmvp.domain.HistoryBean
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.item_home.view.*
 
@@ -14,9 +14,9 @@ import kotlinx.android.synthetic.main.item_home.view.*
  */
 
 class HomeRvAdapter @Inject
-constructor() : BaseRvAdapter<HomeRvAdapter.MyViewHolder, HomeBean.ListEntity>() {
+constructor() : BaseRvAdapter<HomeRvAdapter.MyViewHolder, HistoryBean.ListEntity>() {
 
-    override fun onBindHolder(holder: MyViewHolder, listEntity: HomeBean.ListEntity) {
+    override fun onBindHolder(holder: MyViewHolder, listEntity: HistoryBean.ListEntity) {
         holder.itemView.tv.text = listEntity.nick
         holder.itemView.setBackgroundColor(0xffffffff.toInt())
     }
@@ -29,5 +29,5 @@ constructor() : BaseRvAdapter<HomeRvAdapter.MyViewHolder, HomeBean.ListEntity>()
     override val pageSize: Int
         get() = 10
 
-    inner class MyViewHolder(view: View) : BaseViewHolder(view)
+    inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }

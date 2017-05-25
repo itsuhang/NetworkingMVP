@@ -1,24 +1,18 @@
 package com.suhang.networkmvp.dagger.module
 
-import com.google.gson.Gson
-
 import android.app.Application
-
+import com.google.gson.Gson
 import com.suhang.networkmvp.application.BaseApp
-import com.suhang.networkmvp.constants.Constants
 import com.suhang.networkmvp.function.AddCookiesInterceptor
 import com.suhang.networkmvp.function.CacheInterceptor
 import com.suhang.networkmvp.function.ReceivedCookiesInterceptor
-
-import java.io.File
-import java.util.concurrent.TimeUnit
-
-import javax.inject.Singleton
-
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import java.io.File
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 /**
  * Created by 苏杭 on 2017/1/22 17:32.
@@ -46,12 +40,12 @@ class AppModule(private val mApplication: Application) {
         //设置超时
         builder.cache(cache)
         builder.connectTimeout(10, TimeUnit.SECONDS)
-        builder.readTimeout(20, TimeUnit.SECONDS)
-        builder.writeTimeout(20, TimeUnit.SECONDS)
+        builder.readTimeout(10, TimeUnit.SECONDS)
+        builder.writeTimeout(10, TimeUnit.SECONDS)
         //错误重连
         builder.retryOnConnectionFailure(true)
-//        builder.addInterceptor(AddCookiesInterceptor())
-//        builder.addInterceptor(ReceivedCookiesInterceptor())
+        builder.addInterceptor(AddCookiesInterceptor())
+        builder.addInterceptor(ReceivedCookiesInterceptor())
         builder.addInterceptor(CacheInterceptor())
         builder.addNetworkInterceptor(CacheInterceptor())
         return builder.build()

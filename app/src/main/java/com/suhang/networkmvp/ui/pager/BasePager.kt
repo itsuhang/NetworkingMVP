@@ -49,7 +49,7 @@ abstract class BasePager<T : BaseModel>(activity: Activity) :AnkoLogger {
      * 获取SubscribeManager,可进行订阅操作
      */
     @Inject
-    lateinit var sm: SubstribeManager
+    lateinit var manager: SubstribeManager
 
     lateinit var root:View
 
