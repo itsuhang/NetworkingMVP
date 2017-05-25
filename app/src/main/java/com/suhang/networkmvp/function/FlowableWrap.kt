@@ -3,6 +3,7 @@ package com.suhang.networkmvp.function
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
 import com.suhang.networkmvp.domain.ErrorBean
+import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.utils.LogUtil
 
 import io.reactivex.Flowable
@@ -15,7 +16,7 @@ import org.jetbrains.anko.warn
  * Created by 苏杭 on 2017/4/28 11:02.
  */
 
-class FlowableWrap<T>(private val mFlowable: Flowable<T>, private val mDisposable: CompositeDisposable):AnkoLogger{
+class FlowableWrap<T>(private val mFlowable: Flowable<T>, private val mDisposable: CompositeDisposable):AnkoLogger,ErrorLogger{
 
 
     fun subscribe(consumer: Next<T>): FlowableWrap<T> {

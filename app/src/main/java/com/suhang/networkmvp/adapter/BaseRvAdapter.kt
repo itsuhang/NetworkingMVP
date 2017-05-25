@@ -11,16 +11,18 @@ import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
 import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.function.SubstribeManager
+import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.interfaces.IAdapterHelper
 import com.suhang.networkmvp.mvp.result.ErrorResult
 import io.reactivex.disposables.CompositeDisposable
+import org.jetbrains.anko.AnkoLogger
 import java.util.*
 import javax.inject.Inject
 /**
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adapter<T>(), IAdapterHelper {
+abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adapter<T>(), IAdapterHelper,ErrorLogger,AnkoLogger {
     @Inject
     lateinit var context: Context
     @Inject

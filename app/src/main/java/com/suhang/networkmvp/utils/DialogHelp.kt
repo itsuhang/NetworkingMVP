@@ -48,8 +48,8 @@ object DialogHelp {
         val dialog = Dialog(context, R.style.MyDialog)
         val ra = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
         val params = dialog.window!!.attributes
-        params.width = dip2px(80f)
-        params.height = dip2px(80f)
+        params.width = view.dip2px(80f)
+        params.height = view.dip2px(80f)
         dialog.window!!.attributes = params
         dialog.setCanceledOnTouchOutside(true)
         dialog.setContentView(view)

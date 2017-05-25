@@ -11,6 +11,7 @@ import com.suhang.networkmvp.dagger.component.AppComponent
 import com.suhang.networkmvp.dagger.component.DaggerAppComponent
 import com.suhang.networkmvp.dagger.module.AppModule
 import com.suhang.networkmvp.domain.ErrorBean
+import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.utils.LogUtil
 
 import java.io.File
@@ -29,7 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  * Created by 苏杭 on 2017/1/20 15:01.
  */
 
-abstract class BaseApp : Application(), AnkoLogger {
+abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
     lateinit var appComponent: AppComponent
     var isDebug = true
         set(isDebug) {

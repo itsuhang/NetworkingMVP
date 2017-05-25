@@ -6,6 +6,7 @@ import com.jakewharton.disklrucache.DiskLruCache
 import com.suhang.layoutfinder.MethodFinder
 import com.suhang.networkmvp.constants.*
 import com.suhang.networkmvp.domain.ErrorBean
+import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.mvp.model.INetworkManager
 import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.GET
 import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.POST
@@ -29,7 +30,7 @@ import javax.inject.Inject
  * Created by 苏杭 on 2017/5/23 17:37.
  */
 
-class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger {
+class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLogger {
     companion object {
         val pattern: String = "@packname@"
     }
