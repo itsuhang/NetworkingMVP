@@ -119,9 +119,7 @@ abstract class BaseFragment<T : BaseModel> : Fragment(), AnkoLogger {
     /**
      * 初始化事件
      */
-    protected fun initEvent() {
-
-    }
+    protected abstract fun initEvent()
 
     /**
      * dagger2绑定(需要则重写) ps: getBaseComponent().getMainComponent(new

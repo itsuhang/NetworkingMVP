@@ -25,7 +25,7 @@ interface INetworkManager {
      *
      * @param append 附加信息,随着请求传入,通过Result返回(example:历史删除某条数据,删除成功后返回结果,这时需要知道是哪个位置被删除了,可以通过此参数传入)
      */
-    fun loadPostData(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any = emptyArray())
+    fun loadPostData(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any)
 
     /**
      * 访问网络获取数据(GET)(转换为所需bean类)
@@ -40,7 +40,7 @@ interface INetworkManager {
      *
      * @param append 附加信息,随着请求传入,通过Result返回(example:历史删除某条数据,删除成功后返回结果,这时需要知道是哪个位置被删除了,可以通过此参数传入)
      */
-    fun loadGetData(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any = emptyArray())
+    fun loadGetData(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any)
 
     /**
      * 访问网络获取数据(POST)(获取包裹类,并转换为所需bean类)
@@ -55,7 +55,7 @@ interface INetworkManager {
      *
      * @param append 附加信息,随着请求传入,通过Result返回(example:历史删除某条数据,删除成功后返回结果,这时需要知道是哪个位置被删除了,可以通过此参数传入)
      */
-    fun loadPostDataWrap(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any = emptyArray())
+    fun loadPostDataWrap(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any)
 
     /**
      * 访问网络获取数据(GET)(获取包裹类,并转换为所需bean类)
@@ -70,5 +70,8 @@ interface INetworkManager {
      *
      * @param append 附加信息,随着请求传入,通过Result返回(example:历史删除某条数据,删除成功后返回结果,这时需要知道是哪个位置被删除了,可以通过此参数传入)
      */
-    fun loadGetDataWrap(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any = emptyArray())
+    fun loadGetDataWrap(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any)
+
+    fun download(url: String, path: String, whichTag: Int = DEFAULT_TAG, vararg params: Any)
+    fun initDownload(downloadService: Class<out Any>, baseUrl: String)
 }

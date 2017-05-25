@@ -9,7 +9,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.i("啊啊啊啊","${application.toString()}@${javaClass.canonicalName}")
+        Log.i("啊啊啊啊","$application@${javaClass.canonicalName}")
     }
 
 }

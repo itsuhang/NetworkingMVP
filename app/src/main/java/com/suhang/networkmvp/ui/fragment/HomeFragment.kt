@@ -6,8 +6,11 @@ import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.HomeRvAdapter
 import com.suhang.networkmvp.annotation.FragmentScope
 import com.suhang.networkmvp.dagger.module.BlankModule
+import com.suhang.networkmvp.function.FlowableWrap
 import com.suhang.networkmvp.mvp.model.HomeModel
+import com.suhang.networkmvp.mvp.result.ProgressResult
 import kotlinx.android.synthetic.main.fragment_home.*
+import org.jetbrains.anko.warn
 import javax.inject.Inject
 
 /**
@@ -24,6 +27,11 @@ class HomeFragment : BaseFragment<HomeModel>() {
     }
 
     override fun subscribeEvent() {
+        manager.subscribeResult(ProgressResult::class.java).subscribe(object :FlowableWrap.Next<ProgressResult>{
+            override fun onNext(t: ProgressResult) {
+                warn(t.progress)
+            }
+        })
 //                getManager().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {
 //                    switch (bindingEvent.getId()) {
 //                        case R.id.button:
@@ -62,6 +70,13 @@ class HomeFragment : BaseFragment<HomeModel>() {
 //                });
 
     }
+
+    override fun initEvent() {
+        button.setOnClickListener {
+            model.download()
+        }
+    }
+
 
     override fun initData() {
         rv_home.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

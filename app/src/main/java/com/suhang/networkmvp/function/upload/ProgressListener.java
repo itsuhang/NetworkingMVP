@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.function;
+package com.suhang.networkmvp.function.upload;
 
 /**
  * 进度回调接口，比如用于文件上传与下载

@@ -5,4 +5,4 @@ package com.suhang.networkmvp.mvp.result
  */
 
 class ProgressResult(//返回的进度信息
-        var progress: Int, tag: Int) : BaseResult(tag)
+        var progress: Int,var done:Boolean, tag: Int) : BaseResult(tag)

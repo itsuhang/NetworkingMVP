@@ -2,8 +2,6 @@ package com.suhang.networkmvp.application
 
 import android.app.Application
 import android.os.Environment
-import android.os.Handler
-
 import com.suhang.layoutfinder.MethodFinder
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
@@ -11,19 +9,20 @@ import com.suhang.networkmvp.dagger.component.AppComponent
 import com.suhang.networkmvp.dagger.component.DaggerAppComponent
 import com.suhang.networkmvp.dagger.module.AppModule
 import com.suhang.networkmvp.domain.ErrorBean
+import com.suhang.networkmvp.function.download.DownloadProgressInterceptor
 import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.utils.LogUtil
-
-import java.io.File
-
-import javax.inject.Inject
-
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.warn
+import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
 /**
@@ -89,11 +88,14 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
      * *
      * @param aClass Service的字节码
      */
-    protected fun setRetrofit(baseUrl: String, aClass: Class<*>) {
+    protected fun setRetrofit(baseUrl: String, aClass: Class<*>,factory: Converter.Factory? = GsonConverterFactory.create()) {
         try {
             val builder = Retrofit.Builder()
-            val retrofit = builder.baseUrl(baseUrl).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).addConverterFactory(GsonConverterFactory.create()).client(mHttpClient).build()
-            val o = retrofit.create(aClass)
+            val build = builder.baseUrl(baseUrl).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).client(mHttpClient)
+            if (factory != null) {
+                build.addConverterFactory(factory)
+            }
+            val o = build.build().create(aClass)
             MethodFinder.inject(o, aClass)
         } catch (e: Exception) {
             warn(ErrorBean(ErrorCode.ERROR_CODE_BASEAPP_RETROFIT, ErrorCode.ERROR_DESC_BASEAPP_RETROFIT, errorMessage(e)))

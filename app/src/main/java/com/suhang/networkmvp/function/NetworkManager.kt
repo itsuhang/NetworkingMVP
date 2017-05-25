@@ -4,8 +4,11 @@ import android.util.ArrayMap
 import com.google.gson.Gson
 import com.jakewharton.disklrucache.DiskLruCache
 import com.suhang.layoutfinder.MethodFinder
+import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.constants.*
+import com.suhang.networkmvp.domain.DownLoadBean
 import com.suhang.networkmvp.domain.ErrorBean
+import com.suhang.networkmvp.function.download.DownloadProgressInterceptor
 import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.mvp.model.INetworkManager
 import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.GET
@@ -13,17 +16,29 @@ import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.POST
 import com.suhang.networkmvp.mvp.result.ErrorResult
 import com.suhang.networkmvp.mvp.result.LoadingResult
 import com.suhang.networkmvp.mvp.result.SuccessResult
+import com.suhang.networkmvp.utils.FileUtils
 import com.suhang.networkmvp.utils.Md5Util
 import com.suhang.networkmvp.utils.RxUtil
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.warn
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.security.NoSuchAlgorithmException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -31,10 +46,10 @@ import javax.inject.Inject
  */
 
 class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLogger {
+
     companion object {
         val pattern: String = "@packname@"
     }
-
     @Inject
     lateinit var mRxBus: RxBus
     @Inject
@@ -47,6 +62,37 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
     private val mSubscriptionMap = ArrayMap<Int, Disposable>()
 //    private val mCallMap = ArrayMap<Int, Call>()
 
+    override fun initDownload(downloadService: Class<out Any>, baseUrl: String) {
+        val download = Retrofit.Builder().baseUrl(baseUrl).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).client(getDownloadOkhttp()).build().create(downloadService)
+        MethodFinder.inject(download,downloadService)
+    }
+    override fun download(url: String, path:String,whichTag: Int, vararg params: Any) {
+        var flowable :Flowable<Any>? = null
+            try {
+            flowable = MethodFinder.find(url,*params)
+        } catch (e: Exception) {
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
+            mRxBus.post(LoadingResult(false, whichTag))
+            mRxBus.post(ErrorResult(errorBean, whichTag))
+        }
+        if (flowable != null) {
+            flowable.subscribeOn(Schedulers.computation()).unsubscribeOn(Schedulers.computation()).map(Function<Any,InputStream>{
+                val responseBody = it as ResponseBody
+                return@Function responseBody.byteStream()
+            }).observeOn(Schedulers.computation()).doOnNext({
+                val file :File = File(path)
+                FileUtils.writeFile(it,file)
+            }).observeOn(AndroidSchedulers.mainThread()).subscribe({
+                val download:DownLoadBean = DownLoadBean(path)
+                mRxBus.post(SuccessResult(download,whichTag))
+            },{
+                it.printStackTrace()
+            })
+        } else {
+
+        }
+    }
+
     private fun load(requestWay: Int, url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, isWrap: Boolean = false, vararg params: Any) {
         mRxBus.post(LoadingResult(true, whichTag))
         if (needCache && requestWay == POST) {
@@ -55,7 +101,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
         var flowable: Flowable<Any>? = null
         try {
             flowable = MethodFinder.find(url, *params)
-        } catch (e: Exception) {
+            } catch (e: Exception) {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
             mRxBus.post(LoadingResult(false, whichTag))
             mRxBus.post(ErrorResult(errorBean, whichTag))
@@ -188,6 +234,21 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
         })
     }
 
+
+    private fun getDownloadOkhttp(): OkHttpClient {
+        val builder = OkHttpClient.Builder()
+        val cacheSize = 100 * 1024 * 1024 // 100 MiB
+        val cache = Cache(File(BaseApp.CACHE_PATH_OKHTTP), cacheSize.toLong())
+        //设置超时
+        builder.cache(cache)
+        builder.connectTimeout(10, TimeUnit.SECONDS)
+        builder.readTimeout(10, TimeUnit.SECONDS)
+        builder.writeTimeout(10, TimeUnit.SECONDS)
+        //错误重连
+        builder.retryOnConnectionFailure(true)
+        builder.addInterceptor(DownloadProgressInterceptor(mRxBus))
+        return builder.build()
+    }
 
     /**
      * 添加网络任务到队列,以便于取消任务

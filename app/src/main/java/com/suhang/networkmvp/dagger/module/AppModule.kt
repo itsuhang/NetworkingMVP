@@ -14,6 +14,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
+
 /**
  * Created by 苏杭 on 2017/1/22 17:32.
  * 用于提供单例对象
@@ -73,4 +74,5 @@ class AppModule(private val mApplication: Application) {
     fun provideApplication(): Application {
         return mApplication
     }
+
 }

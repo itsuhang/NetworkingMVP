@@ -1,5 +1,6 @@
 package com.suhang.networkmvp.ui.activity
 
+import android.Manifest
 import android.os.Bundle
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.MainFragmentAdapter
@@ -9,6 +10,7 @@ import com.suhang.networkmvp.mvp.model.BlankModel
 import com.suhang.networkmvp.ui.fragment.AttentionFragment
 import com.suhang.networkmvp.ui.fragment.BaseFragment
 import com.suhang.networkmvp.ui.fragment.HomeFragment
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
 @ActivityScope
@@ -24,6 +26,9 @@ class MainActivity : BaseActivity<BlankModel>() {
     }
 
     override fun initData() {
+        RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE).subscribe({
+
+        })
         val fragments = ArrayList<BaseFragment<*>>()
         fragments.add(HomeFragment())
         fragments.add(AttentionFragment())

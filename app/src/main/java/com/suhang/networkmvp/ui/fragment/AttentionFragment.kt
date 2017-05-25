@@ -17,6 +17,9 @@ import java.util.*
  */
 @FragmentScope
 class AttentionFragment : BaseFragment<BlankModel>() {
+    override fun initEvent() {
+    }
+
     lateinit var adapter:AttentionPagerAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -4,11 +4,16 @@ package com.suhang.networkmvp.function;
 import com.suhang.networkmvp.utils.SystemUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+import io.reactivex.Flowable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Created by 苏杭 on 2017/2/3 16:48.
