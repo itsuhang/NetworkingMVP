@@ -11,7 +11,7 @@ import android.widget.EditText
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule
-import com.suhang.networkmvp.function.SubstribeManager
+import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.mvp.model.BaseModel
 import com.suhang.networkmvp.utils.InputLeakUtil
 import com.suhang.networkmvp.utils.ScreenUtils

@@ -9,6 +9,7 @@ import com.suhang.networkmvp.constants.*
 import com.suhang.networkmvp.domain.DownLoadBean
 import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.function.download.DownloadProgressInterceptor
+import com.suhang.networkmvp.function.rx.RxBus
 import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.mvp.model.INetworkManager
 import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.GET

@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.function
+package com.suhang.networkmvp.function.rx
 
 import com.suhang.networkmvp.annotation.BaseScope
 

@@ -10,7 +10,7 @@ import com.suhang.networkmvp.constants.ERROR_TAG
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
 import com.suhang.networkmvp.domain.ErrorBean
-import com.suhang.networkmvp.function.SubstribeManager
+import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.interfaces.IAdapterHelper
 import com.suhang.networkmvp.mvp.result.ErrorResult

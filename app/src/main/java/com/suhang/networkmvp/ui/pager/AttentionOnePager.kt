@@ -4,13 +4,10 @@ import android.app.Activity
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.annotation.PagerScope
 import com.suhang.networkmvp.dagger.module.BlankModule
-import com.suhang.networkmvp.domain.AppMain
-import com.suhang.networkmvp.domain.GithubBean
-import com.suhang.networkmvp.function.FlowableWrap
 import com.suhang.networkmvp.mvp.model.AttentionModel
 import com.suhang.networkmvp.mvp.result.SuccessResult
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.pager_attention_one.view.*
-import org.jetbrains.anko.info
 
 /**
  * Created by 苏杭 on 2017/1/24 16:28.
@@ -22,21 +19,10 @@ class AttentionOnePager(activity: Activity) : BasePager<AttentionModel>(activity
     }
 
     override fun subscribeEvent() {
-        manager.subscribeResult(SuccessResult::class.java).subscribe(object : FlowableWrap.Next<SuccessResult> {
-            override fun onNext(t: SuccessResult) {
-                val result = t.result
-                when (result) {
-                    is AppMain -> {
-                        info(result)
-                    }
+        manager.subscribeResult(SuccessResult::class.java).subscribe(Consumer {
 
-                    is GithubBean -> {
-                        info(result)
-                    }
-
-                }
-            }
         })
+
     }
 
     override fun initEvent() {

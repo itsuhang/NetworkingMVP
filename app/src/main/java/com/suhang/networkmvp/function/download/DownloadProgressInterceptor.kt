@@ -1,6 +1,6 @@
 package com.suhang.networkmvp.function.download
 
-import com.suhang.networkmvp.function.RxBus
+import com.suhang.networkmvp.function.rx.RxBus
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException

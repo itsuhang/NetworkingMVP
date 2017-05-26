@@ -1,12 +1,10 @@
 package com.suhang.networkmvp.function.download
 
 import com.suhang.networkmvp.constants.DEFAULT_TAG
-import com.suhang.networkmvp.function.RxBus
+import com.suhang.networkmvp.function.rx.RxBus
 import com.suhang.networkmvp.mvp.result.ProgressResult
 
 import java.io.IOException
-
-import javax.inject.Inject
 
 import okhttp3.MediaType
 import okhttp3.ResponseBody

@@ -1,7 +1,6 @@
-package com.suhang.networkmvp.function
+package com.suhang.networkmvp.function.rx
 
 import com.suhang.networkmvp.mvp.event.BaseEvent
-import com.suhang.networkmvp.mvp.result.BaseResult
 
 import javax.inject.Inject
 
@@ -30,7 +29,7 @@ constructor() {
 
      * @param aClass 继承BaseResult的结果类的字节码
      */
-    fun <V : BaseResult> subscribeResult(aClass: Class<V>): FlowableWrap<V> {
+    fun <V> subscribeResult(aClass: Class<V>): FlowableWrap<V> {
         return FlowableWrap(mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
     }
 

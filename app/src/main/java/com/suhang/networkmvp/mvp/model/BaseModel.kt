@@ -2,7 +2,7 @@ package com.suhang.networkmvp.mvp.model
 
 import android.app.Activity
 
-import com.suhang.networkmvp.function.RxBus
+import com.suhang.networkmvp.function.rx.RxBus
 
 import javax.inject.Inject
 
