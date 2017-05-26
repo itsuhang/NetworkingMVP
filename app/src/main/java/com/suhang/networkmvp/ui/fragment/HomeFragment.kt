@@ -9,6 +9,7 @@ import com.suhang.networkmvp.dagger.module.BlankModule
 import com.suhang.networkmvp.function.rx.FlowableWrap
 import com.suhang.networkmvp.mvp.model.HomeModel
 import com.suhang.networkmvp.mvp.result.ProgressResult
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.jetbrains.anko.warn
 import javax.inject.Inject
@@ -27,10 +28,8 @@ class HomeFragment : BaseFragment<HomeModel>() {
     }
 
     override fun subscribeEvent() {
-        manager.subscribeResult(ProgressResult::class.java).subscribe(object : FlowableWrap.Next<ProgressResult>{
-            override fun onNext(t: ProgressResult) {
-                warn(t.progress)
-            }
+        manager.subscribeResult(ProgressResult::class.java).subscribe(Consumer {
+            warn(it.progress)
         })
 //                getManager().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {
 //                    switch (bindingEvent.getId()) {
