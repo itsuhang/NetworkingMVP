@@ -2,19 +2,16 @@ package com.suhang.networkmvp.function.download
 
 import com.suhang.networkmvp.constants.DEFAULT_TAG
 import com.suhang.networkmvp.function.rx.RxBus
+import com.suhang.networkmvp.function.rx.RxBusSingle
 import com.suhang.networkmvp.mvp.result.ProgressResult
-
-import java.io.IOException
-
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import okio.Buffer
-import okio.BufferedSource
-import okio.ForwardingSource
-import okio.Okio
-import okio.Source
+import okio.*
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
+import java.io.IOException
 
-class DownloadProgressResponseBody (private val responseBody: ResponseBody,var mRxBus: RxBus) : ResponseBody() {
+class DownloadProgressResponseBody (private val responseBody: ResponseBody) : ResponseBody(),AnkoLogger {
     private var bufferedSource: BufferedSource? = null
 
     override fun contentType(): MediaType? {
@@ -41,7 +38,7 @@ class DownloadProgressResponseBody (private val responseBody: ResponseBody,var m
                 val bytesRead = super.read(sink, byteCount)
                 // read() returns the number of bytes read, or -1 if this source is exhausted.
                 totalBytesRead += if (bytesRead.toInt() != -1) bytesRead else 0
-                mRxBus.post(ProgressResult((totalBytesRead * 100 / responseBody.contentLength()).toInt(), bytesRead.toInt() != -1,DEFAULT_TAG))
+                RxBusSingle.instance().post(ProgressResult((totalBytesRead * 100 / responseBody.contentLength()).toInt(), bytesRead.toInt() != -1,DEFAULT_TAG))
                 return bytesRead
             }
         }

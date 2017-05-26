@@ -1,17 +1,21 @@
 package com.suhang.networkmvp.function.rx
 
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.mvp.event.BaseEvent
 
 import javax.inject.Inject
 
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 
 /**
  * Created by 苏杭 on 2017/5/2 11:18.
  */
+@BaseScope
 class SubstribeManager @Inject
-constructor() {
+constructor() :AnkoLogger{
     @Inject
     lateinit var mRxBus: RxBus
     @Inject
@@ -29,12 +33,13 @@ constructor() {
 
      * @param aClass 继承BaseResult的结果类的字节码
      */
-    fun <V> subscribeResult(aClass: Class<V>): FlowableWrap<V> {
+    fun <T> subscribeResult(aClass: Class<T>): FlowableWrap<T> {
         return FlowableWrap(mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
     }
 
-    fun <T : BaseEvent> subscribeEvent(aClass: Class<T>): FlowableWrap<T> {
-        return FlowableWrap(mRxBus.toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
+    fun <T> subscribeGloble(aClass: Class<T>): FlowableWrap<T> {
+        info(RxBusSingle.instance())
+        return FlowableWrap(RxBusSingle.instance().toFlowable(aClass).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
     }
 
 }

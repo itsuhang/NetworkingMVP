@@ -15,6 +15,7 @@ import com.suhang.networkmvp.utils.LogUtil
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -38,6 +39,7 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
         }
     @Inject
     lateinit var mHttpClient: OkHttpClient
+    lateinit var mDownloadClient: OkHttpClient
 
     override fun onCreate() {
         super.onCreate()
@@ -45,6 +47,7 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
         CACHE_PATH = cacheDir.absolutePath + File.separator + "NetCache"
         APP_PATH = Environment.getExternalStorageDirectory().absolutePath + "/suhang"
         appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        mDownloadClient = initDownloadOkHttpClient()
         inject()
         instance = this
         changeForDebug()
@@ -88,18 +91,38 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
      * *
      * @param aClass Service的字节码
      */
-    protected fun setRetrofit(baseUrl: String, aClass: Class<*>,factory: Converter.Factory? = GsonConverterFactory.create()) {
+    protected fun setRetrofit(baseUrl: String, aClass: Class<*>,factory: Converter.Factory? = GsonConverterFactory.create(),isDownload:Boolean = false) {
         try {
             val builder = Retrofit.Builder()
-            val build = builder.baseUrl(baseUrl).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).client(mHttpClient)
+            val build = builder.baseUrl(baseUrl).addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             if (factory != null) {
                 build.addConverterFactory(factory)
+            }
+            if (isDownload) {
+                build.client(mDownloadClient)
+            } else {
+                build.client(mHttpClient)
             }
             val o = build.build().create(aClass)
             MethodFinder.inject(o, aClass)
         } catch (e: Exception) {
             warn(ErrorBean(ErrorCode.ERROR_CODE_BASEAPP_RETROFIT, ErrorCode.ERROR_DESC_BASEAPP_RETROFIT, errorMessage(e)))
         }
+    }
+
+    private fun initDownloadOkHttpClient(): OkHttpClient {
+        val builder = OkHttpClient.Builder()
+        val cacheSize = 100 * 1024 * 1024 // 100 MiB
+        val cache = Cache(File(BaseApp.CACHE_PATH_OKHTTP), cacheSize.toLong())
+        //设置超时
+        builder.cache(cache)
+        builder.connectTimeout(10, TimeUnit.SECONDS)
+        builder.readTimeout(10, TimeUnit.SECONDS)
+        builder.writeTimeout(10, TimeUnit.SECONDS)
+        //错误重连
+        builder.retryOnConnectionFailure(true)
+        builder.addInterceptor(DownloadProgressInterceptor())
+        return builder.build()
     }
 
     protected fun changeForDebug() {

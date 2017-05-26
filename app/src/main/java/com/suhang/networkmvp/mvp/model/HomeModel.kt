@@ -2,11 +2,9 @@ package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
 import com.suhang.networkmvp.application.BaseApp
+import com.suhang.networkmvp.constants.DEFAULT_TAG
 import com.suhang.networkmvp.constants.URLS
-
 import com.suhang.networkmvp.function.NetworkManager
-import com.suhang.networkmvp.interfaces.IDownloadService
-
 import javax.inject.Inject
 
 /**
@@ -19,8 +17,12 @@ constructor() : BaseModel() {
     lateinit var manager: NetworkManager
 
     fun download() {
-        manager.initDownload(IDownloadService::class.java, URLS.URL_BASE_DOWNLOAD)
-        manager.download(URLS.URL_DOWNLOAD, BaseApp.APP_PATH+"/aaa.jpg",params = ArrayMap<Any,Any>())
+//        manager.initDownload(IDownloadService::class.java, URLS.URL_BASE_DOWNLOAD)
+        manager.download(URLS.URL_DOWNLOAD, BaseApp.APP_PATH+"/huanpeng.apk",params = ArrayMap<Any,Any>())
+    }
+
+    fun cancelDownload() {
+        manager.cancelNormal(DEFAULT_TAG)
     }
 
     fun getHomeData() {
@@ -82,5 +84,9 @@ constructor() : BaseModel() {
         params.put("history", sb.toString())
         //        manager.setAppendMessage(DeleteHistoryBean.class, positions);
         //        manager.loadPostDataWrap(DeleteHistoryBean.class, false, HomeFragment.TAG_DELETE,params);
+    }
+
+    override fun destroy() {
+        super.destroy()
     }
 }

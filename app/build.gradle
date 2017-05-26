@@ -48,13 +48,16 @@ android {
      compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
      compile 'com.squareup.retrofit2:converter-gson:2.1.0'
      compile 'com.google.code.gson:gson:2.7'
-     compile 'com.suhang:lazyannotation_annotation:1.0.7'
-     compile 'com.suhang:lazyannotation:1.0.7'
-     kapt 'com.suhang:lazyannotation_compiler:1.0.7'
+     compile "com.suhang:lazyannotation_annotation:$suhang_apt_version"
+     compile "com.suhang:lazyannotation:$suhang_apt_version"
+     kapt "com.suhang:lazyannotation_compiler:$suhang_apt_version"
      compile 'com.jakewharton:disklrucache:2.0.2'
      compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
      compile "org.jetbrains.anko:anko-commons:$anko_version"
      kapt 'com.android.databinding:compiler:2.3.0'
+     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
  }
  repositories {
      mavenCentral()

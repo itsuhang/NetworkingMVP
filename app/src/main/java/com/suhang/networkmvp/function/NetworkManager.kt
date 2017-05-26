@@ -1,15 +1,17 @@
 package com.suhang.networkmvp.function
 
 import android.util.ArrayMap
+import android.webkit.MimeTypeMap
 import com.google.gson.Gson
 import com.jakewharton.disklrucache.DiskLruCache
 import com.suhang.layoutfinder.MethodFinder
-import com.suhang.networkmvp.application.BaseApp
-import com.suhang.networkmvp.constants.*
+import com.suhang.networkmvp.constants.DEFAULT_TAG
+import com.suhang.networkmvp.constants.ErrorCode
+import com.suhang.networkmvp.constants.errorMessage
 import com.suhang.networkmvp.domain.DownLoadBean
 import com.suhang.networkmvp.domain.ErrorBean
-import com.suhang.networkmvp.function.download.DownloadProgressInterceptor
 import com.suhang.networkmvp.function.rx.RxBus
+import com.suhang.networkmvp.function.upload.UploadFileRequestBody
 import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.mvp.model.INetworkManager
 import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.GET
@@ -28,29 +30,27 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
-import okhttp3.Cache
-import okhttp3.OkHttpClient
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.warn
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.security.NoSuchAlgorithmException
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
  * Created by 苏杭 on 2017/5/23 17:37.
  */
 
-class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLogger {
+class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorLogger {
 
     companion object {
         val pattern: String = "@packname@"
     }
+
     @Inject
     lateinit var mRxBus: RxBus
     @Inject
@@ -61,36 +61,97 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
     lateinit var mGson: Gson
 
     private val mSubscriptionMap = ArrayMap<Int, Disposable>()
-//    private val mCallMap = ArrayMap<Int, Call>()
 
-    override fun initDownload(downloadService: Class<out Any>, baseUrl: String) {
-        val download = Retrofit.Builder().baseUrl(baseUrl).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).client(getDownloadOkhttp()).build().create(downloadService)
-        MethodFinder.inject(download,downloadService)
+    override fun upload(url: String, file: File, whichTag: Int, append: Any?, param: Map<String, String>, vararg params: Any) {
+        doUpload(url, file, whichTag, append, param = param, params = params)
     }
-    override fun download(url: String, path:String,whichTag: Int, vararg params: Any) {
-        var flowable :Flowable<Any>? = null
-            try {
-            flowable = MethodFinder.find(url,*params)
+
+    override fun uploadWrap(url: String, file: File, whichTag: Int, append: Any?, param: Map<String, String>, vararg params: Any) {
+        doUpload(url, file, whichTag, append, true, param = param, params = params)
+    }
+
+    private fun doUpload(url: String, file: File, whichTag: Int, append: Any?, isWrap: Boolean = false, param: Map<String, String>, vararg params: Any) {
+        val requestBodyMap = ArrayMap<String, RequestBody>()
+        val fileRequestBody = UploadFileRequestBody(file, MediaType.parse(getMimeType(file.absolutePath)))
+        requestBodyMap.put("file\"; filename=\"" + file.name, fileRequestBody)
+        for ((key, value) in param) {
+            requestBodyMap.put(key, RequestBody.create(null, value))
+        }
+        var flowable: Flowable<Any>? = null
+        try {
+            flowable = MethodFinder.find(url, *params)
+        } catch (e: Exception) {
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
+            mRxBus.post(LoadingResult(false, whichTag))
+            mRxBus.post(ErrorResult(errorBean, whichTag))
+        }
+
+        if (flowable != null) {
+            val compose: Flowable<Any>
+            if (isWrap) {
+                compose = flowable.onBackpressureDrop().compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler())
+            } else {
+                compose = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler())
+            }
+            val disposable = compose.subscribe({ o ->
+                mRxBus.post(LoadingResult(false, whichTag))
+                val successResult = SuccessResult(o, whichTag)
+                successResult.append = append
+                mRxBus.post(SuccessResult(o, whichTag))
+            }, { throwable ->
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
+                errorBean.run {
+                    mRxBus.post(LoadingResult(false, whichTag))
+                    mRxBus.post(ErrorResult(this, whichTag))
+                    warn(errorMessage(throwable))
+                }
+            })
+            addDisposable(disposable, whichTag)
+        } else {
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
+            errorBean.run {
+                mRxBus.post(LoadingResult(false, whichTag))
+                mRxBus.post(ErrorResult(this, whichTag))
+                warn(toString())
+            }
+        }
+    }
+
+    override fun download(url: String, path: String, whichTag: Int, vararg params: Any) {
+        var flowable: Flowable<Any>? = null
+        try {
+            flowable = MethodFinder.find(url, *params)
         } catch (e: Exception) {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
             mRxBus.post(LoadingResult(false, whichTag))
             mRxBus.post(ErrorResult(errorBean, whichTag))
         }
         if (flowable != null) {
-            flowable.subscribeOn(Schedulers.computation()).unsubscribeOn(Schedulers.computation()).map(Function<Any,InputStream>{
+            val disposable = flowable.subscribeOn(Schedulers.computation()).unsubscribeOn(Schedulers.computation()).map(Function<Any, InputStream> {
                 val responseBody = it as ResponseBody
                 return@Function responseBody.byteStream()
             }).observeOn(Schedulers.computation()).doOnNext({
-                val file :File = File(path)
-                FileUtils.writeFile(it,file)
+                val file: File = File(path)
+                FileUtils.writeFile(it, file)
             }).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                val download:DownLoadBean = DownLoadBean(path)
-                mRxBus.post(SuccessResult(download,whichTag))
-            },{
-                it.printStackTrace()
+                val download: DownLoadBean = DownLoadBean(path)
+                mRxBus.post(SuccessResult(download, whichTag))
+            }, {
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
+                errorBean.run {
+                    mRxBus.post(LoadingResult(false, whichTag))
+                    mRxBus.post(ErrorResult(this, whichTag))
+                    warn(errorMessage(it))
+                }
             })
+            addDisposable(disposable, whichTag)
         } else {
-
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
+            errorBean.run {
+                mRxBus.post(LoadingResult(false, whichTag))
+                mRxBus.post(ErrorResult(this, whichTag))
+                warn(toString())
+            }
         }
     }
 
@@ -102,7 +163,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
         var flowable: Flowable<Any>? = null
         try {
             flowable = MethodFinder.find(url, *params)
-            } catch (e: Exception) {
+        } catch (e: Exception) {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
             mRxBus.post(LoadingResult(false, whichTag))
             mRxBus.post(ErrorResult(errorBean, whichTag))
@@ -235,20 +296,17 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
         })
     }
 
-
-    private fun getDownloadOkhttp(): OkHttpClient {
-        val builder = OkHttpClient.Builder()
-        val cacheSize = 100 * 1024 * 1024 // 100 MiB
-        val cache = Cache(File(BaseApp.CACHE_PATH_OKHTTP), cacheSize.toLong())
-        //设置超时
-        builder.cache(cache)
-        builder.connectTimeout(10, TimeUnit.SECONDS)
-        builder.readTimeout(10, TimeUnit.SECONDS)
-        builder.writeTimeout(10, TimeUnit.SECONDS)
-        //错误重连
-        builder.retryOnConnectionFailure(true)
-        builder.addInterceptor(DownloadProgressInterceptor(mRxBus))
-        return builder.build()
+    /**
+     * 得到mime类型
+     */
+    private fun getMimeType(path: String): String? {
+        var type: String? = null
+        val extension = MimeTypeMap.getFileExtensionFromUrl(path)
+        if (extension != null) {
+            val mime = MimeTypeMap.getSingleton()
+            type = mime.getMimeTypeFromExtension(extension)
+        }
+        return type
     }
 
     /**
@@ -256,6 +314,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
      */
     private fun addDisposable(disposable: Disposable, tag: Int) {
         mSubscriptionMap.put(tag, disposable)
+        mDisposables.add(disposable)
     }
 
 
@@ -264,40 +323,14 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger,ErrorLo
      */
     fun cancelNormal(tag: Int) {
         if (mSubscriptionMap[tag] != null) {
-            mSubscriptionMap[tag]?.dispose()
+            mDisposables.remove(mSubscriptionMap[tag])
         }
     }
-
-//    /**
-//     * 取消制定的下载任务
-//     */
-//    fun cancelDownload(tag: Int) {
-//        if (mCallMap[tag]. null) {
-//            mCallMap[tag]?.cancel()
-//        }
-//    }
-
-
-    /**
-     * 取消所有网络任务
-     */
-    fun cancelAll() {
-        for ((_, value) in mSubscriptionMap) {
-            value.dispose()
-        }
-        mSubscriptionMap.clear()
-//        for ((_, value) in mCallMap) {
-//            value.cancel()
-//        }
-//        mCallMap.clear()
-    }
-
 
     /**
      * 资源回收
      */
     fun destroy() {
         mDisposables.dispose()
-        cancelAll()
     }
 }

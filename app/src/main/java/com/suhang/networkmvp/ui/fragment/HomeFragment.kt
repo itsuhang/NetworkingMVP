@@ -11,6 +11,7 @@ import com.suhang.networkmvp.mvp.model.HomeModel
 import com.suhang.networkmvp.mvp.result.ProgressResult
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_home.*
+import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import javax.inject.Inject
 
@@ -28,7 +29,8 @@ class HomeFragment : BaseFragment<HomeModel>() {
     }
 
     override fun subscribeEvent() {
-        manager.subscribeResult(ProgressResult::class.java).subscribe(Consumer {
+        info(disposables)
+        manager.subscribeGloble(ProgressResult::class.java).subscribe(Consumer {
             warn(it.progress)
         })
 //                getManager().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {
@@ -73,6 +75,9 @@ class HomeFragment : BaseFragment<HomeModel>() {
     override fun initEvent() {
         button.setOnClickListener {
             model.download()
+        }
+        button1.setOnClickListener {
+            model.cancelDownload()
         }
     }
 

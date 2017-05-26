@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.mvp.model
 
 import com.suhang.networkmvp.constants.DEFAULT_TAG
+import java.io.File
 
 
 /**
@@ -72,6 +73,39 @@ interface INetworkManager {
      */
     fun loadGetDataWrap(url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, vararg params: Any)
 
+    /**
+     * 下载文件
+     * @param url 下载地址
+     *
+     * @param path 保存路径
+     *
+     * @param whichTag 标记,用于一个页面同时处理多个获取数据的请求时分辨是哪一个请求(并可用于取消下载)
+     *
+     * @param params 参数
+     */
     fun download(url: String, path: String, whichTag: Int = DEFAULT_TAG, vararg params: Any)
-    fun initDownload(downloadService: Class<out Any>, baseUrl: String)
+
+    /**
+     * 上传文件
+     * @param url 下载地址
+     *
+     * @param file 文件体
+     *
+     * @param whichTag 标记,用于一个页面同时处理多个获取数据的请求时分辨是哪一个请求(并可用于取消上传)
+     *
+     * @param params 参数
+     */
+    fun upload(url: String, file: File, whichTag: Int = DEFAULT_TAG, append: Any? = null, param: Map<String, String>, vararg params: Any)
+
+    /**
+     * 上传文件(返回带包裹类并处理成需要的Bean类)
+     * @param url 下载地址
+     *
+     * @param file 文件体
+     *
+     * @param whichTag 标记,用于一个页面同时处理多个获取数据的请求时分辨是哪一个请求(并可用于取消上传)
+     *
+     * @param params 参数
+     */
+    fun uploadWrap(url: String, file: File, whichTag: Int = DEFAULT_TAG, append: Any? = null, param: Map<String, String>, vararg params: Any)
 }
