@@ -28,7 +28,7 @@ class FlowableWrap<T>(private val mFlowable: Flowable<T>, private val mDisposabl
     /**
      * 订阅事件,与Rxjava一致,自动添加事件到CompositeDisposable中,方便回收
      */
-    fun subscribe(consumer: Consumer<T>, error: Consumer<in Throwable>) {
+    fun subscribe(consumer: Consumer<T>, error: Consumer<Throwable>) {
         mDisposable.add(mFlowable.subscribe({ consumer.accept(it) }, { error.accept(it) }))
     }
 }

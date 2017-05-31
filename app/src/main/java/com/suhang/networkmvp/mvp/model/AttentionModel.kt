@@ -2,10 +2,7 @@ package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
 import com.suhang.networkmvp.constants.URLS
-import com.suhang.networkmvp.domain.AppMain
-import com.suhang.networkmvp.domain.GithubBean
 import com.suhang.networkmvp.function.NetworkManager
-import org.jetbrains.anko.info
 import javax.inject.Inject
 
 /**

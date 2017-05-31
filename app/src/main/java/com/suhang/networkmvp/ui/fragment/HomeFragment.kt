@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.HomeRvAdapter
 import com.suhang.networkmvp.annotation.FragmentScope
+import com.suhang.networkmvp.constants.subscribeGlobalProgress
 import com.suhang.networkmvp.dagger.module.BlankModule
 import com.suhang.networkmvp.function.rx.FlowableWrap
 import com.suhang.networkmvp.mvp.model.HomeModel
@@ -30,7 +31,7 @@ class HomeFragment : BaseFragment<HomeModel>() {
 
     override fun subscribeEvent() {
         info(disposables)
-        manager.subscribeGloble(ProgressResult::class.java).subscribe(Consumer {
+        manager.subscribeGlobalProgress().subscribe(Consumer {
             warn(it.progress)
         })
 //                getManager().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {

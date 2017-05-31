@@ -29,18 +29,18 @@ fun ErrorLogger.errorMessage(e: Throwable) :String{
 }
 
 fun View.dip2px(dpValue: Float): Int {
-    return (BaseApp.instance.resources.displayMetrics.density*dpValue+0.5f).toInt()
+    return (resources.displayMetrics.density*dpValue+0.5f).toInt()
 }
 
 fun View.dip2pxf(dpValue: Float): Float {
-    return BaseApp.instance.resources.displayMetrics.density*dpValue+0.5f
+    return resources.displayMetrics.density*dpValue+0.5f
 }
 
 fun View.px2dip(pxValue: Float): Int {
-    return (pxValue/BaseApp.instance.resources.displayMetrics.density+0.5f).toInt()
+    return (pxValue/resources.displayMetrics.density+0.5f).toInt()
 }
 
 fun View.px2dipf(pxValue: Float): Float {
-    return pxValue/BaseApp.instance.resources.displayMetrics.density+0.5f
+    return pxValue/resources.displayMetrics.density+0.5f
 }
 
