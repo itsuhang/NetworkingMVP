@@ -1,5 +1,6 @@
 package com.suhang.networkmvp.application
 
+import android.app.Activity
 import android.app.Application
 import android.os.Environment
 import com.suhang.layoutfinder.MethodFinder
@@ -33,6 +34,7 @@ import javax.inject.Inject
 
 abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
     lateinit var appComponent: AppComponent
+    val activityStack:MutableList<Activity> = ArrayList()
     var isDebug = true
         set(isDebug) {
             field = isDebug
@@ -125,6 +127,21 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
         builder.retryOnConnectionFailure(true)
         builder.addInterceptor(DownloadProgressInterceptor())
         return builder.build()
+    }
+
+    fun addToStack(activity: Activity) {
+        activityStack.add(activity)
+    }
+
+    fun removeFromStack(activity: Activity) {
+        activityStack.remove(activity)
+    }
+
+    fun cleanStack() {
+        for (activity in activityStack) {
+            activity.finish()
+        }
+        activityStack.clear()
     }
 
     protected fun changeForDebug() {

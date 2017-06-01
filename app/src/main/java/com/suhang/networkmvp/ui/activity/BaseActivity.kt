@@ -58,6 +58,7 @@ abstract class BaseActivity<T : BaseModel> : AppCompatActivity(),AnkoLogger{
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as BaseApp).addToStack(this)
         baseComponent = (application as BaseApp).appComponent.baseComponent(BaseModule(this))
         injectDagger()
         subscribeEvent()
@@ -138,6 +139,7 @@ abstract class BaseActivity<T : BaseModel> : AppCompatActivity(),AnkoLogger{
 
     override fun onDestroy() {
         super.onDestroy()
+        (application as BaseApp).removeFromStack(this)
         disposables.dispose()
         if (isRegisterEventBus) {
             EventBus.getDefault().unregister(this)
