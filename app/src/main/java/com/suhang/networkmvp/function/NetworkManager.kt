@@ -5,6 +5,7 @@ import android.webkit.MimeTypeMap
 import com.google.gson.Gson
 import com.jakewharton.disklrucache.DiskLruCache
 import com.suhang.layoutfinder.MethodFinder
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.constants.DEFAULT_TAG
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
@@ -13,9 +14,9 @@ import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.function.rx.RxBus
 import com.suhang.networkmvp.function.upload.UploadFileRequestBody
 import com.suhang.networkmvp.interfaces.ErrorLogger
-import com.suhang.networkmvp.mvp.model.INetworkManager
-import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.GET
-import com.suhang.networkmvp.mvp.model.INetworkManager.Companion.POST
+import com.suhang.networkmvp.interfaces.INetworkManager
+import com.suhang.networkmvp.interfaces.INetworkManager.Companion.GET
+import com.suhang.networkmvp.interfaces.INetworkManager.Companion.POST
 import com.suhang.networkmvp.mvp.result.ErrorResult
 import com.suhang.networkmvp.mvp.result.LoadingResult
 import com.suhang.networkmvp.mvp.result.SuccessResult
@@ -44,7 +45,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/5/23 17:37.
  */
-
+@BaseScope
 class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorLogger {
 
     companion object {

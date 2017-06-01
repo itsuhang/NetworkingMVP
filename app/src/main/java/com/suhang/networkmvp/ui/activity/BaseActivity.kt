@@ -12,7 +12,7 @@ import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule
 import com.suhang.networkmvp.function.rx.SubstribeManager
-import com.suhang.networkmvp.mvp.model.BaseModel
+import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.InputLeakUtil
 import com.suhang.networkmvp.utils.ScreenUtils
 import io.reactivex.disposables.CompositeDisposable
@@ -25,7 +25,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-abstract class BaseActivity<T : BaseModel> : AppCompatActivity(),AnkoLogger{
+abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
 
     /**
      * 基主件,用于注册子主件(dagger2)

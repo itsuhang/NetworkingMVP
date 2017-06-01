@@ -9,17 +9,19 @@ import javax.inject.Inject
  * Created by 苏杭 on 2017/4/28 16:33.
  */
 
-class AttentionModel @Inject
-constructor() : BaseModel(), IAttentionModel {
+class AttentionModel:IAttentionModel {
+    override fun destroy() {
+    }
+
     @Inject
     lateinit var mManager: NetworkManager
 
 
-    fun getAppMainData() {
+    override fun getAppMainData() {
         mManager.loadPostDataWrap(URLS.URL_APPMAIN,needCache = true,params = ArrayMap<Any,Any>())
     }
 
-    fun getGithubData() {
+    override fun getGithubData() {
         mManager.loadGetData(URLS.URL_GITHUB, params = "2/1")
     }
 }

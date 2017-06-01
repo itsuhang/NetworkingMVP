@@ -9,7 +9,7 @@ import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule
 import com.suhang.networkmvp.function.rx.SubstribeManager
-import com.suhang.networkmvp.mvp.model.BaseModel
+import com.suhang.networkmvp.mvp.model.IBaseModel
 import io.reactivex.disposables.CompositeDisposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -22,7 +22,7 @@ import javax.inject.Inject
  * Fragment中不方便再嵌套Fragment时,用Pager页面
  */
 
-abstract class BasePager<T : BaseModel>(activity: Activity) :AnkoLogger {
+abstract class BasePager<T : IBaseModel>(activity: Activity) :AnkoLogger {
 
     /**
      * 基主件,用于注册子主件(dagger2)

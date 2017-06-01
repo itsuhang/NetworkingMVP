@@ -5,9 +5,9 @@ import com.suhang.networkmvp.R
 import com.suhang.networkmvp.annotation.ActivityScope
 import com.suhang.networkmvp.dagger.module.BlankModule
 import com.suhang.networkmvp.mvp.model.BlankModel
+import com.suhang.networkmvp.mvp.model.IBaseModel
 
-@ActivityScope
-class SplashActivity : BaseActivity<BlankModel>() {
+class SplashActivity : BaseActivity<IBaseModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -10,9 +10,11 @@ import com.suhang.networkmvp.constants.subscribeError
 import com.suhang.networkmvp.constants.subscribeEvent
 import com.suhang.networkmvp.constants.subscribeSuccess
 import com.suhang.networkmvp.dagger.module.BlankModule
+import com.suhang.networkmvp.dagger.module.HomeModule
 import com.suhang.networkmvp.domain.DeleteHistoryBean
 import com.suhang.networkmvp.domain.HistoryBean
 import com.suhang.networkmvp.mvp.model.HomeModel
+import com.suhang.networkmvp.mvp.model.IHomeModel
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.jetbrains.anko.warn
@@ -21,8 +23,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/1/24 15:31.
  */
-@FragmentScope
-class HomeFragment : BaseFragment<HomeModel>() {
+class HomeFragment : BaseFragment<IHomeModel>() {
     @Inject
     lateinit var mAdapter: HomeRvAdapter
     val luids: ArrayList<String> = ArrayList()
@@ -91,7 +92,7 @@ class HomeFragment : BaseFragment<HomeModel>() {
     }
 
     override fun injectDagger() {
-        baseComponent.providerBlankComponent(BlankModule()).inject(this)
+        baseComponent.providerHomeComponent(HomeModule()).inject(this)
     }
 
     override fun onDestroy() {

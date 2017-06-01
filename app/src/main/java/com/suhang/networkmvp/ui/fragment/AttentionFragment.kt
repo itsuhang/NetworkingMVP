@@ -5,7 +5,7 @@ import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.AttentionPagerAdapter
 import com.suhang.networkmvp.annotation.FragmentScope
 import com.suhang.networkmvp.dagger.module.BlankModule
-import com.suhang.networkmvp.mvp.model.BlankModel
+import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.ui.pager.AttentionOnePager
 import com.suhang.networkmvp.ui.pager.AttentionTwoPager
 import com.suhang.networkmvp.ui.pager.BasePager
@@ -15,8 +15,7 @@ import java.util.*
 /**
  * Created by 苏杭 on 2017/1/24 15:31.
  */
-@FragmentScope
-class AttentionFragment : BaseFragment<BlankModel>() {
+class AttentionFragment : BaseFragment<IBaseModel>() {
     override fun initEvent() {
     }
 

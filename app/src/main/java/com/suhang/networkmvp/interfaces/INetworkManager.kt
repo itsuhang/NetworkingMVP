@@ -1,4 +1,4 @@
-package com.suhang.networkmvp.mvp.model
+package com.suhang.networkmvp.interfaces
 
 import com.suhang.networkmvp.constants.DEFAULT_TAG
 import java.io.File

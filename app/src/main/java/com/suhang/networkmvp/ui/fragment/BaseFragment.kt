@@ -12,7 +12,7 @@ import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule
 import com.suhang.networkmvp.function.rx.SubstribeManager
-import com.suhang.networkmvp.mvp.model.BaseModel
+import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.ScreenUtils
 import io.reactivex.disposables.CompositeDisposable
 import org.greenrobot.eventbus.EventBus
@@ -24,7 +24,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
-abstract class BaseFragment<T : BaseModel> : Fragment(), AnkoLogger {
+abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
 
     /**
      * 基主件,用于注册子主件(dagger2)

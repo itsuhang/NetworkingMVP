@@ -15,7 +15,4 @@ interface BlankComponent {
     fun inject(activity: MainActivity)
     fun inject(activity: SplashActivity)
     fun inject(fragment: AttentionFragment)
-    fun inject(fragment: HomeFragment)
-    fun inject(pager: AttentionOnePager)
-    fun inject(pager: AttentionTwoPager)
 }
