@@ -3,10 +3,7 @@ package com.suhang.networkmvp.constants
 import com.suhang.networkmvp.function.rx.FlowableWrap
 import com.suhang.networkmvp.function.rx.RxBusSingle
 import com.suhang.networkmvp.function.rx.SubstribeManager
-import com.suhang.networkmvp.mvp.result.ErrorResult
-import com.suhang.networkmvp.mvp.result.LoadingResult
-import com.suhang.networkmvp.mvp.result.ProgressResult
-import com.suhang.networkmvp.mvp.result.SuccessResult
+import com.suhang.networkmvp.mvp.result.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
@@ -27,6 +24,10 @@ fun  SubstribeManager.subscribeLoading():FlowableWrap<LoadingResult> {
 
 fun  SubstribeManager.subscribeProgress():FlowableWrap<ProgressResult> {
     return FlowableWrap(mRxBus.toFlowable(ProgressResult::class.java).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
+}
+
+fun  SubstribeManager.subscribeEvent():FlowableWrap<EventResult> {
+    return FlowableWrap(mRxBus.toFlowable(EventResult::class.java).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
 }
 
 fun  SubstribeManager.subscribeGlobalProgress():FlowableWrap<ProgressResult> {

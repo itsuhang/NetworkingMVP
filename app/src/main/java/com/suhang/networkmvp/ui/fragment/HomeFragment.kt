@@ -5,14 +5,16 @@ import android.support.v7.widget.LinearLayoutManager
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.HomeRvAdapter
 import com.suhang.networkmvp.annotation.FragmentScope
-import com.suhang.networkmvp.constants.subscribeGlobalProgress
+import com.suhang.networkmvp.constants.getAdapterTag
+import com.suhang.networkmvp.constants.subscribeError
+import com.suhang.networkmvp.constants.subscribeEvent
+import com.suhang.networkmvp.constants.subscribeSuccess
 import com.suhang.networkmvp.dagger.module.BlankModule
-import com.suhang.networkmvp.function.rx.FlowableWrap
+import com.suhang.networkmvp.domain.DeleteHistoryBean
+import com.suhang.networkmvp.domain.HistoryBean
 import com.suhang.networkmvp.mvp.model.HomeModel
-import com.suhang.networkmvp.mvp.result.ProgressResult
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_home.*
-import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import javax.inject.Inject
 
@@ -23,62 +25,61 @@ import javax.inject.Inject
 class HomeFragment : BaseFragment<HomeModel>() {
     @Inject
     lateinit var mAdapter: HomeRvAdapter
-
+    val luids: ArrayList<String> = ArrayList()
+    val positions: ArrayList<Int> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bind(R.layout.fragment_home)
     }
 
     override fun subscribeEvent() {
-        info(disposables)
-        manager.subscribeGlobalProgress().subscribe(Consumer {
-            warn(it.progress)
+        manager.subscribeError().subscribe(Consumer {
+            warn(it.result)
         })
-//                getManager().subscribeEvent(BindingEvent.class).subscribe(bindingEvent -> {
-//                    switch (bindingEvent.getId()) {
-//                        case R.id.button:
-//                            getModel().getLoadMore(mAdapter.getNextPage());
-//                            break;
-//                        case R.id.parent:
-//                            LogUtil.i("啊啊啊"+ bindingEvent.getData());
-//                            break;
-//                    }
-//                });
-//                getManager().subscribeResult(ErrorResult.class).subscribe(errorResult -> {
-//                    LogUtil.i("啊啊啊" + errorResult.getResult());
-//                });
-//                getManager().subscribeResult(SuccessResult.class).subscribe(successResult -> {
-//                    if (successResult.getTag() == TAG_LOADMORE) {
-//                        HistoryBean result = successResult.getResult(HistoryBean.class);
-//                        mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
-//                        mAdapter.loadMore(result.getList());
-//                    } else if (successResult.getTag() == TAG) {
-//                        HistoryBean result = successResult.getResult(HistoryBean.class);
-//                        mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
-//                        mAdapter.notifyDataSetChanged(result.getList());
-//                    } else if (successResult.getTag() == TAG_DELETE) {
-//                        DeleteHistoryBean result = successResult.getResult(DeleteHistoryBean.class);
-//                        if (result.getFailedList() != null && "".equals(result.getFailedList())) {
-//                            getModel().getHomeData(mAdapter.getCurrentPage() * mAdapter.getPageSize(), (List<Integer>) result.getAppendMessage());
-//                        }
-//                    } else if (successResult.getTag() == TAG_LOADMORE_NORMAL) {
-//                        HistoryBean result = successResult.getResult(HistoryBean.class);
-//                        mAdapter.setTotalCount(Integer.parseInt(result.getTotal()));
-//                        mAdapter.notifyDelete((List<Integer>) result.getAppendMessage(), result.getList());
-//                        mLs1.clear();
-//                        mLs2.clear();
-//                    }
-//
-//                });
+
+        manager.subscribeSuccess().subscribe(Consumer {
+            if (it.tag == TAG_LOADMORE) {
+                (it.result as HistoryBean).run {
+                    mAdapter.totalCount = total.toInt()
+                    mAdapter.loadMore(list)
+                }
+            } else if (it.tag == TAG) {
+                (it.result as HistoryBean).run {
+                    mAdapter.totalCount = total.toInt()
+                    mAdapter.notifyDataSetChanged(list)
+                }
+            } else if (it.tag == TAG_DELETE) {
+                (it.result as DeleteHistoryBean).run {
+                    if (failedList != null && "" == failedList) {
+                        model.getHomeData(mAdapter.currentPage * mAdapter.pageSize, it.append as List<Int>)
+                    }
+                }
+            } else if (it.tag == TAG_LOADMORE_NORMAL) {
+                (it.result as HistoryBean).run {
+                    mAdapter.totalCount = total.toInt()
+                    mAdapter.notifyDelete(it.append as List<Int>, list)
+                }
+            }
+        })
+
+        manager.subscribeEvent().subscribe(Consumer {
+            (it.view).run {
+                setBackgroundColor(0xffff00ff.toInt())
+            }
+            (it.view.getAdapterTag() as HomeRvAdapter.Message).run {
+                luids.add(luid)
+                positions.add(position)
+            }
+        })
 
     }
 
     override fun initEvent() {
         button.setOnClickListener {
-            model.download()
+            model.getLoadMore(mAdapter.nextPage)
         }
         button1.setOnClickListener {
-            model.cancelDownload()
+            model.deleteHistory(luids,positions)
         }
     }
 
@@ -99,9 +100,9 @@ class HomeFragment : BaseFragment<HomeModel>() {
     }
 
     companion object {
-        val TAG = 100
-        val TAG_LOADMORE = 101
-        val TAG_DELETE = 102
-        val TAG_LOADMORE_NORMAL = 103
+        val TAG = 101
+        val TAG_LOADMORE = 102
+        val TAG_DELETE = 103
+        val TAG_LOADMORE_NORMAL = 104
     }
 }

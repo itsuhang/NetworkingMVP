@@ -6,4 +6,4 @@ package com.suhang.networkmvp.mvp.result
  */
 
 class SuccessResult(//返回的结果类
-        var result: Any, tag: Int) : BaseResult(tag)
+        var result: Any,var tag: Int) : BaseResult()

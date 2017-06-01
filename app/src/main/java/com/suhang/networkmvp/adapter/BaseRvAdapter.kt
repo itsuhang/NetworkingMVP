@@ -18,11 +18,12 @@ import io.reactivex.disposables.CompositeDisposable
 import org.jetbrains.anko.AnkoLogger
 import java.util.*
 import javax.inject.Inject
+
 /**
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adapter<T>(), IAdapterHelper,ErrorLogger,AnkoLogger {
+abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adapter<T>(), IAdapterHelper, ErrorLogger, AnkoLogger {
     @Inject
     lateinit var context: Context
     @Inject
@@ -35,11 +36,7 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adap
     var mList: MutableList<V> = ArrayList()
 
     @Inject
-    lateinit var sm: SubstribeManager
-
-    private var mTotalCount = 0
-
-    private var mTotalPage = 0
+    lateinit var manager: SubstribeManager
 
     fun notifyDataSetChanged(v: List<V>?) {
         mList.clear()
@@ -49,7 +46,7 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adap
         notifyDataSetChanged()
     }
 
-    fun bind(layout: Int):View = View.inflate(context, layout, null)
+    fun bind(layout: Int): View = View.inflate(context, layout, null)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): T {
         return onCreateHolder(parent, viewType)
@@ -63,8 +60,8 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adap
         try {
             onBindHolder(holder, mList[position])
         } catch (e: Exception) {
-            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_RVADAPTER_BIND, ErrorCode.ERROR_DESC_RVADAPTER_BIND + "\n" ,errorMessage(e))
-            sm.post(ErrorResult(errorBean, ERROR_TAG))
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_RVADAPTER_BIND, ErrorCode.ERROR_DESC_RVADAPTER_BIND + "\n", errorMessage(e))
+            manager.post(ErrorResult(errorBean, ERROR_TAG))
         }
 
     }
@@ -73,7 +70,7 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adap
      * 加载更多(合并数据)
      */
     fun loadMore(beans: List<V>) {
-        if (nextPage > mTotalPage) {
+        if (nextPage > totalPage) {
             Toast.makeText(context, "没有更多了", Toast.LENGTH_SHORT).show()
         } else {
             if (mList.size > 0) {
@@ -123,43 +120,35 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adap
         notifyItemRangeChanged(start, positions.size)
     }
 
-    /**
-     * 得到每页数据大小
-     */
-    abstract val pageSize: Int
+    override var pageSize: Int = 10
 
-    override fun setTotalCount(count: Int) {
-        try {
-            if (mTotalCount % pageSize == 0) {
-                mTotalPage = mTotalCount / pageSize
-            } else {
-                mTotalPage = mTotalCount / pageSize + 1
+    override var totalCount: Int = 0
+
+    override var totalPage: Int = 0
+        get() {
+            var page:Int
+            try {
+                if (totalCount % pageSize == 0) {
+                    page = totalCount / pageSize
+                } else {
+                    page = totalCount / pageSize + 1
+                }
+            } catch (e: Exception) {
+                page = 0
             }
-        } catch (e: Exception) {
+            return page
         }
-
-        mTotalCount = count
-    }
-
-    fun getTotalCount(): Int {
-        return mTotalCount
-    }
-
-    override fun getCurrentCount(): Int {
-        return itemCount
-    }
-
 
     /**
      * 获取下一页页数
      */
-    val nextPage: Int
+    override var nextPage: Int = 0
         get() = currentPage + 1
 
     /**
      * 获取当前所在页数
      */
-    val currentPage: Int
+    override var currentPage: Int = 0
         get() {
             var page: Int
             try {
@@ -171,7 +160,6 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adap
             } catch (e: Exception) {
                 page = 0
             }
-
             return page
         }
 
@@ -179,9 +167,6 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adap
         return mList.size
     }
 
-    override fun getMaxCount(): Int {
-        return pageSize
-    }
 
     fun destory() {
         mDisposables.dispose()

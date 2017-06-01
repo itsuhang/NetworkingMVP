@@ -3,6 +3,7 @@ package com.suhang.networkmvp.application
 import android.app.Application
 import android.os.Environment
 import com.suhang.layoutfinder.MethodFinder
+import com.suhang.layoutfinder.SharedPreferencesFinder
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
 import com.suhang.networkmvp.dagger.component.AppComponent
@@ -51,6 +52,7 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
         inject()
         instance = this
         changeForDebug()
+        SharedPreferencesFinder.init(this)
         initRetrofitService()
     }
 

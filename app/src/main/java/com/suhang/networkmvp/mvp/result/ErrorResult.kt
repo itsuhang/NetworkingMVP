@@ -8,4 +8,4 @@ import com.suhang.networkmvp.domain.ErrorBean
  */
 
 class ErrorResult(//返回的错误结果类
-        var result: ErrorBean, tag: Int) : BaseResult(tag)
+        var result: ErrorBean,var tag: Int) : BaseResult()

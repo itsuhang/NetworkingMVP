@@ -97,7 +97,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 mRxBus.post(LoadingResult(false, whichTag))
                 val successResult = SuccessResult(o, whichTag)
                 successResult.append = append
-                mRxBus.post(SuccessResult(o, whichTag))
+                mRxBus.post(successResult)
             }, { throwable ->
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
@@ -182,7 +182,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 if (requestWay == POST) {
                     dealCache(url, cacheTag, o, tag = whichTag)
                 }
-                mRxBus.post(SuccessResult(o, whichTag))
+                mRxBus.post(successResult)
             }, { throwable ->
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url.hashCode()", type = ErrorBean.TYPE_SHOW)
                 errorBean.run {

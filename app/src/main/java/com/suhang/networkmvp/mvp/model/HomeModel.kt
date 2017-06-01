@@ -5,6 +5,7 @@ import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.constants.DEFAULT_TAG
 import com.suhang.networkmvp.constants.URLS
 import com.suhang.networkmvp.function.NetworkManager
+import com.suhang.networkmvp.ui.fragment.HomeFragment
 import javax.inject.Inject
 
 /**
@@ -18,7 +19,7 @@ constructor() : BaseModel() {
 
     fun download() {
 //        manager.initDownload(IDownloadService::class.java, URLS.URL_BASE_DOWNLOAD)
-        manager.download(URLS.URL_DOWNLOAD, BaseApp.APP_PATH+"/huanpeng.apk",params = ArrayMap<Any,Any>())
+        manager.download(URLS.URL_DOWNLOAD, BaseApp.APP_PATH + "/huanpeng.apk", params = ArrayMap<Any, Any>())
     }
 
     fun cancelDownload() {
@@ -30,7 +31,7 @@ constructor() : BaseModel() {
         ls.put("uid", "2240")
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", "10")
-        //        manager.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG, ls);
+        manager.loadPostDataWrap(URLS.URL_HISTORY, whichTag = HomeFragment.TAG, params = ls)
     }
 
     fun getHomeData(count: Int, position: Int) {
@@ -39,7 +40,7 @@ constructor() : BaseModel() {
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", count.toString())
         //        manager.setAppendMessage(HistoryBean.class, position);
-        //        manager.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
+        manager.loadPostDataWrap(URLS.URL_HISTORY, HomeFragment.TAG_LOADMORE_NORMAL, append = position, params = ls)
     }
 
     fun getHomeData(count: Int, position: List<Int>) {
@@ -47,8 +48,7 @@ constructor() : BaseModel() {
         ls.put("uid", "2240")
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", count.toString())
-        //        manager.setAppendMessage(HistoryBean.class, position);
-        //        manager.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG_LOADMORE_NORMAL, ls);
+        manager.loadPostDataWrap(URLS.URL_HISTORY, HomeFragment.TAG_LOADMORE_NORMAL, append = position, params = ls)
     }
 
     fun getLoadMore(page: Int) {
@@ -57,7 +57,7 @@ constructor() : BaseModel() {
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", "10")
         ls.put("page", page.toString())
-        //        manager.loadPostDataWrap(HistoryBean.class, false, HomeFragment.TAG_LOADMORE, ls);
+        manager.loadPostDataWrap(URLS.URL_HISTORY, whichTag = HomeFragment.TAG_LOADMORE, params = ls)
     }
 
     fun deleteHistory(luid: String, position: Int) {
@@ -65,8 +65,7 @@ constructor() : BaseModel() {
         params.put("uid", "2240")
         params.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         params.put("history", luid)
-        //        manager.setAppendMessage(DeleteHistoryBean.class, position);
-        //        manager.loadPostDataWrap(DeleteHistoryBean.class, false, HomeFragment.TAG_DELETE,params);
+        manager.loadPostDataWrap(URLS.URL_HISTORY_DELETE, HomeFragment.TAG_DELETE, append = position, params = params)
     }
 
     fun deleteHistory(luids: List<String>, positions: List<Int>) {
@@ -82,8 +81,7 @@ constructor() : BaseModel() {
             }
         }
         params.put("history", sb.toString())
-        //        manager.setAppendMessage(DeleteHistoryBean.class, positions);
-        //        manager.loadPostDataWrap(DeleteHistoryBean.class, false, HomeFragment.TAG_DELETE,params);
+        manager.loadPostDataWrap(URLS.URL_HISTORY_DELETE, HomeFragment.TAG_DELETE, append = positions, params = params)
     }
 
     override fun destroy() {

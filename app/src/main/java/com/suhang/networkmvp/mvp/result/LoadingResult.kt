@@ -6,4 +6,4 @@ package com.suhang.networkmvp.mvp.result
  */
 
 class LoadingResult(//调用加载操作和隐藏加载操作的标志
-        var isLoading: Boolean, tag: Int) : BaseResult(tag)
+        var isLoading: Boolean,var tag: Int) : BaseResult()
