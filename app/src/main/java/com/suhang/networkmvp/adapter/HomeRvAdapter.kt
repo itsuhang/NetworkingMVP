@@ -21,7 +21,7 @@ constructor() : BaseRvAdapter<HomeRvAdapter.MyViewHolder, HistoryBean.ListEntity
         holder.itemView.tv.text = v.nick
         holder.itemView.setBackgroundColor(0xffffffff.toInt())
         holder.itemView.setOnClickListener {
-            it.setAdapterTag(Message(holder.adapterPosition,v.uid))
+            it.setAdapterTag(Message(holder.adapterPosition, v.uid))
             manager.post(EventResult(it))
         }
     }

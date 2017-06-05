@@ -4,17 +4,13 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.HomeRvAdapter
-import com.suhang.networkmvp.annotation.FragmentScope
 import com.suhang.networkmvp.constants.getAdapterTag
 import com.suhang.networkmvp.constants.subscribeError
 import com.suhang.networkmvp.constants.subscribeEvent
 import com.suhang.networkmvp.constants.subscribeSuccess
-import com.suhang.networkmvp.dagger.module.BlankModule
-import com.suhang.networkmvp.dagger.module.HomeModule
 import com.suhang.networkmvp.domain.DeleteHistoryBean
 import com.suhang.networkmvp.domain.HistoryBean
 import com.suhang.networkmvp.mvp.model.HomeModel
-import com.suhang.networkmvp.mvp.model.IHomeModel
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.jetbrains.anko.warn
@@ -23,7 +19,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/1/24 15:31.
  */
-class HomeFragment : BaseFragment<IHomeModel>() {
+class HomeFragment : BaseFragment<HomeModel>() {
     @Inject
     lateinit var mAdapter: HomeRvAdapter
     val luids: ArrayList<String> = ArrayList()
@@ -89,10 +85,6 @@ class HomeFragment : BaseFragment<IHomeModel>() {
         rv_home.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         rv_home.adapter = mAdapter
         model.getHomeData()
-    }
-
-    override fun injectDagger() {
-        baseComponent.providerHomeComponent(HomeModule()).inject(this)
     }
 
     override fun onDestroy() {

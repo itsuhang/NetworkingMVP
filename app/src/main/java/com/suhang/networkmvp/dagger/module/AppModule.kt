@@ -3,6 +3,7 @@ package com.suhang.networkmvp.dagger.module
 import android.app.Application
 import com.google.gson.Gson
 import com.suhang.networkmvp.application.BaseApp
+import com.suhang.networkmvp.dagger.component.*
 import com.suhang.networkmvp.function.AddCookiesInterceptor
 import com.suhang.networkmvp.function.CacheInterceptor
 import com.suhang.networkmvp.function.ReceivedCookiesInterceptor
@@ -21,7 +22,7 @@ import javax.inject.Singleton
  */
 
 @Singleton
-@Module
+@Module(subcomponents = arrayOf(ChildComponent::class,HomeComponent::class,GrandChildOneComponent::class,GrandChildTwoComponent::class))
 class AppModule(private val mApplication: Application) {
     private val mOkHttpClient: OkHttpClient
     private val mGson: Gson

@@ -5,12 +5,15 @@ import com.suhang.networkmvp.constants.URLS
 import com.suhang.networkmvp.interfaces.IDownloadService
 import com.suhang.networkmvp.interfaces.INetworkOtherService
 import com.suhang.networkmvp.interfaces.INetworkService
+import dagger.android.AndroidInjector
+import dagger.android.DaggerApplication
 
 /**
  * Created by 苏杭 on 2017/4/25 11:38.
  */
 
 class App : BaseApp() {
+
     override fun inject() {
         appComponent.inject(this)
     }

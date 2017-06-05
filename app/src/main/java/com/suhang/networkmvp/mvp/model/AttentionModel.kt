@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Created by 苏杭 on 2017/4/28 16:33.
  */
 
-class AttentionModel:IAttentionModel {
+class AttentionModel @Inject constructor():IAttentionModel {
     override fun destroy() {
     }
 

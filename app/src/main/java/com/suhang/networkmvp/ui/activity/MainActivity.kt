@@ -4,16 +4,14 @@ import android.Manifest
 import android.os.Bundle
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.MainFragmentAdapter
-import com.suhang.networkmvp.annotation.ActivityScope
-import com.suhang.networkmvp.dagger.module.BlankModule
-import com.suhang.networkmvp.mvp.model.IBaseModel
-import com.suhang.networkmvp.ui.fragment.AttentionFragment
+import com.suhang.networkmvp.ui.BasicActivity
 import com.suhang.networkmvp.ui.fragment.BaseFragment
+import com.suhang.networkmvp.ui.fragment.ChildFragment
 import com.suhang.networkmvp.ui.fragment.HomeFragment
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : BaseActivity<IBaseModel>() {
+class MainActivity : BasicActivity() {
     lateinit var adapter:MainFragmentAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,14 +28,9 @@ class MainActivity : BaseActivity<IBaseModel>() {
         })
         val fragments = ArrayList<BaseFragment<*>>()
         fragments.add(HomeFragment())
-        fragments.add(AttentionFragment())
+        fragments.add(ChildFragment())
         adapter = MainFragmentAdapter(supportFragmentManager, fragments)
         vp_main.adapter = adapter
-    }
-
-
-    override fun injectDagger() {
-        baseComponent.providerBlankComponent(BlankModule()).inject(this)
     }
 
     override fun onDestroy() {

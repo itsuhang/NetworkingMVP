@@ -8,16 +8,14 @@ import com.suhang.layoutfinder.SharedPreferencesFinder
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
 import com.suhang.networkmvp.dagger.component.AppComponent
-import com.suhang.networkmvp.dagger.component.DaggerAppComponent
-import com.suhang.networkmvp.dagger.module.AppModule
 import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.function.download.DownloadProgressInterceptor
 import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.utils.LogUtil
+import dagger.android.DaggerApplication
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -32,7 +30,7 @@ import javax.inject.Inject
  * Created by 苏杭 on 2017/1/20 15:01.
  */
 
-abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
+abstract class BaseApp : DaggerApplication(), AnkoLogger,ErrorLogger {
     lateinit var appComponent: AppComponent
     val activityStack:MutableList<Activity> = ArrayList()
     var isDebug = true
@@ -49,7 +47,6 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
         CACHE_PATH_OKHTTP = cacheDir.absolutePath + File.separator + "NetCache_OKHTTP"
         CACHE_PATH = cacheDir.absolutePath + File.separator + "NetCache"
         APP_PATH = Environment.getExternalStorageDirectory().absolutePath + "/suhang"
-        appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()
         mDownloadClient = initDownloadOkHttpClient()
         inject()
         instance = this

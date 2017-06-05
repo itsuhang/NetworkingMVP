@@ -2,12 +2,9 @@ package com.suhang.networkmvp.ui.activity
 
 import android.os.Bundle
 import com.suhang.networkmvp.R
-import com.suhang.networkmvp.annotation.ActivityScope
-import com.suhang.networkmvp.dagger.module.BlankModule
-import com.suhang.networkmvp.mvp.model.BlankModel
-import com.suhang.networkmvp.mvp.model.IBaseModel
+import com.suhang.networkmvp.ui.BasicActivity
 
-class SplashActivity : BaseActivity<IBaseModel>() {
+class SplashActivity : BasicActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,8 +18,4 @@ class SplashActivity : BaseActivity<IBaseModel>() {
 
     override fun initData() {}
 
-
-    override fun injectDagger() {
-        baseComponent.providerBlankComponent(BlankModule()).inject(this)
-    }
 }

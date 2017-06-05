@@ -16,9 +16,7 @@ import java.io.File
  * 用于提供公共对象(公用但非单例)
  */
 
-@BaseScope
-@Module
-class BaseModule(private val mActivity: Activity) {
+abstract class BaseModule(private val mActivity: Activity) {
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
     @BaseScope
     @Provides
