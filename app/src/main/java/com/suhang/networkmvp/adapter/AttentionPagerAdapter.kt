@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.adapter
 
 
+import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.view.ViewGroup
@@ -12,8 +13,8 @@ import com.suhang.networkmvp.ui.fragment.BaseFragment
  * Created by 苏杭 on 2016/11/11 17:24.
  */
 
-class AttentionPagerAdapter(fm: FragmentManager, private val fragments: List<BasicFragment>) : FragmentPagerAdapter(fm) {
-    override fun getItem(position: Int): BasicFragment {
+class AttentionPagerAdapter(fm: FragmentManager, private val fragments: List<Fragment>) : FragmentPagerAdapter(fm) {
+    override fun getItem(position: Int): Fragment {
         return fragments[position]
     }
 
@@ -26,10 +27,8 @@ class AttentionPagerAdapter(fm: FragmentManager, private val fragments: List<Bas
     }
 
     fun destroy() {
-        for (fragment in fragments) {
-            if (fragment is BaseFragment<*>) {
-                fragment.destroy()
-            }
-        }
+        fragments
+                .filterIsInstance<BaseFragment<*>>()
+                .forEach { it.destroy() }
     }
 }

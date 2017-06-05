@@ -13,5 +13,6 @@ import dagger.android.AndroidInjector
 @BaseScope
 @Subcomponent(modules = arrayOf(HomeModule::class))
 interface HomeComponent :AndroidInjector<HomeFragment>{
+    @Subcomponent.Builder
     abstract class Builder :AndroidInjector.Builder<HomeFragment>()
 }

@@ -9,19 +9,13 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.suhang.networkmvp.utils.ScreenUtils
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.AndroidSupportInjection
-import dagger.android.support.HasSupportFragmentInjector
 import org.jetbrains.anko.AnkoLogger
-import javax.inject.Inject
 
 /**
  * Created by 苏杭 on 2017/6/5 14:37.
  */
-abstract class BasicFragment : Fragment(), HasSupportFragmentInjector, AnkoLogger {
-    @Inject
-    lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
+abstract class BasicFragment : Fragment(), AnkoLogger {
+
     //是否为缓存布局
     private var isCacheView: Boolean = false
 
@@ -30,15 +24,6 @@ abstract class BasicFragment : Fragment(), HasSupportFragmentInjector, AnkoLogge
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         subscribeEvent()
-    }
-
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return childFragmentInjector
     }
 
     fun bind(layout: Int) {

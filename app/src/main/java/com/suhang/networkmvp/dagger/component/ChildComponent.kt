@@ -2,6 +2,8 @@ package com.suhang.networkmvp.dagger.component
 
 import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.dagger.module.ChildModule
+import com.suhang.networkmvp.dagger.module.GrandChildOneModule
+import com.suhang.networkmvp.dagger.module.GrandChildTwoModule
 import com.suhang.networkmvp.ui.fragment.ChildFragment
 import dagger.Subcomponent
 import dagger.android.AndroidInjector

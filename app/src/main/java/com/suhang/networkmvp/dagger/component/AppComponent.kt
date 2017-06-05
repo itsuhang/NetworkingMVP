@@ -2,7 +2,8 @@ package com.suhang.networkmvp.dagger.component
 
 
 import com.suhang.networkmvp.application.App
-import com.suhang.networkmvp.dagger.module.*
+import com.suhang.networkmvp.application.BaseApp
+import com.suhang.networkmvp.dagger.module.AppModule
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import dagger.android.AndroidInjector
@@ -15,11 +16,9 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = arrayOf(AndroidInjectionModule::class,
         AndroidSupportInjectionModule::class,
-        AppModule::class, ChildModule::class,
-        HomeModule::class,
-        GrandChildOneModule::class,
-        GrandChildTwoModule::class
+        AppModule::class
         ))
-interface AppComponent :AndroidInjector<App>{
-    abstract class Builder :AndroidInjector.Builder<App>()
+interface AppComponent :AndroidInjector<BaseApp>{
+    @Component.Builder
+    abstract class Builder :AndroidInjector.Builder<BaseApp>()
 }

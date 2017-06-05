@@ -1,8 +1,10 @@
 package com.suhang.networkmvp.ui.fragment
 
+import android.content.Context
 import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.ui.BasicFragment
+import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -25,6 +27,10 @@ abstract class BaseFragment<T : IBaseModel> : BasicFragment() {
     @Inject
     lateinit var manager: SubstribeManager
 
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onDestroy() {
         super.onDestroy()

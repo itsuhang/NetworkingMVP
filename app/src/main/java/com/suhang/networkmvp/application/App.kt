@@ -2,6 +2,7 @@ package com.suhang.networkmvp.application
 
 import com.squareup.leakcanary.LeakCanary
 import com.suhang.networkmvp.constants.URLS
+import com.suhang.networkmvp.dagger.component.DaggerAppComponent
 import com.suhang.networkmvp.interfaces.IDownloadService
 import com.suhang.networkmvp.interfaces.INetworkOtherService
 import com.suhang.networkmvp.interfaces.INetworkService
@@ -13,9 +14,8 @@ import dagger.android.DaggerApplication
  */
 
 class App : BaseApp() {
-
-    override fun inject() {
-        appComponent.inject(this)
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        return DaggerAppComponent.builder().create(this)
     }
 
     override fun onCreate() {

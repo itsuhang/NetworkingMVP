@@ -2,9 +2,11 @@ package com.suhang.networkmvp.ui.activity
 
 import android.Manifest
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.MainFragmentAdapter
 import com.suhang.networkmvp.ui.BasicActivity
+import com.suhang.networkmvp.ui.BasicFragment
 import com.suhang.networkmvp.ui.fragment.BaseFragment
 import com.suhang.networkmvp.ui.fragment.ChildFragment
 import com.suhang.networkmvp.ui.fragment.HomeFragment
@@ -26,7 +28,7 @@ class MainActivity : BasicActivity() {
         RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE).subscribe({
 
         })
-        val fragments = ArrayList<BaseFragment<*>>()
+        val fragments = ArrayList<Fragment>()
         fragments.add(HomeFragment())
         fragments.add(ChildFragment())
         adapter = MainFragmentAdapter(supportFragmentManager, fragments)

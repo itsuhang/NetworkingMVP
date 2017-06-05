@@ -1,13 +1,11 @@
 package com.suhang.networkmvp.application
 
 import android.app.Activity
-import android.app.Application
 import android.os.Environment
 import com.suhang.layoutfinder.MethodFinder
 import com.suhang.layoutfinder.SharedPreferencesFinder
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
-import com.suhang.networkmvp.dagger.component.AppComponent
 import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.function.download.DownloadProgressInterceptor
 import com.suhang.networkmvp.interfaces.ErrorLogger
@@ -31,7 +29,6 @@ import javax.inject.Inject
  */
 
 abstract class BaseApp : DaggerApplication(), AnkoLogger,ErrorLogger {
-    lateinit var appComponent: AppComponent
     val activityStack:MutableList<Activity> = ArrayList()
     var isDebug = true
         set(isDebug) {
@@ -43,13 +40,12 @@ abstract class BaseApp : DaggerApplication(), AnkoLogger,ErrorLogger {
     lateinit var mDownloadClient: OkHttpClient
 
     override fun onCreate() {
-        super.onCreate()
         CACHE_PATH_OKHTTP = cacheDir.absolutePath + File.separator + "NetCache_OKHTTP"
         CACHE_PATH = cacheDir.absolutePath + File.separator + "NetCache"
         APP_PATH = Environment.getExternalStorageDirectory().absolutePath + "/suhang"
         mDownloadClient = initDownloadOkHttpClient()
-        inject()
         instance = this
+        super.onCreate()
         changeForDebug()
         SharedPreferencesFinder.init(this)
         initRetrofitService()
@@ -75,11 +71,6 @@ abstract class BaseApp : DaggerApplication(), AnkoLogger,ErrorLogger {
     fun setAppPath(path: String) {
         APP_PATH = path
     }
-
-    /**
-     * 注入当前Application
-     */
-    abstract fun inject()
 
     /**
      * 初始化Retrofit的Service

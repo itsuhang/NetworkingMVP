@@ -15,20 +15,20 @@ import java.io.File
  * Created by 苏杭 on 2017/1/20 16:26.
  * 用于提供公共对象(公用但非单例)
  */
-
-abstract class BaseModule(private val mActivity: Activity) {
+@Module
+abstract class BaseModule {
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
-    @BaseScope
-    @Provides
-    fun provideActivity(): Activity {
-        return mActivity
-    }
-
-    @BaseScope
-    @Provides
-    fun provideContext(): Context {
-        return mActivity
-    }
+//    @BaseScope
+//    @Provides
+//    fun provideActivity(): Activity {
+//        return mActivity
+//    }
+//
+//    @BaseScope
+//    @Provides
+//    fun provideContext(): Context {
+//        return mActivity
+//    }
 
     @Provides
     @BaseScope
