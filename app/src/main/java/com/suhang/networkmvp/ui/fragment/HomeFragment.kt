@@ -8,6 +8,7 @@ import com.suhang.networkmvp.constants.getAdapterTag
 import com.suhang.networkmvp.constants.subscribeError
 import com.suhang.networkmvp.constants.subscribeEvent
 import com.suhang.networkmvp.constants.subscribeSuccess
+import com.suhang.networkmvp.dagger.module.HomeModule
 import com.suhang.networkmvp.domain.DeleteHistoryBean
 import com.suhang.networkmvp.domain.HistoryBean
 import com.suhang.networkmvp.mvp.model.HomeModel
@@ -20,6 +21,10 @@ import javax.inject.Inject
  * Created by 苏杭 on 2017/1/24 15:31.
  */
 class HomeFragment : BaseFragment<HomeModel>() {
+    override fun injectDagger() {
+        baseComponent.providerHomeComponent(HomeModule(activity)).inject(this)
+    }
+
     @Inject
     lateinit var mAdapter: HomeRvAdapter
     val luids: ArrayList<String> = ArrayList()

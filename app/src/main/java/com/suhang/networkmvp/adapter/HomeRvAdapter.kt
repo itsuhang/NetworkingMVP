@@ -1,5 +1,6 @@
 package com.suhang.networkmvp.adapter
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,7 @@ import kotlinx.android.synthetic.main.item_home.view.*
  */
 
 class HomeRvAdapter @Inject
-constructor() : BaseRvAdapter<HomeRvAdapter.MyViewHolder, HistoryBean.ListEntity>() {
+constructor(context: Context) : BaseRvAdapter<HomeRvAdapter.MyViewHolder, HistoryBean.ListEntity>(context) {
     override fun onBindHolder(holder: MyViewHolder, v: HistoryBean.ListEntity) {
         holder.itemView.tv.text = v.nick
         holder.itemView.setBackgroundColor(0xffffffff.toInt())

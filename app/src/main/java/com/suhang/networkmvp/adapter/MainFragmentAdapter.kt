@@ -1,12 +1,10 @@
 package com.suhang.networkmvp.adapter
 
+
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.view.ViewGroup
-import com.suhang.networkmvp.ui.BasicFragment
-
-
 import com.suhang.networkmvp.ui.fragment.BaseFragment
 
 

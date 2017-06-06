@@ -1,6 +1,5 @@
 package com.suhang.networkmvp.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -23,11 +22,7 @@ import javax.inject.Inject
  * Created by 苏杭 on 2016/11/9 21:50.
  */
 
-abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V> : RecyclerView.Adapter<T>(), IAdapterHelper, ErrorLogger, AnkoLogger {
-    @Inject
-    lateinit var context: Context
-    @Inject
-    lateinit var activity: Activity
+abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V>(val context: Context) : RecyclerView.Adapter<T>(), IAdapterHelper, ErrorLogger, AnkoLogger {
 
     //Rxjava事件集合，用于退出时取消事件
     @Inject

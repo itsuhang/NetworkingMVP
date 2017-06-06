@@ -13,21 +13,18 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-
 /**
- * Created by 苏杭 on 2017/1/22 17:32.
- * 用于提供单例对象
+ * Created by 苏杭 on 2017/6/6 10:22.
  */
-
-@Singleton
 @Module
-class AppModule{
-    private val mOkHttpClient: OkHttpClient
-    private val mGson: Gson
+class AppModule(private val app: BaseApp) {
+    private val mOkHttpClient = initOkHttpClient()
+    private val mGson = Gson()
 
-    init {
-        mOkHttpClient = initOkHttpClient()
-        mGson = Gson()
+    @Provides
+    @Singleton
+    fun providerApp():BaseApp {
+        return app
     }
 
     /**
@@ -51,12 +48,13 @@ class AppModule{
         return builder.build()
     }
 
+
     /**
      * 提供OkHttpClient(全局单例)
      */
     @Singleton
     @Provides
-    fun provideOkHttpClient(): OkHttpClient {
+    internal fun provideOkHttpClient(): OkHttpClient {
         return mOkHttpClient
     }
 
@@ -65,7 +63,7 @@ class AppModule{
      */
     @Singleton
     @Provides
-    fun provideGson(): Gson {
+    internal fun provideGson(): Gson {
         return mGson
     }
 }

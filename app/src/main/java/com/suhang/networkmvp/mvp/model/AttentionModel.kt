@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.constants.URLS
 import com.suhang.networkmvp.function.NetworkManager
 import javax.inject.Inject
@@ -8,7 +9,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/4/28 16:33.
  */
-
+@BaseScope
 class AttentionModel @Inject constructor():IAttentionModel {
     override fun destroy() {
     }

@@ -1,14 +1,11 @@
 package com.suhang.networkmvp.function.rx
 
 import com.suhang.networkmvp.annotation.BaseScope
-
-import javax.inject.Inject
-
 import io.reactivex.Flowable
 import io.reactivex.processors.FlowableProcessor
 import io.reactivex.processors.PublishProcessor
 import io.reactivex.subscribers.SerializedSubscriber
-
+import javax.inject.Inject
 @BaseScope
 class RxBus @Inject
 constructor() {

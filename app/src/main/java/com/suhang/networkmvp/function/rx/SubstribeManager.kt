@@ -1,19 +1,14 @@
 package com.suhang.networkmvp.function.rx
 
-import com.suhang.networkmvp.annotation.BaseScope
-import com.suhang.networkmvp.mvp.event.BaseEvent
-
-import javax.inject.Inject
-
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import javax.inject.Inject
 
 /**
  * Created by 苏杭 on 2017/5/2 11:18.
  */
-@BaseScope
 class SubstribeManager @Inject
 constructor() :AnkoLogger{
     @Inject

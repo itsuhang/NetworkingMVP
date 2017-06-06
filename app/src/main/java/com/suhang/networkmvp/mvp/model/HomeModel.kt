@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.constants.DEFAULT_TAG
 import com.suhang.networkmvp.constants.URLS
@@ -11,7 +12,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/5/2 16:33.
  */
-
+@BaseScope
 class HomeModel @Inject constructor():  IHomeModel {
     override fun destroy() {
     }

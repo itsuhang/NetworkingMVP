@@ -3,14 +3,19 @@ package com.suhang.networkmvp.ui.fragment
 import android.os.Bundle
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.AttentionPagerAdapter
-import com.suhang.networkmvp.ui.BasicFragment
+import com.suhang.networkmvp.dagger.module.BlankModule
+import com.suhang.networkmvp.mvp.model.BlankModel
 import kotlinx.android.synthetic.main.fragment_attention.*
 import java.util.*
 
 /**
  * Created by 苏杭 on 2017/1/24 15:31.
  */
-class ChildFragment : BasicFragment() {
+class ChildFragment : BaseFragment<BlankModel>() {
+    override fun injectDagger() {
+        baseComponent.providerBlankComponent(BlankModule()).inject(this)
+    }
+
     override fun initEvent() {
     }
 

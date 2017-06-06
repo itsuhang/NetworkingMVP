@@ -1,5 +1,6 @@
 package com.suhang.test;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -13,6 +14,6 @@ public class MainActivity extends BaseActivity {
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		Log.i("啊啊啊", mDog + "");
+		startActivity(new Intent(this,Main2Activity.class));
 	}
 }

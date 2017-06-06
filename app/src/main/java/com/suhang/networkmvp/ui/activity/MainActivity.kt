@@ -5,15 +5,18 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.MainFragmentAdapter
-import com.suhang.networkmvp.ui.BasicActivity
-import com.suhang.networkmvp.ui.BasicFragment
-import com.suhang.networkmvp.ui.fragment.BaseFragment
+import com.suhang.networkmvp.dagger.module.BlankModule
+import com.suhang.networkmvp.mvp.model.BlankModel
 import com.suhang.networkmvp.ui.fragment.ChildFragment
 import com.suhang.networkmvp.ui.fragment.HomeFragment
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : BasicActivity() {
+class MainActivity : BaseActivity<BlankModel>() {
+    override fun injectDagger() {
+        baseComponent.providerBlankComponent(BlankModule()).inject(this)
+    }
+
     lateinit var adapter:MainFragmentAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
