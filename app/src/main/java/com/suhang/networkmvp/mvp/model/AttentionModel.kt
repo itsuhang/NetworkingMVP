@@ -4,18 +4,20 @@ import android.util.ArrayMap
 import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.constants.URLS
 import com.suhang.networkmvp.function.NetworkManager
+import org.jetbrains.anko.info
 import javax.inject.Inject
 
 /**
  * Created by 苏杭 on 2017/4/28 16:33.
  */
-@BaseScope
-class AttentionModel @Inject constructor():IAttentionModel {
+class AttentionModel :IAttentionModel {
     override fun destroy() {
+        info(mManager)
     }
 
     @Inject
     lateinit var mManager: NetworkManager
+
 
 
     override fun getAppMainData() {

@@ -1,5 +1,6 @@
 package com.suhang.networkmvp.dagger.component
 
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.dagger.module.ChildModule
 import com.suhang.networkmvp.ui.fragment.GrandChildOneFragment
 import com.suhang.networkmvp.ui.fragment.GrandChildTwoFragment
