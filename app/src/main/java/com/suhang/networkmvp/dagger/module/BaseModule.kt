@@ -6,10 +6,12 @@ import com.jakewharton.disklrucache.DiskLruCache
 import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.utils.SystemUtil
+import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Module
 import dagger.Provides
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
+import javax.inject.Singleton
 
 /**
  * Created by 苏杭 on 2017/1/20 16:26.
@@ -18,12 +20,19 @@ import java.io.File
 @BaseScope
 @Module
 class BaseModule(val activity: Activity) {
+    private val mRxPermission:RxPermissions = RxPermissions(activity)
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
 
     @BaseScope
     @Provides
     fun provideActivity(): Activity {
         return activity
+    }
+
+    @BaseScope
+    @Provides
+    fun providerRxPermission(): RxPermissions {
+        return mRxPermission
     }
 
     @BaseScope

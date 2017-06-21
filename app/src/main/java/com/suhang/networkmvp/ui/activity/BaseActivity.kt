@@ -15,6 +15,8 @@ import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.InputLeakUtil
 import com.suhang.networkmvp.utils.ScreenUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -47,6 +49,9 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
 
     @Inject
     lateinit var model: T
+
+    @Inject
+    lateinit var rxPermission:RxPermissions
 
     /**
      * 获取RxBus,可进行订阅操作

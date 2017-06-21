@@ -5,6 +5,7 @@ import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.function.AddCookiesInterceptor
 import com.suhang.networkmvp.function.CacheInterceptor
 import com.suhang.networkmvp.function.ReceivedCookiesInterceptor
+import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
