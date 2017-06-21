@@ -1,5 +1,6 @@
 package com.suhang.networkmvp.dagger.component
 
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.dagger.module.HomeModule
 import com.suhang.networkmvp.ui.fragment.HomeFragment
 import dagger.Subcomponent

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import com.suhang.networkmvp.annotation.Model
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule

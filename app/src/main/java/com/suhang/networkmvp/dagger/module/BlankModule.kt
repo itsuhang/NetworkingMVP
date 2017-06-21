@@ -1,5 +1,6 @@
 package com.suhang.networkmvp.dagger.module
 
+import com.suhang.networkmvp.annotation.BaseScope
 import dagger.Module
 
 /**
