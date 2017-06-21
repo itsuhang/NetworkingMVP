@@ -2,6 +2,7 @@ package com.suhang.networkmvp.interfaces
 
 
 import com.suhang.layoutfinderannotation.FindMethod
+import com.suhang.layoutfinderannotation.ToString
 import com.suhang.networkmvp.constants.URLS
 import com.suhang.networkmvp.domain.AppMain
 import com.suhang.networkmvp.domain.DeleteHistoryBean
@@ -18,6 +19,7 @@ import retrofit2.http.POST
 @FindMethod
 interface INetworkService {
     @POST(URLS.URL_APPMAIN)
+    @ToString
     @FormUrlEncoded
     fun getAppMain(@FieldMap params: Map<String, String>): Flowable<HuanPeng<AppMain>>
 

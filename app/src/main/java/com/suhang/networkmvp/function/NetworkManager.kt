@@ -100,7 +100,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 successResult.append = append
                 mRxBus.post(successResult)
             }, { throwable ->
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url", type = ErrorBean.TYPE_SHOW)
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
                     mRxBus.post(LoadingResult(false, whichTag))
                     mRxBus.post(ErrorResult(this, whichTag))
@@ -109,7 +109,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             })
             addDisposable(disposable, whichTag)
         } else {
-            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", "$url", type = ErrorBean.TYPE_SHOW)
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
                 mRxBus.post(LoadingResult(false, whichTag))
                 mRxBus.post(ErrorResult(this, whichTag))
@@ -138,7 +138,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 val download: DownLoadBean = DownLoadBean(path)
                 mRxBus.post(SuccessResult(download, whichTag))
             }, {
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url", type = ErrorBean.TYPE_SHOW)
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
                     mRxBus.post(LoadingResult(false, whichTag))
                     mRxBus.post(ErrorResult(this, whichTag))
@@ -147,7 +147,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             })
             addDisposable(disposable, whichTag)
         } else {
-            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", "$url", type = ErrorBean.TYPE_SHOW)
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
                 mRxBus.post(LoadingResult(false, whichTag))
                 mRxBus.post(ErrorResult(this, whichTag))
@@ -185,7 +185,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 }
                 mRxBus.post(successResult)
             }, { throwable ->
-                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, "$url", type = ErrorBean.TYPE_SHOW)
+                val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
                     mRxBus.post(LoadingResult(false, whichTag))
                     mRxBus.post(ErrorResult(this, whichTag))
@@ -194,7 +194,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             })
             addDisposable(disposable, whichTag)
         } else {
-            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", "$url", type = ErrorBean.TYPE_SHOW)
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
                 mRxBus.post(LoadingResult(false, whichTag))
                 mRxBus.post(ErrorResult(this, whichTag))
