@@ -19,14 +19,16 @@ import retrofit2.http.POST
 @FindMethod
 interface INetworkService {
     @POST(URLS.URL_APPMAIN)
-    @ToString
     @FormUrlEncoded
+    @ToString(URLS.URL_BASE)
     fun getAppMain(@FieldMap params: Map<String, String>): Flowable<HuanPeng<AppMain>>
 
+    @ToString(URLS.URL_BASE)
     @POST(URLS.URL_HISTORY)
     @FormUrlEncoded
     fun getHistoryInfo(@FieldMap params: Map<String, String>): Flowable<HuanPeng<HistoryBean>>
 
+    @ToString(URLS.URL_BASE)
     @POST(URLS.URL_HISTORY_DELETE)
     @FormUrlEncoded
     fun deleteHistory(@FieldMap params: Map<String, String>): Flowable<HuanPeng<DeleteHistoryBean>>

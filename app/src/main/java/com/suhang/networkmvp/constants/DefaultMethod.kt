@@ -8,7 +8,9 @@ import java.lang.StringBuilder
 /**
  * Created by 苏杭 on 2017/5/23 17:30.
  */
-
+/**
+ * 输出异常的信息
+ */
 fun ErrorLogger.errorMessage(e: Exception): String {
     val sb: StringBuilder = StringBuilder()
     sb.append(e.toString() + "\n")
@@ -19,6 +21,9 @@ fun ErrorLogger.errorMessage(e: Exception): String {
     return sb.toString()
 }
 
+/**
+ * 输出异常的信息
+ */
 fun ErrorLogger.errorMessage(e: Throwable): String {
     val sb: StringBuilder = StringBuilder()
     sb.append(e.toString() + "\n")
@@ -45,10 +50,16 @@ fun View.px2dipf(pxValue: Float): Float {
     return pxValue / resources.displayMetrics.density + 0.5f
 }
 
+/**
+ * 设置adapter中View的tag,可用于传递adapter中点击事件所需的数据
+ */
 fun View.setAdapterTag(o:Any?){
     setTag(R.id.id_adapter,o)
 }
 
+/**
+ * 得到adapter中View的tag,可用于接收adapter中点击事件所需的数据
+ */
 fun View.getAdapterTag(): Any? {
     return getTag(R.id.id_adapter)
 }

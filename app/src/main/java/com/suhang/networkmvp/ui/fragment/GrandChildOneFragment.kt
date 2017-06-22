@@ -17,7 +17,7 @@ import org.jetbrains.anko.info
  * Created by 苏杭 on 2017/6/5 11:33.
  */
 @BaseScope
-class GrandChildOneFragment : BaseFragment<IAttentionModel>() {
+class GrandChildOneFragment : BaseFragment<AttentionModel>() {
     override fun injectDagger() {
         baseComponent.providerAttentionComponent(ChildModule(activity)).inject(this)
     }

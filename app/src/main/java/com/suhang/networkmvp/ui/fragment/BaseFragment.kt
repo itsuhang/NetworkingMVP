@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import com.suhang.networkmvp.annotation.Model
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.dagger.component.BaseComponent
 import com.suhang.networkmvp.dagger.module.BaseModule
@@ -16,9 +15,6 @@ import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.ScreenUtils
 import io.reactivex.disposables.CompositeDisposable
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.AnkoLogger
 import javax.inject.Inject
 
@@ -53,8 +49,6 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
 
     lateinit var root: View
 
-    private var isRegisterEventBus: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         baseComponent = (activity.application as BaseApp).appComponent.baseComponent(BaseModule(activity))
@@ -88,27 +82,10 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
      */
     protected abstract fun subscribeEvent()
 
-    /**
-     * 注册事件总线
-     */
-    protected fun registerEventBus() {
-        EventBus.getDefault().register(this)
-        isRegisterEventBus = true
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         initData()
         initEvent()
-    }
-
-
-    /**
-     * EventBus事件(防崩溃,需要则重写)
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun event(i: Int?) {
-
     }
 
     /**
@@ -159,7 +136,6 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
         super.onDestroy()
         disposables.dispose()
         model.destroy()
-        EventBus.getDefault().unregister(this)
     }
 
 
@@ -169,9 +145,6 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
     fun destroy() {
         disposables.dispose()
         //取消所有正在进行的网络任务
-        if (isRegisterEventBus) {
-            EventBus.getDefault().unregister(this)
-        }
         model.destroy()
     }
 }

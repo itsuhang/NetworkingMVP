@@ -16,11 +16,7 @@ import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.InputLeakUtil
 import com.suhang.networkmvp.utils.ScreenUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
-import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.AnkoLogger
 import javax.inject.Inject
 
@@ -59,8 +55,6 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
     @Inject
     lateinit var manager: SubstribeManager
 
-    private var isRegisterEventBus: Boolean = false
-
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as BaseApp).addToStack(this)
@@ -79,23 +73,6 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
      * 订阅事件
      */
     protected abstract fun subscribeEvent()
-
-    /**
-     * 注册事件总线
-     */
-    protected fun registerEventBus() {
-        EventBus.getDefault().register(this)
-        isRegisterEventBus = true
-    }
-
-
-    /**
-     * EventBus事件(防崩溃,需要则重写)
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun event(i: Int?) {
-
-    }
 
     /**
      * 初始化数据
@@ -146,9 +123,6 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
         super.onDestroy()
         (application as BaseApp).removeFromStack(this)
         disposables.dispose()
-        if (isRegisterEventBus) {
-            EventBus.getDefault().unregister(this)
-        }
         //处理InputMethodManager导致的内存泄漏
         model.destroy()
         InputLeakUtil.fixInputMethodManager(this)

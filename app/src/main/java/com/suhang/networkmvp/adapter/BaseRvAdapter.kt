@@ -115,10 +115,19 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V>(val context: Contex
         notifyItemRangeChanged(start, positions.size)
     }
 
+    /**
+     * 每页的大小
+     */
     override var pageSize: Int = 10
 
+    /**
+     * 从服务器获取的所有信息的总数
+     */
     override var totalCount: Int = 0
 
+    /**
+     * 根据页的大小和总数,算出总页数
+     */
     override var totalPage: Int = 0
         get() {
             var page:Int
