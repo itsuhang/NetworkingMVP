@@ -11,6 +11,7 @@ import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
 import com.suhang.networkmvp.domain.DownLoadBean
 import com.suhang.networkmvp.domain.ErrorBean
+import com.suhang.networkmvp.domain.ZipData
 import com.suhang.networkmvp.function.rx.RxBus
 import com.suhang.networkmvp.function.upload.UploadFileRequestBody
 import com.suhang.networkmvp.interfaces.ErrorLogger
@@ -30,6 +31,7 @@ import io.reactivex.FlowableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.*
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
@@ -48,7 +50,6 @@ import javax.inject.Inject
  */
 @BaseScope
 class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorLogger {
-
     companion object {
         val pattern: String = "@packname@"
     }
@@ -102,7 +103,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 mRxBus.post(successResult)
             }, { throwable ->
                 mDisposables.add(RetrofitHelper.find(url, params).onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
-                    warn("data:"+it)
+                    warn("data:" + it)
                 }))
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
@@ -160,6 +161,96 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         }
     }
 
+
+    private fun loadFlowable(url: String, whichTag: Int = DEFAULT_TAG, isWrap: Boolean = false, vararg params: Any): Flowable<Any>? {
+        var flowable: Flowable<Any>? = null
+        try {
+            flowable = MethodFinder.find(url, *params)
+        } catch (e: Exception) {
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
+            mRxBus.post(LoadingResult(false, whichTag))
+            mRxBus.post(ErrorResult(errorBean, whichTag))
+        }
+        if (flowable != null) {
+            if (isWrap) {
+                flowable = flowable.onBackpressureDrop().compose(RxUtil.handleResultNone()).compose(RxUtil.fixScheduler())
+            } else {
+                flowable = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler())
+            }
+        }
+        return flowable
+    }
+
+    override fun getFlowable(url: String, whichTag: Int, vararg params: Any): FlowableInfo {
+        val info: FlowableInfo = FlowableInfo(loadFlowable(url, whichTag, params = *params), whichTag, url)
+        return info
+    }
+
+    override fun getFlowableWrap(url: String, whichTag: Int, vararg params: Any): FlowableInfo {
+        val info: FlowableInfo = FlowableInfo(loadFlowable(url, whichTag, true, *params), whichTag, url)
+        return info
+    }
+
+    data class FlowableInfo constructor(val flowable: Flowable<Any>?, val tag: Int, val url: String)
+
+
+    override fun zip(info1: FlowableInfo, info2: FlowableInfo) {
+        addDisposable(info1.flowable?.zipWith<Any, ZipData>(info2.flowable, BiFunction { o, o2 ->
+            val map: ArrayMap<Int, Any> = ArrayMap()
+            map.put(info1.tag, o)
+            map.put(info2.tag, o2)
+            ZipData(map)
+        })?.subscribe({
+            mRxBus.post(SuccessResult(it, info1.tag))
+        }, {
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, info1.url + "\n" + info2.url, type = ErrorBean.TYPE_SHOW)
+            errorBean.run {
+                mRxBus.post(LoadingResult(false, info1.tag))
+                mRxBus.post(ErrorResult(this, info1.tag))
+                warn(errorMessage(it))
+            }
+        })!!, info1.tag)
+    }
+
+    override fun zip(info1: FlowableInfo, info2: FlowableInfo, info3: FlowableInfo) {
+        addDisposable(Flowable.zip<Any, Any, Any, ZipData>(info1.flowable, info2.flowable, info3.flowable, Function3 { t1, t2, t3 ->
+            val map: ArrayMap<Int, Any> = ArrayMap()
+            map.put(info1.tag, t1)
+            map.put(info2.tag, t2)
+            map.put(info3.tag, t3)
+            ZipData(map)
+        })?.subscribe({
+            mRxBus.post(SuccessResult(it, info1.tag))
+        }, {
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, info1.url + "\n" + info2.url + "\n" + info3.url, type = ErrorBean.TYPE_SHOW)
+            errorBean.run {
+                mRxBus.post(LoadingResult(false, info1.tag))
+                mRxBus.post(ErrorResult(this, info1.tag))
+                warn(errorMessage(it))
+            }
+        })!!, info1.tag)
+    }
+
+    override fun zip(info1: FlowableInfo, info2: FlowableInfo, info3: FlowableInfo, info4: FlowableInfo) {
+        addDisposable(Flowable.zip<Any, Any, Any, Any, ZipData>(info1.flowable, info2.flowable, info3.flowable, info4.flowable, Function4 { t1, t2, t3, t4 ->
+            val map: ArrayMap<Int, Any> = ArrayMap()
+            map.put(info1.tag, t1)
+            map.put(info2.tag, t2)
+            map.put(info3.tag, t3)
+            map.put(info4.tag, t4)
+            ZipData(map)
+        })?.subscribe({
+            mRxBus.post(SuccessResult(it, info1.tag))
+        }, {
+            val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, info1.url + "\n" + info2.url + "\n" + info3.url, type = ErrorBean.TYPE_SHOW)
+            errorBean.run {
+                mRxBus.post(LoadingResult(false, info1.tag))
+                mRxBus.post(ErrorResult(this, info1.tag))
+                warn(errorMessage(it))
+            }
+        })!!, info1.tag)
+    }
+
     private fun load(requestWay: Int, url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, isWrap: Boolean = false, vararg params: Any) {
         mRxBus.post(LoadingResult(true, whichTag))
         if (needCache && requestWay == POST) {
@@ -190,7 +281,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 mRxBus.post(successResult)
             }, { throwable ->
                 mDisposables.add(RetrofitHelper.find(url, params).onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
-                    warn("data:"+it)
+                    warn("data:" + it)
                 }))
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {

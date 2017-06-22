@@ -7,6 +7,7 @@ import com.suhang.networkmvp.constants.subscribeSuccess
 import com.suhang.networkmvp.dagger.module.ChildModule
 import com.suhang.networkmvp.domain.AppMain
 import com.suhang.networkmvp.domain.GithubBean
+import com.suhang.networkmvp.domain.ZipData
 import com.suhang.networkmvp.mvp.model.AttentionModel
 import com.suhang.networkmvp.mvp.model.IAttentionModel
 import io.reactivex.functions.Consumer
@@ -30,18 +31,22 @@ class GrandChildOneFragment : BaseFragment<AttentionModel>() {
     override fun subscribeEvent() {
         info(manager)
         model.destroy()
-//        manager.subscribeSuccess().subscribe(Consumer {
-//            val result = it.result
-//            when (result) {
-//                is AppMain ->{
-//                    info(result)
-//                }
-//
-//                is GithubBean ->{
-//                    info(result)
-//                }
-//            }
-//        })
+        manager.subscribeSuccess().subscribe(Consumer {
+            val result = it.result
+            when (result) {
+                is AppMain ->{
+                    info(result)
+                }
+
+                is ZipData ->{
+                    info(result)
+                }
+
+                is GithubBean ->{
+                    info(result)
+                }
+            }
+        })
     }
 
     override fun initData() {
