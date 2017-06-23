@@ -31,8 +31,10 @@ import io.reactivex.FlowableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.*
+import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
+import io.reactivex.functions.Function3
+import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -181,20 +183,17 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         return flowable
     }
 
-    override fun getFlowable(url: String, whichTag: Int, vararg params: Any): FlowableInfo {
-        val info: FlowableInfo = FlowableInfo(loadFlowable(url, whichTag, params = *params), whichTag, url)
+    override fun getFlowable(url: String, whichTag: Int, vararg params: Any): INetworkManager.FlowableInfo {
+        val info: INetworkManager.FlowableInfo = INetworkManager.FlowableInfo(loadFlowable(url, whichTag, params = *params), whichTag, url)
         return info
     }
 
-    override fun getFlowableWrap(url: String, whichTag: Int, vararg params: Any): FlowableInfo {
-        val info: FlowableInfo = FlowableInfo(loadFlowable(url, whichTag, true, *params), whichTag, url)
+    override fun getFlowableWrap(url: String, whichTag: Int, vararg params: Any): INetworkManager.FlowableInfo {
+        val info: INetworkManager.FlowableInfo = INetworkManager.FlowableInfo(loadFlowable(url, whichTag, true, *params), whichTag, url)
         return info
     }
 
-    data class FlowableInfo constructor(val flowable: Flowable<Any>?, val tag: Int, val url: String)
-
-
-    override fun zip(info1: FlowableInfo, info2: FlowableInfo) {
+    override fun zip(info1: INetworkManager.FlowableInfo, info2: INetworkManager.FlowableInfo) {
         addDisposable(info1.flowable?.zipWith<Any, ZipData>(info2.flowable, BiFunction { o, o2 ->
             val map: ArrayMap<Int, Any> = ArrayMap()
             map.put(info1.tag, o)
@@ -212,7 +211,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         })!!, info1.tag)
     }
 
-    override fun zip(info1: FlowableInfo, info2: FlowableInfo, info3: FlowableInfo) {
+    override fun zip(info1: INetworkManager.FlowableInfo, info2: INetworkManager.FlowableInfo, info3: INetworkManager.FlowableInfo) {
         addDisposable(Flowable.zip<Any, Any, Any, ZipData>(info1.flowable, info2.flowable, info3.flowable, Function3 { t1, t2, t3 ->
             val map: ArrayMap<Int, Any> = ArrayMap()
             map.put(info1.tag, t1)
@@ -231,7 +230,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         })!!, info1.tag)
     }
 
-    override fun zip(info1: FlowableInfo, info2: FlowableInfo, info3: FlowableInfo, info4: FlowableInfo) {
+    override fun zip(info1: INetworkManager.FlowableInfo, info2: INetworkManager.FlowableInfo, info3: INetworkManager.FlowableInfo, info4: INetworkManager.FlowableInfo) {
         addDisposable(Flowable.zip<Any, Any, Any, Any, ZipData>(info1.flowable, info2.flowable, info3.flowable, info4.flowable, Function4 { t1, t2, t3, t4 ->
             val map: ArrayMap<Int, Any> = ArrayMap()
             map.put(info1.tag, t1)
@@ -417,10 +416,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
     }
 
 
-    /**
-     * 取消制定的网络任务
-     */
-    fun cancelNormal(tag: Int) {
+    override fun cancelNormal(tag: Int) {
         if (mSubscriptionMap[tag] != null) {
             mDisposables.remove(mSubscriptionMap[tag])
         }
@@ -429,7 +425,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
     /**
      * 资源回收
      */
-    fun destroy() {
+    override fun destroy() {
         mDisposables.dispose()
     }
 }

@@ -5,7 +5,7 @@ import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.constants.DEFAULT_TAG
 import com.suhang.networkmvp.constants.URLS
-import com.suhang.networkmvp.function.NetworkManager
+import com.suhang.networkmvp.interfaces.INetworkManager
 import com.suhang.networkmvp.ui.fragment.HomeFragment
 import javax.inject.Inject
 
@@ -18,7 +18,7 @@ class HomeModel @Inject constructor():  IHomeModel {
     }
 
     @Inject
-    lateinit var manager: NetworkManager
+    lateinit var manager: INetworkManager
 
     override fun download() {
 //        manager.initDownload(IDownloadService::class.java, URLS.URL_BASE_DOWNLOAD)

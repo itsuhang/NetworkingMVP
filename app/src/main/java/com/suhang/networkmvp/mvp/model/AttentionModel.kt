@@ -2,7 +2,7 @@ package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
 import com.suhang.networkmvp.constants.URLS
-import com.suhang.networkmvp.function.NetworkManager
+import com.suhang.networkmvp.interfaces.INetworkManager
 import org.jetbrains.anko.info
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ class AttentionModel @Inject constructor():IAttentionModel {
     }
 
     @Inject
-    lateinit var mManager: NetworkManager
+    lateinit var mManager: INetworkManager
 
 
 

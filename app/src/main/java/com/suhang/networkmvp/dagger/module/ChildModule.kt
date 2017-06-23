@@ -12,7 +12,7 @@ import dagger.Provides
 @Module
 class ChildModule(val activity: Activity) {
     @Provides
-    fun prividerModel(): IAttentionModel {
-        return AttentionModel()
+    fun prividerModel(attentionModel: AttentionModel): IAttentionModel {
+        return attentionModel
     }
 }

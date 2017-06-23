@@ -5,6 +5,8 @@ import android.content.Context
 import com.jakewharton.disklrucache.DiskLruCache
 import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
+import com.suhang.networkmvp.function.NetworkManager
+import com.suhang.networkmvp.interfaces.INetworkManager
 import com.suhang.networkmvp.utils.SystemUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Module
@@ -39,6 +41,12 @@ class BaseModule(val activity: Activity) {
     @Provides
     fun provideContext(): Context {
         return activity
+    }
+
+    @BaseScope
+    @Provides
+    fun provideManager(manager: NetworkManager): INetworkManager {
+        return manager
     }
 
     @Provides
