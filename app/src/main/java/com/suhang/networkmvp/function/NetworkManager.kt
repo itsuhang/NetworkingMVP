@@ -104,9 +104,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 successResult.append = append
                 mRxBus.post(successResult)
             }, { throwable ->
-                mDisposables.add(RetrofitHelper.find(url, params).onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
-                    warn("data:" + it)
-                }))
+                val stringFlowable = RetrofitHelper.find(url, params)
+                if (stringFlowable != null) {
+                    mDisposables.add(stringFlowable.onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
+                        warn("data:" + it)
+                    }))
+                }
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
                     mRxBus.post(LoadingResult(false, whichTag))
@@ -279,9 +282,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 }
                 mRxBus.post(successResult)
             }, { throwable ->
-                mDisposables.add(RetrofitHelper.find(url, params).onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
-                    warn("data:" + it)
-                }))
+                val stringFlowable = RetrofitHelper.find(url, params)
+                if (stringFlowable != null) {
+                    mDisposables.add(stringFlowable.onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
+                        warn("data:" + it)
+                    }))
+                }
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
                     mRxBus.post(LoadingResult(false, whichTag))
