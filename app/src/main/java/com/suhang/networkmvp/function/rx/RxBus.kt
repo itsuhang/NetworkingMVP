@@ -12,10 +12,6 @@ constructor() {
     //相当于Rxjava1.x中的Subject
     private val mBus: FlowableProcessor<Any> = PublishProcessor.create<Any>().toSerialized()
 
-    init {
-        //调用toSerialized()方法，保证线程安全
-    }
-
     /**
      * 发送消息
      * @param o

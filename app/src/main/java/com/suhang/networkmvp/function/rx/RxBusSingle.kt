@@ -4,16 +4,20 @@ import io.reactivex.Flowable
 import io.reactivex.processors.FlowableProcessor
 import io.reactivex.processors.PublishProcessor
 import io.reactivex.subscribers.SerializedSubscriber
+
 class RxBusSingle {
-    companion object{
-        val mBus:FlowableProcessor<Any> =PublishProcessor.create<Any>().toSerialized()
+    val mBus: FlowableProcessor<Any> = PublishProcessor.create<Any>().toSerialized()
+
+    companion object {
         fun instance(): RxBusSingle {
             return Holder.INSTANCE
         }
     }
-    private object Holder{
-        val INSTANCE:RxBusSingle = RxBusSingle()
+
+    private object Holder {
+        val INSTANCE: RxBusSingle = RxBusSingle()
     }
+
     init {
         //调用toSerialized()方法，保证线程安全
     }

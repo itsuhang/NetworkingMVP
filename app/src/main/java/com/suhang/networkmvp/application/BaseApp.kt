@@ -5,10 +5,11 @@ import android.app.Application
 import android.os.Environment
 import com.suhang.layoutfinder.MethodFinder
 import com.suhang.layoutfinder.SharedPreferencesFinder
+import com.suhang.layoutfinderannotation.GenDaggerHelper
+import com.suhang.layoutfinderannotation.GenRootComponent
+import com.suhang.networkmvp.constants.Constant
 import com.suhang.networkmvp.constants.ErrorCode
 import com.suhang.networkmvp.constants.errorMessage
-import com.suhang.networkmvp.dagger.component.AppComponent
-import com.suhang.networkmvp.dagger.component.DaggerAppComponent
 import com.suhang.networkmvp.dagger.module.AppModule
 import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.function.download.DownloadProgressInterceptor
@@ -25,14 +26,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 
 
 /**
  * Created by 苏杭 on 2017/1/20 15:01.
  */
-
+@GenDaggerHelper
+@GenRootComponent(tag = Constant.APP_DAGGER_TAG,childTag = Constant.BASE_DAGGER_TAG,modules = arrayOf(AppModule::class),scope = Singleton::class)
 abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
-    lateinit var appComponent: AppComponent
     val activityStack:MutableList<Activity> = ArrayList()
     var isDebug = true
         set(isDebug) {
@@ -43,17 +45,14 @@ abstract class BaseApp : Application(), AnkoLogger,ErrorLogger {
     lateinit var mHttpClient: OkHttpClient
     lateinit var mDownloadClient: OkHttpClient
 
-    abstract fun inject()
-
     override fun onCreate() {
         super.onCreate()
         CACHE_PATH_OKHTTP = cacheDir.absolutePath + File.separator + "NetCache_OKHTTP"
         CACHE_PATH = cacheDir.absolutePath + File.separator + "NetCache"
         APP_PATH = Environment.getExternalStorageDirectory().absolutePath + "/suhang"
         mDownloadClient = initDownloadOkHttpClient()
-        appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        DaggerHelper.getInstance().getBaseAppComponent(this,this)
         instance = this
-        inject()
         changeForDebug()
         SharedPreferencesFinder.init(this)
         initRetrofitService()

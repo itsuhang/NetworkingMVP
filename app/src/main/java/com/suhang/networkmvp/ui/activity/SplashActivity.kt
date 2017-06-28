@@ -1,13 +1,17 @@
 package com.suhang.networkmvp.ui.activity
 
 import android.os.Bundle
+import com.suhang.layoutfinderannotation.GenSubComponent
 import com.suhang.networkmvp.R
+import com.suhang.networkmvp.application.DaggerHelper
+import com.suhang.networkmvp.constants.Constant
 import com.suhang.networkmvp.dagger.module.BlankModule
 import com.suhang.networkmvp.mvp.model.BlankModel
 
+@GenSubComponent(tag = Constant.BASE_CHILD_DAGGER_TAG, modules = arrayOf(BlankModule::class))
 class SplashActivity : BaseActivity<BlankModel>() {
-    override fun injectDagger() {
-        baseComponent.providerBlankComponent(BlankModule()).inject(this)
+    override fun initDagger() {
+        DaggerHelper.getInstance().getSplashActivityComponent(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

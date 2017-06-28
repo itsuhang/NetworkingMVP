@@ -8,9 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import com.suhang.networkmvp.application.BaseApp
-import com.suhang.networkmvp.dagger.component.BaseComponent
-import com.suhang.networkmvp.dagger.module.BaseModule
+import com.suhang.networkmvp.application.DaggerHelper
 import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.ScreenUtils
@@ -22,14 +20,6 @@ import javax.inject.Inject
  * Created by 苏杭 on 2017/1/21 10:52.
  */
 abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
-
-    /**
-     * 基主件,用于注册子主件(dagger2)
-     */
-    /**
-     * 获取父Component(dagger2)
-     */
-    lateinit var baseComponent: BaseComponent
 
     //Rxjava事件集合，用于退出时取消事件
     @Inject
@@ -51,8 +41,8 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        baseComponent = (activity.application as BaseApp).appComponent.baseComponent(BaseModule(activity))
-        injectDagger()
+        DaggerHelper.getInstance().getBaseComponent(activity)
+        initDagger()
         subscribeEvent()
     }
 
@@ -64,6 +54,11 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
         onViewCreate(inflater, container, savedInstanceState)
         return root
     }
+
+    /**
+     * 可使用DaggerHelper初始化Dagger
+     */
+    abstract fun initDagger()
 
     /**
      * 需要在绑定布局之前(onCreateView之前)做处理则覆盖此方法
@@ -98,12 +93,6 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
      * 初始化事件
      */
     protected abstract fun initEvent()
-
-    /**
-     * dagger2绑定(需要则重写) ps: getBaseComponent().getMainComponent(new
-     * MainModule()).inject(this);
-     */
-    protected abstract fun injectDagger()
 
 
     /**

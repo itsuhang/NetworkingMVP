@@ -2,12 +2,12 @@ package com.suhang.networkmvp.ui.fragment
 
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import com.suhang.layoutfinderannotation.GenSubComponent
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.HomeRvAdapter
-import com.suhang.networkmvp.constants.getAdapterTag
-import com.suhang.networkmvp.constants.subscribeError
-import com.suhang.networkmvp.constants.subscribeEvent
-import com.suhang.networkmvp.constants.subscribeSuccess
+import com.suhang.networkmvp.application.DaggerHelper
+import com.suhang.networkmvp.constants.*
+import com.suhang.networkmvp.dagger.module.ChildModule
 import com.suhang.networkmvp.dagger.module.HomeModule
 import com.suhang.networkmvp.domain.DeleteHistoryBean
 import com.suhang.networkmvp.domain.HistoryBean
@@ -20,9 +20,10 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/1/24 15:31.
  */
+@GenSubComponent(tag = Constant.BASE_CHILD_DAGGER_TAG, modules = arrayOf(HomeModule::class))
 class HomeFragment : BaseFragment<HomeModel>() {
-    override fun injectDagger() {
-        baseComponent.providerHomeComponent(HomeModule(activity)).inject(this)
+    override fun initDagger() {
+        DaggerHelper.getInstance().getHomeFragmentComponent(this, activity)
     }
 
     @Inject
@@ -81,7 +82,7 @@ class HomeFragment : BaseFragment<HomeModel>() {
             model.getLoadMore(mAdapter.nextPage)
         }
         button1.setOnClickListener {
-            model.deleteHistory(luids,positions)
+            model.deleteHistory(luids, positions)
         }
     }
 

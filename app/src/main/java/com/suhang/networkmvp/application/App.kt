@@ -11,10 +11,6 @@ import com.suhang.networkmvp.interfaces.INetworkService
  */
 
 class App : BaseApp() {
-    override fun inject(){
-        appComponent.inject(this)
-    }
-
     override fun onCreate() {
         super.onCreate()
         if (LeakCanary.isInAnalyzerProcess(this)) {

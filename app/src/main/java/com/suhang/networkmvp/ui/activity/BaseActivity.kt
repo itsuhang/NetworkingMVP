@@ -9,8 +9,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.suhang.networkmvp.application.BaseApp
-import com.suhang.networkmvp.dagger.component.BaseComponent
-import com.suhang.networkmvp.dagger.module.BaseModule
+import com.suhang.networkmvp.application.DaggerHelper
 import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.InputLeakUtil
@@ -24,14 +23,6 @@ import javax.inject.Inject
  * Created by 苏杭 on 2017/1/21 10:52.
  */
 abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
-
-    /**
-     * 基主件,用于注册子主件(dagger2)
-     */
-    /**
-     * 获取父Component(dagger2)
-     */
-    lateinit var baseComponent: BaseComponent
 
     //Rxjava事件集合，用于退出时取消事件
     @Inject
@@ -58,8 +49,8 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as BaseApp).addToStack(this)
-        baseComponent = (application as BaseApp).appComponent.baseComponent(BaseModule(this))
-        injectDagger()
+        DaggerHelper.getInstance().getBaseComponent(this)
+        initDagger()
         subscribeEvent()
     }
 
@@ -68,6 +59,11 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
         initData()
         initEvent()
     }
+
+    /**
+     * 可使用DaggerHelper初始化Dagger
+     */
+    abstract fun initDagger()
 
     /**
      * 订阅事件
@@ -86,12 +82,6 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
     protected fun initEvent() {
 
     }
-
-    /**
-     * dagger2绑定(需要则重写) ps: getBaseComponent().getMainComponent(new
-     * MainModule()).inject(this);
-     */
-    protected abstract fun injectDagger()
 
     /**
      * 隐藏软键盘
