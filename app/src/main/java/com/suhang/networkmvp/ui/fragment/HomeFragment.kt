@@ -20,9 +20,10 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/1/24 15:31.
  */
-@GenSubComponent(tag = Constant.BASE_CHILD_DAGGER_TAG, modules = arrayOf(HomeModule::class))
+@GenSubComponent(tag = Constant.BASE_FRAGMENT_DAGGER_TAG, modules = arrayOf(HomeModule::class))
 class HomeFragment : BaseFragment<HomeModel>() {
     override fun initDagger() {
+        super.initDagger()
         DaggerHelper.getInstance().getHomeFragmentComponent(this, activity)
     }
 

@@ -7,6 +7,8 @@ import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.function.NetworkManager
 import com.suhang.networkmvp.interfaces.INetworkManager
+import com.suhang.networkmvp.mvp.model.AttentionModel
+import com.suhang.networkmvp.mvp.model.IAttentionModel
 import com.suhang.networkmvp.utils.SystemUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Module

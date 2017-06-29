@@ -15,12 +15,7 @@ import java.util.*
 /**
  * Created by 苏杭 on 2017/1/24 15:31.
  */
-@GenSubComponent(tag = Constant.BASE_CHILD_DAGGER_TAG, modules = arrayOf(BlankModule::class))
 class ChildFragment : BaseFragment<BlankModel>() {
-    override fun initDagger() {
-        DaggerHelper.getInstance().getChildFragmentComponent(this)
-    }
-
     override fun initEvent() {
     }
 

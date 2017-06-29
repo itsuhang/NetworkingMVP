@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.mvp.model
 
 import android.util.ArrayMap
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.constants.URLS
 import com.suhang.networkmvp.interfaces.INetworkManager
 import org.jetbrains.anko.info

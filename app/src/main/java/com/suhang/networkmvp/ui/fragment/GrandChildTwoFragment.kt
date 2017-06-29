@@ -14,9 +14,10 @@ import com.suhang.networkmvp.mvp.model.IAttentionModel
 /**
  * Created by 苏杭 on 2017/6/5 11:33.
  */
-@GenSubComponent(tag = Constant.BASE_CHILD_DAGGER_TAG, modules = arrayOf(ChildModule::class))
+@GenSubComponent(tag = Constant.BASE_FRAGMENT_DAGGER_TAG, modules = arrayOf(ChildModule::class))
 class GrandChildTwoFragment : BaseFragment<IAttentionModel>() {
     override fun initDagger() {
+        super.initDagger()
         DaggerHelper.getInstance().getGrandChildTwoFragmentComponent(this, activity)
     }
 

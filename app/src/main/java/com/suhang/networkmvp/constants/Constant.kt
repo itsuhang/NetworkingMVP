@@ -7,6 +7,7 @@ class Constant {
     companion object{
         const val APP_DAGGER_TAG = 10
         const val BASE_DAGGER_TAG = 11
-        const val BASE_CHILD_DAGGER_TAG = 12
+        const val BASE_ACTIVITY_DAGGER_TAG = 12
+        const val BASE_FRAGMENT_DAGGER_TAG = 13
     }
 }

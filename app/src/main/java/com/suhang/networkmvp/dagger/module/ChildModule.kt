@@ -1,6 +1,7 @@
 package com.suhang.networkmvp.dagger.module
 
 import android.app.Activity
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.mvp.model.AttentionModel
 import com.suhang.networkmvp.mvp.model.IAttentionModel
 import dagger.Module

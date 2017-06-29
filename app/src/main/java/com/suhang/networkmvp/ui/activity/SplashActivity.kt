@@ -8,11 +8,7 @@ import com.suhang.networkmvp.constants.Constant
 import com.suhang.networkmvp.dagger.module.BlankModule
 import com.suhang.networkmvp.mvp.model.BlankModel
 
-@GenSubComponent(tag = Constant.BASE_CHILD_DAGGER_TAG, modules = arrayOf(BlankModule::class))
 class SplashActivity : BaseActivity<BlankModel>() {
-    override fun initDagger() {
-        DaggerHelper.getInstance().getSplashActivityComponent(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

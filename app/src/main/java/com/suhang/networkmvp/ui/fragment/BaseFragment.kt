@@ -8,7 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import com.suhang.layoutfinderannotation.GenInheritedSubComponent
+import com.suhang.layoutfinderannotation.GenSubComponent
+import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.DaggerHelper
+import com.suhang.networkmvp.constants.Constant
+import com.suhang.networkmvp.dagger.module.BaseModule
 import com.suhang.networkmvp.function.rx.SubstribeManager
 import com.suhang.networkmvp.mvp.model.IBaseModel
 import com.suhang.networkmvp.utils.ScreenUtils
@@ -19,6 +24,7 @@ import javax.inject.Inject
 /**
  * Created by 苏杭 on 2017/1/21 10:52.
  */
+@GenInheritedSubComponent(tag = Constant.BASE_DAGGER_TAG,childTag = Constant.BASE_FRAGMENT_DAGGER_TAG,modules = arrayOf(BaseModule::class),scope = BaseScope::class,shouldInject = false)
 abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
 
     //Rxjava事件集合，用于退出时取消事件
@@ -41,7 +47,6 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DaggerHelper.getInstance().getBaseComponent(activity)
         initDagger()
         subscribeEvent()
     }
@@ -58,7 +63,9 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
     /**
      * 可使用DaggerHelper初始化Dagger
      */
-    abstract fun initDagger()
+    open fun initDagger() {
+        DaggerHelper.getInstance().getBaseFragmentComponent(this,activity)
+    }
 
     /**
      * 需要在绑定布局之前(onCreateView之前)做处理则覆盖此方法

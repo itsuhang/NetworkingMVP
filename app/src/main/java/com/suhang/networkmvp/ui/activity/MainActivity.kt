@@ -17,11 +17,7 @@ import com.suhang.networkmvp.ui.fragment.HomeFragment
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
-@GenSubComponent(tag = Constant.BASE_CHILD_DAGGER_TAG, modules = arrayOf(BlankModule::class))
 class MainActivity : BaseActivity<BlankModel>() {
-    override fun initDagger() {
-        DaggerHelper.getInstance().getMainActivityComponent(this)
-    }
 
     lateinit var adapter: MainFragmentAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
