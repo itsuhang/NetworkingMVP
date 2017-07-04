@@ -11,5 +11,5 @@ interface IHomeModel :IBaseModel{
     fun getHomeData(count: Int, position: List<Int>)
     fun getLoadMore(page: Int)
     fun deleteHistory(luid: String, position: Int)
-    fun deleteHistory(luids: List<String>, positions: List<Int>)
+    fun deleteHistory(luids: String, positions: List<Int>)
 }

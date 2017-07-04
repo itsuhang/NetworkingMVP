@@ -6,7 +6,7 @@ package com.suhang.networkmvp.constants
 
 interface URLS {
     companion object {
-        const val URL_BASE = "http://dev.huanpeng.com"
+        const val URL_BASE = "http://www.huanpeng.com"
         const val URL_BASE_DOWNLOAD = "http://www.huanpeng.com"
         const val URL_DOWNLOAD = "/api/app/download.php"
         const val URL_BASE_1 = "http://gank.io/api/"

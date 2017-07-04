@@ -71,19 +71,11 @@ class HomeModel @Inject constructor():  IHomeModel {
         manager.loadPostDataWrap(URLS.URL_HISTORY_DELETE, HomeFragment.TAG_DELETE, append = position, params = params)
     }
 
-    override fun deleteHistory(luids: List<String>, positions: List<Int>) {
+    override fun deleteHistory(luids: String, positions: List<Int>) {
         val params = ArrayMap<String, String>()
         params.put("uid", "2240")
         params.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
-        val sb = StringBuffer()
-        for (i in luids.indices) {
-            if (i == 0) {
-                sb.append(luids[i])
-            } else {
-                sb.append("," + luids[i])
-            }
-        }
-        params.put("history", sb.toString())
+        params.put("history", luids)
         manager.loadPostDataWrap(URLS.URL_HISTORY_DELETE, HomeFragment.TAG_DELETE, append = positions, params = params)
     }
 

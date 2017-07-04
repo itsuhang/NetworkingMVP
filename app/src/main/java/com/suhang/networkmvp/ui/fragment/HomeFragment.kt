@@ -62,6 +62,7 @@ class HomeFragment : BaseFragment<HomeModel>() {
                 (it.result as HistoryBean).run {
                     mAdapter.totalCount = total.toInt()
                     mAdapter.notifyDelete(it.append as List<Int>, list)
+                    positions.clear()
                 }
             }
         })
@@ -83,7 +84,16 @@ class HomeFragment : BaseFragment<HomeModel>() {
             model.getLoadMore(mAdapter.nextPage)
         }
         button1.setOnClickListener {
-            model.deleteHistory(luids, positions)
+            val sb = StringBuffer()
+            for (i in luids.indices) {
+                if (i == 0) {
+                    sb.append(luids[i])
+                } else {
+                    sb.append("," + luids[i])
+                }
+            }
+            luids.clear()
+            model.deleteHistory(sb.toString(), positions)
         }
     }
 
