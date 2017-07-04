@@ -13,6 +13,7 @@ import com.suhang.networkmvp.domain.DownLoadBean
 import com.suhang.networkmvp.domain.ErrorBean
 import com.suhang.networkmvp.domain.ZipData
 import com.suhang.networkmvp.function.rx.RxBus
+import com.suhang.networkmvp.function.rx.RxBusSingle
 import com.suhang.networkmvp.function.upload.UploadFileRequestBody
 import com.suhang.networkmvp.interfaces.ErrorLogger
 import com.suhang.networkmvp.interfaces.INetworkManager
@@ -76,6 +77,9 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
     }
 
     private fun doUpload(url: String, file: File, whichTag: Int, append: Any?, isWrap: Boolean = false, param: Map<String, String>, vararg params: Any) {
+        val loadingResult = LoadingResult(true, whichTag)
+        mRxBus.post(loadingResult)
+        RxBusSingle.instance().post(loadingResult)
         val requestBodyMap = ArrayMap<String, RequestBody>()
         val fileRequestBody = UploadFileRequestBody(file, MediaType.parse(getMimeType(file.absolutePath)))
         requestBodyMap.put("file\"; filename=\"" + file.name, fileRequestBody)
@@ -87,8 +91,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             flowable = MethodFinder.find(url, *params)
         } catch (e: Exception) {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
-            mRxBus.post(LoadingResult(false, whichTag))
-            mRxBus.post(ErrorResult(errorBean, whichTag))
+            val loading = LoadingResult(false, whichTag)
+            mRxBus.post(loading)
+            RxBusSingle.instance().post(loading)
+            val errorResult = ErrorResult(errorBean, whichTag)
+            mRxBus.post(errorResult)
+            RxBusSingle.instance().post(errorResult)
         }
 
         if (flowable != null) {
@@ -99,10 +107,13 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 compose = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler())
             }
             val disposable = compose.subscribe({ o ->
-                mRxBus.post(LoadingResult(false, whichTag))
+                val loading = LoadingResult(false, whichTag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
                 val successResult = SuccessResult(o, whichTag)
                 successResult.append = append
                 mRxBus.post(successResult)
+                RxBusSingle.instance().post(successResult)
             }, { throwable ->
                 val stringFlowable = RetrofitHelper.find(url, params)
                 if (stringFlowable != null) {
@@ -112,8 +123,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 }
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
-                    mRxBus.post(LoadingResult(false, whichTag))
-                    mRxBus.post(ErrorResult(this, whichTag))
+                    val loading = LoadingResult(false, whichTag)
+                    mRxBus.post(loading)
+                    RxBusSingle.instance().post(loading)
+                    val errorResult = ErrorResult(this, whichTag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                     warn(errorMessage(throwable))
                 }
             })
@@ -121,21 +136,32 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         } else {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
-                mRxBus.post(LoadingResult(false, whichTag))
-                mRxBus.post(ErrorResult(this, whichTag))
+                val loading = LoadingResult(false, whichTag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
+                val errorResult = ErrorResult(this, whichTag)
+                mRxBus.post(errorResult)
+                RxBusSingle.instance().post(errorResult)
                 warn(toString())
             }
         }
     }
 
     override fun download(url: String, path: String, whichTag: Int, vararg params: Any) {
+        val loadingResult = LoadingResult(false, whichTag)
+        mRxBus.post(loadingResult)
+        RxBusSingle.instance().post(loadingResult)
         var flowable: Flowable<Any>? = null
         try {
             flowable = MethodFinder.find(url, *params)
         } catch (e: Exception) {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
-            mRxBus.post(LoadingResult(false, whichTag))
-            mRxBus.post(ErrorResult(errorBean, whichTag))
+            val loading = LoadingResult(false, whichTag)
+            mRxBus.post(loading)
+            RxBusSingle.instance().post(loading)
+            val errorResult = ErrorResult(errorBean, whichTag)
+            mRxBus.post(errorResult)
+            RxBusSingle.instance().post(errorResult)
         }
         if (flowable != null) {
             val disposable = flowable.subscribeOn(Schedulers.computation()).unsubscribeOn(Schedulers.computation()).map(Function<Any, InputStream> {
@@ -146,12 +172,18 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 FileUtils.writeFile(it, file)
             }).observeOn(AndroidSchedulers.mainThread()).subscribe({
                 val download: DownLoadBean = DownLoadBean(path)
-                mRxBus.post(SuccessResult(download, whichTag))
+                val successResult = SuccessResult(download, whichTag);
+                mRxBus.post(successResult)
+                RxBusSingle.instance().post(successResult)
             }, {
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
-                    mRxBus.post(LoadingResult(false, whichTag))
-                    mRxBus.post(ErrorResult(this, whichTag))
+                    val loading = LoadingResult(false, whichTag)
+                    mRxBus.post(loading)
+                    RxBusSingle.instance().post(loading)
+                    val errorResult = ErrorResult(errorBean, whichTag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                     warn(errorMessage(it))
                 }
             })
@@ -159,8 +191,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         } else {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
-                mRxBus.post(LoadingResult(false, whichTag))
-                mRxBus.post(ErrorResult(this, whichTag))
+                val loading = LoadingResult(false, whichTag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
+                val errorResult = ErrorResult(errorBean, whichTag)
+                mRxBus.post(errorResult)
+                RxBusSingle.instance().post(errorResult)
                 warn(toString())
             }
         }
@@ -173,8 +209,9 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             flowable = MethodFinder.find(url, *params)
         } catch (e: Exception) {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
-            mRxBus.post(LoadingResult(false, whichTag))
-            mRxBus.post(ErrorResult(errorBean, whichTag))
+            val errorResult = ErrorResult(errorBean, whichTag)
+            mRxBus.post(errorResult)
+            RxBusSingle.instance().post(errorResult)
         }
         if (flowable != null) {
             if (isWrap) {
@@ -197,24 +234,36 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
     }
 
     override fun zip(info1: INetworkManager.FlowableInfo, info2: INetworkManager.FlowableInfo) {
+        val loadingResult = LoadingResult(true, info1.tag)
+        mRxBus.post(loadingResult)
+        RxBusSingle.instance().post(loadingResult)
         addDisposable(info1.flowable?.zipWith<Any, ZipData>(info2.flowable, BiFunction { o, o2 ->
             val map: ArrayMap<Int, Any> = ArrayMap()
             map.put(info1.tag, o)
             map.put(info2.tag, o2)
             ZipData(map)
         })?.subscribe({
-            mRxBus.post(SuccessResult(it, info1.tag))
+            val successResult = SuccessResult(it, info1.tag)
+            mRxBus.post(successResult)
+            RxBusSingle.instance().post(successResult)
         }, {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, info1.url + "\n" + info2.url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
-                mRxBus.post(LoadingResult(false, info1.tag))
-                mRxBus.post(ErrorResult(this, info1.tag))
+                val loading = LoadingResult(false, info1.tag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
+                val errorResult = ErrorResult(errorBean, info1.tag)
+                mRxBus.post(errorResult)
+                RxBusSingle.instance().post(errorResult)
                 warn(errorMessage(it))
             }
         })!!, info1.tag)
     }
 
     override fun zip(info1: INetworkManager.FlowableInfo, info2: INetworkManager.FlowableInfo, info3: INetworkManager.FlowableInfo) {
+        val loadingResult = LoadingResult(true, info1.tag)
+        mRxBus.post(loadingResult)
+        RxBusSingle.instance().post(loadingResult)
         addDisposable(Flowable.zip<Any, Any, Any, ZipData>(info1.flowable, info2.flowable, info3.flowable, Function3 { t1, t2, t3 ->
             val map: ArrayMap<Int, Any> = ArrayMap()
             map.put(info1.tag, t1)
@@ -222,18 +271,27 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             map.put(info3.tag, t3)
             ZipData(map)
         })?.subscribe({
-            mRxBus.post(SuccessResult(it, info1.tag))
+            val successResult = SuccessResult(it, info1.tag)
+            mRxBus.post(successResult)
+            RxBusSingle.instance().post(successResult)
         }, {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, info1.url + "\n" + info2.url + "\n" + info3.url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
-                mRxBus.post(LoadingResult(false, info1.tag))
-                mRxBus.post(ErrorResult(this, info1.tag))
+                val loading = LoadingResult(false, info1.tag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
+                val errorResult = ErrorResult(errorBean, info1.tag)
+                mRxBus.post(errorResult)
+                RxBusSingle.instance().post(errorResult)
                 warn(errorMessage(it))
             }
         })!!, info1.tag)
     }
 
     override fun zip(info1: INetworkManager.FlowableInfo, info2: INetworkManager.FlowableInfo, info3: INetworkManager.FlowableInfo, info4: INetworkManager.FlowableInfo) {
+        val loadingResult = LoadingResult(true, info1.tag)
+        mRxBus.post(loadingResult)
+        RxBusSingle.instance().post(loadingResult)
         addDisposable(Flowable.zip<Any, Any, Any, Any, ZipData>(info1.flowable, info2.flowable, info3.flowable, info4.flowable, Function4 { t1, t2, t3, t4 ->
             val map: ArrayMap<Int, Any> = ArrayMap()
             map.put(info1.tag, t1)
@@ -242,19 +300,27 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             map.put(info4.tag, t4)
             ZipData(map)
         })?.subscribe({
-            mRxBus.post(SuccessResult(it, info1.tag))
+            val successResult = SuccessResult(it, info1.tag)
+            mRxBus.post(successResult)
+            RxBusSingle.instance().post(successResult)
         }, {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, info1.url + "\n" + info2.url + "\n" + info3.url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
-                mRxBus.post(LoadingResult(false, info1.tag))
-                mRxBus.post(ErrorResult(this, info1.tag))
+                val loading = LoadingResult(false, info1.tag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
+                val errorResult = ErrorResult(errorBean, info1.tag)
+                mRxBus.post(errorResult)
+                RxBusSingle.instance().post(errorResult)
                 warn(errorMessage(it))
             }
         })!!, info1.tag)
     }
 
     private fun load(requestWay: Int, url: String, whichTag: Int = DEFAULT_TAG, needCache: Boolean = false, cacheTag: String? = null, append: Any? = null, isWrap: Boolean = false, vararg params: Any) {
-        mRxBus.post(LoadingResult(true, whichTag))
+        val loadingResult = LoadingResult(true, whichTag)
+        mRxBus.post(loadingResult)
+        RxBusSingle.instance().post(loadingResult)
         if (needCache && requestWay == POST) {
             dealCache(url, cacheTag, tag = whichTag)
         }
@@ -263,8 +329,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             flowable = MethodFinder.find(url, *params)
         } catch (e: Exception) {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_FINDMETHOD, ErrorCode.ERROR_DESC_NETWORK_FINDMETHOD, errorMessage(e))
-            mRxBus.post(LoadingResult(false, whichTag))
-            mRxBus.post(ErrorResult(errorBean, whichTag))
+            val loading = LoadingResult(false, whichTag)
+            mRxBus.post(loading)
+            RxBusSingle.instance().post(loading)
+            val errorResult = ErrorResult(errorBean, whichTag)
+            mRxBus.post(errorResult)
+            RxBusSingle.instance().post(errorResult)
         }
         if (flowable != null) {
             val compose: Flowable<Any>
@@ -274,13 +344,16 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 compose = flowable.onBackpressureDrop().compose(RxUtil.fixScheduler())
             }
             val disposable = compose.subscribe({ o ->
-                mRxBus.post(LoadingResult(false, whichTag))
+                val loading = LoadingResult(false, whichTag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
                 val successResult = SuccessResult(o, whichTag)
                 successResult.append = append
                 if (requestWay == POST) {
                     dealCache(url, cacheTag, o, tag = whichTag)
                 }
                 mRxBus.post(successResult)
+                RxBusSingle.instance().post(successResult)
             }, { throwable ->
                 val stringFlowable = RetrofitHelper.find(url, params)
                 if (stringFlowable != null) {
@@ -290,8 +363,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 }
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
                 errorBean.run {
-                    mRxBus.post(LoadingResult(false, whichTag))
-                    mRxBus.post(ErrorResult(this, whichTag))
+                    val loading = LoadingResult(false, whichTag)
+                    mRxBus.post(loading)
+                    RxBusSingle.instance().post(loading)
+                    val errorResult = ErrorResult(errorBean, whichTag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                     warn(errorMessage(throwable))
                 }
             })
@@ -299,8 +376,12 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         } else {
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
-                mRxBus.post(LoadingResult(false, whichTag))
-                mRxBus.post(ErrorResult(this, whichTag))
+                val loading = LoadingResult(false, whichTag)
+                mRxBus.post(loading)
+                RxBusSingle.instance().post(loading)
+                val errorResult = ErrorResult(errorBean, whichTag)
+                mRxBus.post(errorResult)
+                RxBusSingle.instance().post(errorResult)
                 warn(toString())
             }
         }
@@ -361,31 +442,46 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_CACHEWR, ErrorCode.ERROR_DESC_CACHEWR, errorMessage(e))
                 errorBean.run {
                     mRxBus.post(loadingResult)
-                    mRxBus.post(ErrorResult(errorBean, tag))
+                    RxBusSingle.instance().post(loadingResult)
+                    val errorResult = ErrorResult(errorBean, tag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                 }
             } catch (e: IllegalAccessException) {
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL, errorMessage(e))
                 errorBean.run {
                     mRxBus.post(loadingResult)
-                    mRxBus.post(ErrorResult(errorBean, tag))
+                    RxBusSingle.instance().post(loadingResult)
+                    val errorResult = ErrorResult(errorBean, tag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                 }
             } catch (e: NoSuchFieldException) {
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_GETURL, ErrorCode.ERROR_DESC_GETURL, errorMessage(e))
                 errorBean.run {
                     mRxBus.post(loadingResult)
-                    mRxBus.post(ErrorResult(errorBean, tag))
+                    RxBusSingle.instance().post(loadingResult)
+                    val errorResult = ErrorResult(errorBean, tag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                 }
             } catch (e: NoSuchAlgorithmException) {
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_ALGORITHM, ErrorCode.ERROR_DESC_ALGORITHM, errorMessage(e))
                 errorBean.run {
                     mRxBus.post(loadingResult)
-                    mRxBus.post(ErrorResult(errorBean, tag))
+                    RxBusSingle.instance().post(loadingResult)
+                    val errorResult = ErrorResult(errorBean, tag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                 }
             } catch (e: Exception) {
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK_PARAMS, ErrorCode.ERROR_DESC_NETWORK_PARAMS, errorMessage(e))
                 errorBean.run {
                     mRxBus.post(loadingResult)
-                    mRxBus.post(ErrorResult(errorBean, tag))
+                    RxBusSingle.instance().post(loadingResult)
+                    val errorResult = ErrorResult(errorBean, tag)
+                    mRxBus.post(errorResult)
+                    RxBusSingle.instance().post(errorResult)
                 }
             }
 
@@ -395,7 +491,9 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         }, BackpressureStrategy.BUFFER).compose(RxUtil.fixScheduler()).subscribe { success ->
             //o==null为读取缓存,o!=null 为写缓存操作,写缓存不需要通过这里发送成功结果
             if (o == null) {
-                mRxBus.post(SuccessResult(success, tag))
+                val successResult = SuccessResult(success, tag)
+                mRxBus.post(successResult)
+                RxBusSingle.instance().post(successResult)
             }
         })
     }
