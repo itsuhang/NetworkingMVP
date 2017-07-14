@@ -30,9 +30,6 @@ class MainActivity : BaseActivity<BlankModel>() {
     }
 
     override fun initData() {
-        RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE).subscribe({
-
-        })
         val fragments = ArrayList<Fragment>()
         fragments.add(HomeFragment())
         fragments.add(ChildFragment())
