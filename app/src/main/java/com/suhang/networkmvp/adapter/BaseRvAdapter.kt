@@ -130,7 +130,7 @@ abstract class BaseRvAdapter<T : RecyclerView.ViewHolder, V>(val context: Contex
      */
     override var totalPage: Int = 0
         get() {
-            var page:Int
+            var page: Int
             try {
                 if (totalCount % pageSize == 0) {
                     page = totalCount / pageSize

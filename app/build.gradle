@@ -18,7 +18,30 @@ android {
         }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    flavorDimensions "default"
+    productFlavors {
+        dev {
+            dimension "default"
+            resConfigs "en", "xxhdpi"
+        }
+    }
+
+    //Compiler参数 -PdevBuild
+    if (project.hasProperty("devBuild")) {
+        aaptOptions.cruncherEnabled = false
+    }
+
+    dexOptions {
+        preDexLibraries true
+        maxProcessCount 8
+    }
+
     buildTypes {
+        debug {
+            ext.enableCrashlytics = false
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
