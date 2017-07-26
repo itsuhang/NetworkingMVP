@@ -521,8 +521,9 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
 
 
     override fun cancelNormal(tag: Int) {
-        if (mSubscriptionMap[tag] != null) {
-            mDisposables.remove(mSubscriptionMap[tag])
+        val disposable = mSubscriptionMap[tag]
+        if (disposable != null) {
+            mDisposables.remove(disposable)
         }
     }
 

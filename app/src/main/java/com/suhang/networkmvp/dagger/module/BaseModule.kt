@@ -7,15 +7,12 @@ import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.function.NetworkManager
 import com.suhang.networkmvp.interfaces.INetworkManager
-import com.suhang.networkmvp.mvp.model.AttentionModel
-import com.suhang.networkmvp.mvp.model.IAttentionModel
 import com.suhang.networkmvp.utils.SystemUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Module
 import dagger.Provides
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
-import javax.inject.Singleton
 
 /**
  * Created by 苏杭 on 2017/1/20 16:26.
