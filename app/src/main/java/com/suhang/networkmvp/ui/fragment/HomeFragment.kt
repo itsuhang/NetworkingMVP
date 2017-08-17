@@ -11,8 +11,8 @@ import com.suhang.networkmvp.dagger.module.ChildModule
 import com.suhang.networkmvp.dagger.module.HomeModule
 import com.suhang.networkmvp.domain.DeleteHistoryBean
 import com.suhang.networkmvp.domain.HistoryBean
+import com.suhang.networkmvp.function.rx.Consumer
 import com.suhang.networkmvp.mvp.model.HomeModel
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.jetbrains.anko.warn
 import javax.inject.Inject

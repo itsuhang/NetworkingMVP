@@ -143,4 +143,33 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
         //取消所有正在进行的网络任务
         model.destroy()
     }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+    }
 }

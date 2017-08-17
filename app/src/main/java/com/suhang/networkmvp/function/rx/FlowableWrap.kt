@@ -7,7 +7,6 @@ import com.suhang.networkmvp.interfaces.ErrorLogger
 
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Consumer
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.warn
 

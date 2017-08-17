@@ -107,6 +107,25 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
         view.setPadding(0, ScreenUtils.getStatusBarHeight(this), 0, 0)
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+    }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
 
     /**
      * 显示软键盘

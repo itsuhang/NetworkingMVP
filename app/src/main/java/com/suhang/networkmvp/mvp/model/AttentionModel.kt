@@ -12,7 +12,6 @@ import javax.inject.Inject
  */
 class AttentionModel @Inject constructor():IAttentionModel {
     override fun destroy() {
-        info(mManager)
     }
 
     @Inject

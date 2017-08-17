@@ -2,6 +2,11 @@
  apply plugin: 'kotlin-android'
  apply plugin: 'kotlin-kapt'
  apply plugin: 'kotlin-android-extensions'
+ //apply plugin: 'aspectjx.close'
+ apply plugin: 'aspectjx.open'
+aspectjx {
+    includeJarFilter 'constraint-layout'
+}
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -72,6 +77,8 @@ android {
      releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
      testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
      compile 'com.squareup.retrofit2:converter-scalars:2.3.0'
+     compile 'com.android.support.constraint:constraint-layout:1.0.1'
+     compile 'org.aspectj:aspectjrt:1.8.10'
  }
  repositories {
      mavenCentral()

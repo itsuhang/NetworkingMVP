@@ -172,7 +172,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 FileUtils.writeFile(it, file)
             }).observeOn(AndroidSchedulers.mainThread()).subscribe({
                 val download: DownLoadBean = DownLoadBean(path)
-                val successResult = SuccessResult(download, whichTag);
+                val successResult = SuccessResult(download, whichTag)
                 mRxBus.post(successResult)
                 RxBusSingle.instance().post(successResult)
             }, {
