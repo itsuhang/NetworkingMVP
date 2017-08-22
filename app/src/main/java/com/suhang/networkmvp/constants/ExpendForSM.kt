@@ -30,6 +30,14 @@ fun  SubstribeManager.subscribeEvent():FlowableWrap<EventResult> {
     return FlowableWrap(mRxBus.toFlowable(EventResult::class.java).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
 }
 
+fun  SubstribeManager.subscribeRefresh():FlowableWrap<RefreshResult> {
+    return FlowableWrap(mRxBus.toFlowable(RefreshResult::class.java).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
+}
+
+fun  SubstribeManager.subscribeLoadMore():FlowableWrap<LoadMoreResult> {
+    return FlowableWrap(mRxBus.toFlowable(LoadMoreResult::class.java).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
+}
+
 fun  SubstribeManager.subscribeGlobalProgress():FlowableWrap<ProgressResult> {
     return FlowableWrap(RxBusSingle.instance().toFlowable(ProgressResult::class.java).observeOn(AndroidSchedulers.mainThread()).onBackpressureDrop(), mDisposable)
 }

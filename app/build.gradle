@@ -5,7 +5,7 @@
  //apply plugin: 'aspectjx.close'
  apply plugin: 'aspectjx.open'
 aspectjx {
-    includeJarFilter 'constraint-layout'
+    includeJarFilter 'constraint-layout','okhttp'
 }
 android {
     compileSdkVersion 25

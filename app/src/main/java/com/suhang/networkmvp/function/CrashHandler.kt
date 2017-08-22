@@ -61,7 +61,7 @@ class CrashHandler private constructor() : UncaughtExceptionHandler {
             mDefaultHandler!!.uncaughtException(thread, ex)
         } else {
             android.os.Process.killProcess(android.os.Process.myPid())
-            System.exit(1)
+            BaseApp.instance.cleanStack()
         }
     }
 

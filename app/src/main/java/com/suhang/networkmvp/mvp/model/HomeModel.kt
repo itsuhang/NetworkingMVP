@@ -34,7 +34,7 @@ class HomeModel @Inject constructor():  IHomeModel {
         ls.put("uid", "2240")
         ls.put("encpass", "9db06bcff9248837f86d1a6bcf41c9e7")
         ls.put("size", "10")
-        manager.loadPostDataWrap(URLS.URL_HISTORY, whichTag = HomeFragment.TAG, params = ls)
+        manager.loadPostDataWrap(URLS.URL_HISTORY, whichTag = HomeFragment.TAG, needCache = true,params = ls)
     }
 
     override fun getHomeData(count: Int, position: Int) {

@@ -67,15 +67,28 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
     lateinit var mGson: Gson
 
     private val mSubscriptionMap = ArrayMap<Int, Disposable>()
-
+    /**
+     * 上传,返回Bean类
+     * INetworkManager接口方法
+     * @see doUpload
+     */
     override fun upload(url: String, file: File, whichTag: Int, append: Any?, param: Map<String, String>, vararg params: Any) {
         doUpload(url, file, whichTag, append, param = param, params = params)
     }
 
+    /**
+     * 上传,返回Wrap类
+     * INetworkManager接口方法
+     * @see doUpload
+     */
     override fun uploadWrap(url: String, file: File, whichTag: Int, append: Any?, param: Map<String, String>, vararg params: Any) {
         doUpload(url, file, whichTag, append, true, param = param, params = params)
     }
 
+    /**
+     * 上传,返回数据
+     * 具体方法
+     */
     private fun doUpload(url: String, file: File, whichTag: Int, append: Any?, isWrap: Boolean = false, param: Map<String, String>, vararg params: Any) {
         val loadingResult = LoadingResult(true, whichTag)
         mRxBus.post(loadingResult)
@@ -119,6 +132,7 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 if (stringFlowable != null) {
                     mDisposables.add(stringFlowable.onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
                         warn("data:" + it)
+                    },{
                     }))
                 }
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
@@ -147,6 +161,10 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         }
     }
 
+    /**
+     * 下载数据
+     * INetworkManager接口方法
+     */
     override fun download(url: String, path: String, whichTag: Int, vararg params: Any) {
         val loadingResult = LoadingResult(false, whichTag)
         mRxBus.post(loadingResult)
@@ -321,9 +339,6 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
         val loadingResult = LoadingResult(true, whichTag)
         mRxBus.post(loadingResult)
         RxBusSingle.instance().post(loadingResult)
-        if (needCache && requestWay == POST) {
-            dealCache(url, cacheTag, tag = whichTag)
-        }
         var flowable: Flowable<Any>? = null
         try {
             flowable = MethodFinder.find(url, *params)
@@ -355,10 +370,15 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
                 mRxBus.post(successResult)
                 RxBusSingle.instance().post(successResult)
             }, { throwable ->
+                //出现异常,则加载缓存
+                if (needCache && requestWay == POST) {
+                    dealCache(url, cacheTag, tag = whichTag)
+                }
                 val stringFlowable = RetrofitHelper.find(url, params)
                 if (stringFlowable != null) {
                     mDisposables.add(stringFlowable.onBackpressureDrop().subscribeOn(Schedulers.computation()).subscribe({
                         warn("data:" + it)
+                    },{
                     }))
                 }
                 val errorBean = ErrorBean(ErrorCode.ERROR_CODE_NETWORK, ErrorCode.ERROR_DESC_NETWORK, url, type = ErrorBean.TYPE_SHOW)
@@ -374,6 +394,9 @@ class NetworkManager @Inject constructor() : INetworkManager, AnkoLogger, ErrorL
             })
             addDisposable(disposable, whichTag)
         } else {
+            if (needCache && requestWay == POST) {
+                dealCache(url, cacheTag, tag = whichTag)
+            }
             val errorBean = ErrorBean(ErrorCode.ERROR_CODE_FETCH, ErrorCode.ERROR_DESC_FETCH + "flowable is null", url, type = ErrorBean.TYPE_SHOW)
             errorBean.run {
                 val loading = LoadingResult(false, whichTag)
