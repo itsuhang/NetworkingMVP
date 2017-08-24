@@ -9,7 +9,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.suhang.layoutfinderannotation.GenInheritedSubComponent
-import com.suhang.layoutfinderannotation.GenSubComponent
 import com.suhang.networkmvp.annotation.BaseScope
 import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.application.DaggerHelper
@@ -69,8 +68,10 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
      * 可使用DaggerHelper初始化Dagger
      */
     open fun initDagger() {
-        DaggerHelper.getInstance().getBaseActivityComponent(this,this)
+        baseActivityComponent = DaggerHelper.getInstance().getBaseActivityComponent(this,this)
     }
+
+    lateinit var baseActivityComponent:BaseActivityComponent
 
     /**
      * 订阅事件
@@ -142,5 +143,6 @@ abstract class BaseActivity<T : IBaseModel> : AppCompatActivity(),AnkoLogger{
         //处理InputMethodManager导致的内存泄漏
         model.destroy()
         InputLeakUtil.fixInputMethodManager(this)
+        DaggerHelper.getInstance().removeComponent(baseActivityComponent)
     }
 }

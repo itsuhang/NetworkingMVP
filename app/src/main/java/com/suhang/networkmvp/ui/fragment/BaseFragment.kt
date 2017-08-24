@@ -11,6 +11,7 @@ import android.widget.EditText
 import com.suhang.layoutfinderannotation.GenInheritedSubComponent
 import com.suhang.layoutfinderannotation.GenSubComponent
 import com.suhang.networkmvp.annotation.BaseScope
+import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.application.DaggerHelper
 import com.suhang.networkmvp.constants.Constant
 import com.suhang.networkmvp.dagger.module.BaseModule
@@ -64,8 +65,10 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
      * 可使用DaggerHelper初始化Dagger
      */
     open fun initDagger() {
-        DaggerHelper.getInstance().getBaseFragmentComponent(this,activity)
+        baseFragmentComponent = DaggerHelper.getInstance().getBaseFragmentComponent(this,activity)
     }
+
+    lateinit var baseFragmentComponent:BaseFragmentComponent
 
     /**
      * 需要在绑定布局之前(onCreateView之前)做处理则覆盖此方法
@@ -132,6 +135,7 @@ abstract class BaseFragment<T : IBaseModel> : Fragment(), AnkoLogger {
         super.onDestroy()
         disposables.dispose()
         model.destroy()
+        DaggerHelper.getInstance().removeComponent(baseFragmentComponent)
     }
 
 

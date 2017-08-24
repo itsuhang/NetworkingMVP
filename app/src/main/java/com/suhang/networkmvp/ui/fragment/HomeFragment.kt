@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import com.suhang.layoutfinderannotation.GenSubComponent
 import com.suhang.networkmvp.R
 import com.suhang.networkmvp.adapter.HomeRvAdapter
+import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.application.DaggerHelper
 import com.suhang.networkmvp.constants.*
 import com.suhang.networkmvp.dagger.module.ChildModule

@@ -3,6 +3,7 @@ package com.suhang.networkmvp.ui.fragment
 import android.os.Bundle
 import com.suhang.layoutfinderannotation.GenSubComponent
 import com.suhang.networkmvp.R
+import com.suhang.networkmvp.application.BaseApp
 import com.suhang.networkmvp.application.DaggerHelper
 import com.suhang.networkmvp.constants.Constant
 import com.suhang.networkmvp.constants.subscribeSuccess

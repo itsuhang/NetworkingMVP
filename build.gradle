@@ -1,3 +1,5 @@
+import com.sun.jndi.toolkit.url.Uri
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
@@ -5,9 +7,10 @@ buildscript {
     ext.anko_version = '0.10.0'
     ext.support_version = '25.3.1'
     ext.dagger_version = '2.11'
-    ext.suhang_apt_version = '1.1.8'
+    ext.suhang_apt_version = '1.2.6'
     repositories {
-        maven{
+        mavenLocal()
+        maven {
             url 'https://dl.bintray.com/suhang/maven'
         }
         jcenter()
